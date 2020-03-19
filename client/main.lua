@@ -29,7 +29,6 @@ function love.load()
 
     connection.host = enet.host_create()
     connection.host:compress_with_range_coder()
-    connection.server = connection.host:connect("127.0.0.1:6789")
 end
 
 function love.draw()
@@ -45,13 +44,7 @@ function love.draw()
         love_graphics.printf("Ping: " .. connection.server:round_trip_time(), 300, 10, love_graphics.getWidth(), "left")
     end
 
-    if data.left_mfd then
-        local image = love_graphics.newImage(data.left_mfd)
-        love_graphics.draw(image, 10, 40)
-    else
-        love_graphics.printf("No data", (443/2) + 10, (443/2) + 40, love_graphics.getWidth(), "left")
-        love.graphics.rectangle("line", 10, 40, 443, 443);
-    end
+    draw_mfd(data.left_mfd, 30, 50)
 
     if data.right_mfd then
         local image = love.graphics.newImage(data.right_mfd)
@@ -60,6 +53,17 @@ function love.draw()
 
     local t2 = love_timer.getTime()
 	stats.time_update = (t2-t1) * 1000
+end
+
+function draw_mfd(data, x, y)
+    if data then
+        local image = love_graphics.newImage(data)
+        love_graphics.draw(image, 10, 40)
+    else
+        local msg = "No data..."
+        love_graphics.printf(msg, x + (443/2) - Font[20]:getWidth(msg)/2, y + (443/2) - Font[20]:getHeight(), love_graphics.getWidth(), "left")
+        love.graphics.rectangle("line", x, y, 443, 443);
+    end
 end
 
 function love.update(dt)
@@ -76,14 +80,16 @@ function love.update(dt)
 end
 
 function connect()
-    if not connection.connected then
-        local event = connection.host:service()
-        if event and event.type == "connect" then
-            print("Connected to peer:", event.peer)
-            connection.connected = true
-        elseif event then
-            print("connection event: ", event.type)
-        end
+    if not connection.server then
+        print("Connecting...")
+        connection.server = connection.host:connect("192.168.10.139:6789")
+    end
+    local event = connection.host:service()
+    if event and event.type == "connect" then
+        print("Connected to:", event.peer)
+        connection.connected = true
+    elseif event and event.type == "disconnected" then
+        connection.server = connection.host:connect("192.168.10.139:6789")
     end
 end
 
@@ -93,11 +99,12 @@ function disconnect(event)
     connection.server:disconnect()
     connection.host:flush()
     connection.connected = false
+    connection.server = nil
 end
 
 function request_data()
     -- request left mfd for now
-    connection.server:send("f16/left-mfd", 0)
+    connection.server:send("f16/rwr", 0)
     local event = connection.host:service()
     while event do
         if event.type == "receive" then
