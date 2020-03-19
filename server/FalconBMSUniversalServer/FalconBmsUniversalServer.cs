@@ -3,43 +3,17 @@ using F4TexSharedMem;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
+using System.Collections.Generic;
 
 namespace FalconBmsUniversalServer
 {
-
-    struct SharedTextureMemoryPosition
-    {
-
-        public int X { get; }
-        public int Y { get; }
-        public int Height { get; }
-        public int Width { get; }
-
-        public SharedTextureMemoryPosition(int x, int y, int width, int height)
-        {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-        }
-
-        public System.Drawing.Rectangle ToRect() {
-            return new System.Drawing.Rectangle(X, Y, Width, Height);
-        }
-    }
-
-
-
     class FalconBmsUniversalServer
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
 
-        private readonly SharedTextureMemoryPosition leftMfd = new SharedTextureMemoryPosition(753, 753, 443, 443);
-        private readonly SharedTextureMemoryPosition rightMfd = new SharedTextureMemoryPosition(753, 293, 443, 443);
-        private readonly SharedTextureMemoryPosition rwr = new SharedTextureMemoryPosition(960, 0, 240, 240);
-        private readonly SharedTextureMemoryPosition ded = new SharedTextureMemoryPosition(575, 140, 400, 150);
-
-        private readonly Reader reader = new Reader();
+        private readonly OffersClientRequestables[] requestables = new OffersClientRequestables[] {
+            new SharedTexttureMemoryExtractor(new Reader())
+        };
 
         static void Main(string[] args)
         {
@@ -79,40 +53,90 @@ namespace FalconBmsUniversalServer
             var peer = sender as ENetPeer;
 
             using (var reader = new StreamReader(e.GetPayloadStream(false))) {
-                var message = reader.ReadLine();
-                switch (message)
+                var identifier = reader.ReadLine();
+                foreach (OffersClientRequestables offering in requestables)
                 {
-                    case "f16/left-mfd":
-                        SendSharedMemoryTexture(peer, leftMfd);
-                        break;
-                    case "f16/right-mfd":
-                        SendSharedMemoryTexture(peer, rightMfd);
-                        break;
-                    case "f16/ded":
-                        SendSharedMemoryTexture(peer, ded);
-                        break;
-                    case "f16/rwr":
-                        SendSharedMemoryTexture(peer, rwr);
-                        break;
-                    default:
-                        logger.Error("Received unknown message {0}", message);
-                        break;
+                    if(offering.Offers(identifier) && offering.IsDataAvailable) {
+                        byte[] encoded = offering.GetEncoded(identifier);
+                        peer.Send(encoded, 0, 0);
+                    }
                 }
             }
         }
+    }
 
-        private void SendSharedMemoryTexture(ENetPeer peer, SharedTextureMemoryPosition sharedTextureMemoryPosition)
+    /*
+    * Something the client can request and we know how to get it from BMS.
+    */
+    interface ClientRequestable {
+        string Identifier { get; }
+    }
+
+    interface OffersClientRequestables {
+        bool Offers(string identifier);
+
+        bool IsDataAvailable { get; }
+
+        byte[] GetEncoded(string identifier);
+    }
+
+    struct SharedTextureMemory: ClientRequestable
+    {
+
+        public int X { get; }
+        public int Y { get; }
+        public int Height { get; }
+        public int Width { get; }
+
+        public string Identifier { get; }
+
+        public SharedTextureMemory(string identifier, int x, int y, int width, int height)
         {
-            if (!reader.IsDataAvailable)
-            {
-                return;
-            }
-
-            byte[] buffer = ReadSharedTextureMemory(reader, sharedTextureMemoryPosition);
-            peer.Send(buffer, 0, 0);
+            Identifier = identifier;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
         }
 
-        private byte[] ReadSharedTextureMemory(Reader reader, SharedTextureMemoryPosition sharedTextureMemoryPosition)
+        public System.Drawing.Rectangle ToRect() {
+            return new System.Drawing.Rectangle(X, Y, Width, Height);
+        }
+    }
+
+    class SharedTexttureMemoryExtractor: OffersClientRequestables {
+        private static readonly SharedTextureMemory leftMfd = new SharedTextureMemory( "f16/left-mfd", 753, 753, 443, 443);
+        private static readonly SharedTextureMemory rightMfd = new SharedTextureMemory("f16/right-mfd", 753, 293, 443, 443);
+        private static readonly SharedTextureMemory rwr = new SharedTextureMemory( "f16/rwr", 960, 0, 240, 240);
+        private static readonly SharedTextureMemory ded = new SharedTextureMemory("f16/ded", 575, 140, 400, 150);
+
+        private readonly Dictionary<string, SharedTextureMemory> offered = new Dictionary<string, SharedTextureMemory>(){
+            {leftMfd.Identifier, leftMfd},
+            {rightMfd.Identifier, rightMfd},
+            {rwr.Identifier, rwr},
+            {ded.Identifier, ded} 
+        };
+
+        private readonly Reader reader;
+
+        public SharedTexttureMemoryExtractor(Reader reader)
+        {
+            this.reader = reader;
+        }
+
+        public bool IsDataAvailable { get => reader.IsDataAvailable; }
+
+        public bool Offers(string identifier)
+        {
+            return offered.ContainsKey(identifier);
+        }
+
+        public byte[] GetEncoded(string identifier)
+        {
+            return ReadSharedTextureMemory(offered[identifier]);
+        }
+
+        private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
         {
             System.Drawing.Bitmap left_mfd = reader.GetImage(sharedTextureMemoryPosition.ToRect());
             MemoryStream buffer = new MemoryStream();
