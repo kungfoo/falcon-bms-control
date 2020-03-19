@@ -1,0 +1,2 @@
+msbuild FalconBMSUniversalServer\FalconBMSUniversalServer.sln -t:Clean -property:Configuration=Debug
+msbuild FalconBMSUniversalServer\FalconBMSUniversalServer.sln -t:Clean -property:Configuration=Release
