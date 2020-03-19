@@ -28,8 +28,8 @@ function love.load()
     tick.rate = 0.016
 
     connection.host = enet.host_create()
-    connection.server = connection.host:connect("127.0.0.1:6789")
     connection.host:compress_with_range_coder()
+    connection.server = connection.host:connect("127.0.0.1:6789")
 end
 
 function love.draw()
@@ -39,10 +39,18 @@ function love.draw()
     love_graphics.setFont(Font[20])
 
     love_graphics.printf("Universal MFD/ICP", 10, 10, love_graphics.getWidth(), "left")
+    if not connection.connected then
+        love_graphics.printf("not connected...", 300, 10, love_graphics.getWidth(), "left")
+    else
+        love_graphics.printf("Ping: " .. connection.server:round_trip_time(), 300, 10, love_graphics.getWidth(), "left")
+    end
 
     if data.left_mfd then
-        local image = love.graphics.newImage(data.left_mfd)
+        local image = love_graphics.newImage(data.left_mfd)
         love_graphics.draw(image, 10, 40)
+    else
+        love_graphics.printf("No data", (443/2) + 10, (443/2) + 40, love_graphics.getWidth(), "left")
+        love.graphics.rectangle("line", 10, 40, 443, 443);
     end
 
     if data.right_mfd then
@@ -72,7 +80,6 @@ function connect()
         local event = connection.host:service()
         if event and event.type == "connect" then
             print("Connected to peer:", event.peer)
-            connection.peer = event.peer
             connection.connected = true
         elseif event then
             print("connection event: ", event.type)
@@ -90,8 +97,7 @@ end
 
 function request_data()
     -- request left mfd for now
-    connection.peer:send("f16/left-mfd", 0)
-    -- connection.peer:send("f16/right-mfd")
+    connection.server:send("f16/left-mfd", 0)
     local event = connection.host:service()
     while event do
         if event.type == "receive" then
