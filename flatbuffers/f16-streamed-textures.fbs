@@ -1,0 +1,25 @@
+namespace F16.StreamedTextures;
+
+enum TextureIdentifier:byte {
+    None = 0,
+    MFD_L = 1,
+    MFD_R = 2,
+    DED = 5,
+    RWR = 6
+}
+
+enum TextureCompression:byte {
+    None = 0,
+    PNG = 1
+}
+
+table StreamedTexture {
+    id: TextureIdentifier = 0;
+    payload: [byte];
+    compression: TextureCompression;
+}
+
+table RequestTexture {
+    id: TextureIdentifier = 0;
+    compression: TextureCompression;
+}

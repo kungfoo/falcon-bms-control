@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{517D1B4D-E8C7-4331-BBE7-300FD6B78441}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>F4SharedMem</RootNamespace>
+    <AssemblyName>F4SharedMem</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Sn.key.snk</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <PublishUrl>http://localhost/F4SharedMem/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <DelaySign>false</DelaySign>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>3003</NoWarn>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>3003</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Headers\AltBits.cs" />
+    <Compile Include="Headers\BettyBits.cs" />
+    <Compile Include="Headers\BlinkBits.cs" />
+    <Compile Include="Headers\BMS4FlightData.cs" />
+    <Compile Include="Headers\Callsign_LineOfText.cs" />
+    <Compile Include="Headers\CmdsModes.cs" />
+    <Compile Include="Headers\DED_PFL_LineOfText.cs" />
+    <Compile Include="FlightData.cs" />
+    <Compile Include="Headers\DrawingData.cs" />
+    <Compile Include="Headers\FlightData2.cs" />
+    <Compile Include="Headers\FlyStates.cs" />
+    <Compile Include="Headers\HsiBits.cs" />
+    <Compile Include="Headers\InstrLight.cs" />
+    <Compile Include="Headers\IntellivibeData.cs" />
+    <Compile Include="Headers\LightBits.cs" />
+    <Compile Include="Headers\LightBits2.cs" />
+    <Compile Include="Headers\LightBits3.cs" />
+    <Compile Include="Headers\MiscBits.cs" />
+    <Compile Include="Headers\NavModes.cs" />
+    <Compile Include="Headers\OSBData.cs" />
+    <Compile Include="Headers\OSBLabel.cs" />
+    <Compile Include="Headers\PowerBits.cs" />
+    <Compile Include="Headers\RadioClientControl.cs" />
+    <Compile Include="Headers\RadioClientStatus.cs" />
+    <Compile Include="Headers\RTT_areas.cs" />
+    <Compile Include="Headers\StringData.cs" />
+    <Compile Include="Headers\StringIdentifier.cs" />
+    <Compile Include="Headers\SwitchStates.cs" />
+    <Compile Include="Reader.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Headers\TacanBits.cs" />
+    <Compile Include="Headers\TacanSources.cs" />
+    <Compile Include="Writer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sn.key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F4TexSharedMem", "F4TexSharedMem.csproj", "{E930BA7B-7474-49D7-B7CF-25106C450190}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E930BA7B-7474-49D7-B7CF-25106C450190}.Debug|x86.ActiveCfg = Debug|x86
+		{E930BA7B-7474-49D7-B7CF-25106C450190}.Debug|x86.Build.0 = Debug|x86
+		{E930BA7B-7474-49D7-B7CF-25106C450190}.Release|x86.ActiveCfg = Release|x86
+		{E930BA7B-7474-49D7-B7CF-25106C450190}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
