@@ -1,4 +1,4 @@
-namespace F16.Icp;
+namespace UniversalMfd.Icp;
 
 enum IcpKey:byte {
     NoKey = 0,
@@ -25,7 +25,7 @@ enum IcpKey:byte {
 }
 
 
-struct KeyPress {
+table KeyPress {
     key: IcpKey;
     event_counter: long;
 }

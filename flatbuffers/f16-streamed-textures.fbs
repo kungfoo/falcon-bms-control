@@ -1,4 +1,4 @@
-namespace F16.StreamedTextures;
+namespace UniversalMfd.Mfd;
 
 enum TextureIdentifier:byte {
     None = 0,
@@ -10,7 +10,8 @@ enum TextureIdentifier:byte {
 
 enum TextureCompression:byte {
     None = 0,
-    PNG = 1
+    PNG = 1,
+    JPEG = 2
 }
 
 table StreamedTexture {

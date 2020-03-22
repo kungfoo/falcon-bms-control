@@ -1,2 +1,13 @@
-namespace F16.Messages;
 
+include "f16-streamed-textures.fbs";
+include "f16-icp.fbs";
+
+namespace UniversalMfd;
+
+union Any {  Mfd.RequestTexture, Icp.KeyPress, Mfd.StreamedTexture}
+
+table Message {
+    payload: Any;
+}
+
+root_type Message;
