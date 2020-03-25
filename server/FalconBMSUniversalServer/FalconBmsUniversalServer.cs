@@ -4,20 +4,26 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Collections.Generic;
+using MsgPack.Serialization;
 
 namespace FalconBmsUniversalServer
 {
-    class FalconBmsUniversalServer
-    {
+    class FalconBmsUniversalServer {
+
         private static readonly NLog.Logger logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
 
         private readonly OffersClientRequestables[] requestables = new OffersClientRequestables[] {
             new SharedTexttureMemoryExtractor(new Reader())
         };
 
+        private static readonly SerializationContext context = new SerializationContext();
+        public static readonly MessagePackSerializer<Message> serializer = MessagePackSerializer.Get<Message>(context);
+        public static readonly MessagePackSerializer<MessageWithPayload> msgWPSerializer = MessagePackSerializer.Get<MessageWithPayload>(context);
+
         static void Main(string[] args)
         {
             logger.Info("Starting up...");
+            context.SerializationMethod = SerializationMethod.Map;
             new FalconBmsUniversalServer().Run();
         }
 
@@ -52,18 +58,21 @@ namespace FalconBmsUniversalServer
         {
             var peer = sender as ENetPeer;
 
-            using (var reader = new StreamReader(e.GetPayloadStream(false))) {
-                var identifier = reader.ReadLine();
+                var message = serializer.Unpack(e.GetPayloadStream(false));
+                var identifier = message.identifier;
                 foreach (OffersClientRequestables offering in requestables)
                 {
                     if(offering.Offers(identifier) && offering.IsDataAvailable) {
                         byte[] encoded = offering.GetEncoded(identifier);
-                        peer.Send(encoded, 0, 0);
+                        MessageWithPayload reply = new MessageWithPayload("response", message.kind, message.identifier, encoded);
+                        var buffer = new MemoryStream();
+                        msgWPSerializer.Pack(buffer, reply);
+                        peer.Send(buffer.ToArray(), 0, 0);
                     }
                 }
             }
         }
-    }
+    
 
     /*
     * Something the client can request and we know how to get it from BMS.
@@ -101,6 +110,37 @@ namespace FalconBmsUniversalServer
 
         public System.Drawing.Rectangle ToRect() {
             return new System.Drawing.Rectangle(X, Y, Width, Height);
+        }
+    }
+
+    public struct Message {
+
+        // lowercase property names, because message pack works automagic like this.
+        public string type { get; }
+        public string kind { get; }
+        public string identifier { get; }
+
+        public Message(string type, string kind, string identifier) {
+            this.type = type;
+            this.kind = kind;
+            this.identifier = identifier;
+        }
+    }
+
+    public struct MessageWithPayload {
+
+        // lowercase property names, because message pack works automagic like this.
+        public string type { get; }
+        public string kind { get; }
+        public string identifier { get; }
+        public byte[] payload { get; }
+
+        public MessageWithPayload(string type, string kind, string identifier, byte[] payload) 
+        {
+            this.type = type;
+            this.kind = kind;
+            this.identifier = identifier;
+            this.payload = payload;
         }
     }
 
@@ -145,3 +185,5 @@ namespace FalconBmsUniversalServer
         }
     }
 }
+
+

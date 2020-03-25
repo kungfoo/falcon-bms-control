@@ -4,7 +4,7 @@ require("util.proxy")
 local tick = require("lib.tick.tick")
 local Color = require("util.colors")
 local enet = require("enet")
-local bson = require("lib.bson")
+local msgpack = require("lib.msgpack")
 local inspect = require("lib.inspect")
 
 local love_graphics = love.graphics
@@ -73,7 +73,7 @@ function love.update(dt)
 
     if connection.connected then
         request_data()
-        handle_enet_frames()
+        receive_data()
     else
         connect()
     end
@@ -110,16 +110,17 @@ function request_data()
     local message = {
         type = "request",
         kind = "streamed-texture",
-        item = "f16/left-mfd"
+        identifier = "f16/left-mfd"
     }
-    connection.server:send(bson.encode(message), 0)
+    connection.server:send(msgpack.pack(message), 0)
 end
 
-function handle_enet_frames()
+function receive_data()
     local event = connection.host:service()
     while event do
         if event.type == "receive" then
-            receive_data(event.data)
+            local message = msgpack.unpack(event.data)
+            receive(message)
         elseif event.type == "disconnect" then
             disconnect(event)
         else
@@ -129,10 +130,9 @@ function handle_enet_frames()
     end
 end
 
-function receive_data(data)
-    local message = bson.decode(data)
+function receive(message)
     if message.type == "response" and message.kind == "streamed-texture" then
-        if message.item == "f16/left-mfd" then
+        if message.identifier == "f16/left-mfd" then
             local bytes = love.data.newByteData(message.payload)
             data.left_mfd = love.image.newImageData(bytes)
         end

@@ -42,6 +42,9 @@
     <Reference Include="F4TexSharedMem">
       <HintPath>..\F4TexSharedMem\bin\x64\Release\F4TexSharedMem.dll</HintPath>
     </Reference>
+    <Reference Include="MsgPack, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
+      <HintPath>packages\MsgPack.Cli.1.0.1\lib\net46\MsgPack.dll</HintPath>
+    </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
     </Reference>
