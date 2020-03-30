@@ -11,7 +11,7 @@ Font  = Proxy(function(arg)
 	if tonumber(arg) then
 		return love.graphics.newFont('fonts/slkscr.ttf', arg)
 	end
-	return Proxy(function(size) return love.graphics.newFont('font/'..arg..'.ttf', size) end)
+	return Proxy(function(size) return love.graphics.newFont('fonts/'..arg..'.ttf', size) end)
 end)
 
 Image = Proxy(function(image_file)

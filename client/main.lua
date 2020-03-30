@@ -1,159 +1,222 @@
+-- globals that are used all over the place.
+Class = require("lib.hump.class")
+Signal = require("lib.hump.signal")
+State = require("lib.hump.gamestate")
+Timer = require("lib.hump.timer")
+require("lib.interpolate")
 
-require("util.proxy")
-
-local tick = require("lib.tick.tick")
-local Color = require("util.colors")
+-- libraries
+local socket = require("socket")
 local enet = require("enet")
 local msgpack = require("lib.msgpack")
+local tick = require("lib.tick")
 local inspect = require("lib.inspect")
+local suit = require("lib.suit")
 
-local love_graphics = love.graphics
-local love_timer = love.timer
-
-local state = {
-    debug = true
+-- connection states
+local broadcasting = {
+	port = 9020
 }
 
-local stats = {
-    time_update = 0,
-	time_draw = 0
+local connecting = {
+	port = 9022
 }
+
+local connected = {
+	stats = {
+		time_update = 0,
+		time_draw = 0
+	}
+}
+
+local Mfd = require("mfd")
 
 local connection = {
-    connected = false
+	ip = nil,
+	server = nil,
+	host = nil,
+	peer = nil
 }
 
-local data = {}
+local shine = {
+	dots = { ".", "..", "..." },
+	position = 1
+}
+
+local state = {
+	debug = true
+}
+
+local components = {}
 
 function love.load()
-    tick.framerate = 60
-    tick.rate = 0.016
+	love.graphics.setFont(love.graphics.newFont("fonts/falconded.ttf", 20, 'normal'))
+	tick.framerate = 60 -- Limit framerate to 60 frames per second.
+	tick.rate = 0.016
 
-    connection.host = enet.host_create()
-    connection.host:compress_with_range_coder()
+	State.registerEvents()
+	State.switch(broadcasting)
+
+	Signal.register("send-to-server", function(message)
+		print("Sending to server:\n" .. inspect(message))
+		connection.server:send(msgpack.pack(message))
+	end)
+
+	Timer.every(0.5, function()
+		shine.position = ((shine.position + 1) % #shine.dots) + 1
+	end)
 end
 
-function love.draw()
-    local t1 = love_timer.getTime()
-    draw_debug_info()
-
-    love_graphics.setFont(Font[20])
-
-    love_graphics.printf("Universal MFD/ICP", 10, 10, love_graphics.getWidth(), "left")
-    if not connection.connected then
-        love_graphics.printf("not connected...", 300, 10, love_graphics.getWidth(), "left")
-    else
-        love_graphics.printf("Ping: " .. connection.server:round_trip_time(), 300, 10, love_graphics.getWidth(), "left")
-    end
-
-    draw_mfd(data.left_mfd, 30, 50)
-
-    if data.right_mfd then
-        local image = love.graphics.newImage(data.right_mfd)
-        love_graphics.draw(image, 500, 40)
-    end
-
-    local t2 = love_timer.getTime()
-	stats.time_update = (t2-t1) * 1000
+function broadcasting:enter()
+	broadcasting.socket = socket.udp4()
+	broadcasting.socket:settimeout(0)
+	broadcasting.socket:setoption("broadcast", true)
+	broadcasting.send = Timer.every(1, self.sendHello)
+	broadcasting.receive = Timer.every(1, self.receiveAck)
 end
 
-function draw_mfd(data, x, y)
-    if data then
-        local image = love_graphics.newImage(data)
-        love_graphics.draw(image, 10, 40)
-    else
-        local msg = "No data..."
-        love_graphics.printf(msg, x + (443/2) - Font[20]:getWidth(msg)/2, y + (443/2) - Font[20]:getHeight(), love_graphics.getWidth(), "left")
-        love.graphics.rectangle("line", x, y, 443, 443);
-    end
+function broadcasting:sendHello()
+	local message = msgpack.pack({
+		type = "hello"
+	})
+	broadcasting.socket:sendto(message, "255.255.255.255", broadcasting.port)
 end
 
-function love.update(dt)
-    local t1 = love_timer.getTime()
-
-    if connection.connected then
-        request_data()
-        receive_data()
-    else
-        connect()
-    end
-
-    local t2 = love_timer.getTime()
-	stats.time_update = (t2-t1) * 1000
+function broadcasting:receiveAck()
+	local datagram, ip, port, error = broadcasting.socket:receivefrom()
+	if datagram and ip and port then
+		local message = msgpack.unpack(datagram)
+		if message.type == "ack" then
+			print("Discovered server at [${ip}] on port [${port}]" % { ip = ip, port = port })
+			State.switch(connecting, ip)
+		end
+	end
 end
 
-function connect()
-    if not connection.server then
-        print("Connecting...")
-        connection.server = connection.host:connect("192.168.10.139:6789")
-    end
-    local event = connection.host:service()
-    if event and event.type == "connect" then
-        print("Connected to:", event.peer)
-        connection.connected = true
-    elseif event and event.type == "disconnected" then
-        connection.server = connection.host:connect("192.168.10.139:6789")
-    end
+function broadcasting:leave()
+	Timer.cancel(broadcasting.send)
+	Timer.cancel(broadcasting.receive)
+	broadcasting.socket:close()
 end
 
-function disconnect(event)
-    print(event.peer, "disconnected.")
-
-    connection.server:disconnect()
-    connection.host:flush()
-    connection.connected = false
-    connection.server = nil
+function broadcasting:draw()
+	love.graphics.print("DISCOVERING SERVER" .. shine.dots[shine.position], 30, 30)
 end
 
-function request_data()
-    -- request left mfd for now
-    local message = {
-        type = "request",
-        kind = "streamed-texture",
-        identifier = "f16/left-mfd"
-    }
-    connection.server:send(msgpack.pack(message), 0)
+function connecting:enter(previous, serverIp)
+	connection.ip = serverIp or connection.ip
+	connection.host = enet.host_create()
+	connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port)
 end
 
-function receive_data()
-    local event = connection.host:service()
-    while event do
-        if event.type == "receive" then
-            local message = msgpack.unpack(event.data)
-            receive(message)
-        elseif event.type == "disconnect" then
-            disconnect(event)
+function connecting:update(dt)
+	local event = connection.host:service()
+	while event do
+		if event.type == "connect" then
+			print("Connected ...")
+			connection.peer = event.peer
+			State.switch(connected)
+		end
+		event = connection.host:service()
+	end
+end
+
+function connecting:draw()
+	love.graphics.print("CONNECTING" .. shine.dots[shine.position], 30, 30)
+end
+
+function connected:init()
+	local leftMfd = Mfd("f16/left-mfd", 20, 30)
+	local rightMfd = Mfd("f16/right-mfd", 520, 30)
+	table.insert(components, leftMfd)
+	table.insert(components, rightMfd)
+end
+
+function connected:update(dt)
+	local t1 = love.timer.getTime()
+	local event = connection.host:service()
+	while event do
+        if event.type == "disconnect" then
+			print("Disconnected.")
+			State.switch(connecting)
+		elseif event.type == "receive" then
+			local payload = msgpack.unpack(event.data)
+			if payload.type == "image-payload" then
+				local bytes = love.data.newByteData(payload.data)
+				data.image = love.graphics.newImage(love.image.newImageData(bytes))
+
+			else
+				print("Received: ", inspect(payload))
+			end
         else
-            print("Unmtached event type: ", event.type)
+            print("Not handled: ", event.type)
         end
-        event = connection.host:service()
-    end
+		event = connection.host:service()
+	end
+	local t2 = love.timer.getTime()
+	self.stats.time_update = (t2-t1) * 1000
 end
 
-function receive(message)
-    if message.type == "response" and message.kind == "streamed-texture" then
-        if message.identifier == "f16/left-mfd" then
-            local bytes = love.data.newByteData(message.payload)
-            data.left_mfd = love.image.newImageData(bytes)
-        end
-    end
+function connected:draw()
+	local t1 = love.timer.getTime()
+
+	love.graphics.setColor(1,1,1)
+	for _,component in ipairs(components) do
+		component:draw()
+	end
+
+	local t2 = love.timer.getTime()
+	self.stats.time_draw = (t2-t1) * 1000
+
+	if state.debug then
+		self:draw_debug_info()
+	end
 end
 
-function love.quit()
-    if(connection.connected) then
-        connection.server:disconnect()
-        connection.host:flush()
-    end
-end
-
-function draw_debug_info()
-    if state.debug then
-        local fps = love_timer.getFPS()
+function connected:draw_debug_info()
+	if state.debug then
+		local fps = love.timer.getFPS()
 		local mem = collectgarbage("count")
 		local text = ("upd: %.2fms, drw: %.2fms, fps: %d, mem: %.2fMB, tex_mem: %.2f MB"):format(stats.time_update, stats.time_draw, fps, mem / 1024, love_graphics.getStats().texturememory / 1024 / 1024)
 
-		love_graphics.setFont(Font[15])
-		love_graphics.setColor(255, 255, 255)
-		love_graphics.printf(text, 10, love_graphics.getHeight() - 20, love_graphics.getWidth(), "left")
-    end
+		love.graphics.setFont(Font[15])
+		love.graphics.setColor(255, 255, 255)
+		love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
+	end
+end
+
+function connected:leave()
+	connection.peer:disconnect()
+	connection.host:flush()
+end
+
+function connected:mousepressed(x, y, button, isTouch, presses)
+	for _,component in ipairs(components) do
+		component:mousepressed(x, y, button, isTouch, presses)
+	end
+end
+
+function connected:mousereleased(x, y, button, isTouch, presses)
+	for _,component in ipairs(components) do
+		component:mousereleased(x, y, button, isTouch, presses)
+	end
+end
+
+function love.update(dt)
+	-- always update timers
+	Timer.update(dt)
+end
+
+function love.keypressed(key, scancode, isrepeat)
+  if key == "escape" then
+	love.event.quit()
+  end
+end
+
+function love.quit()
+	print("Quitting client...")
+	if connection.peer then
+		connection.peer:disconnect()
+		connection.host:flush()
+	end
 end
