@@ -177,7 +177,8 @@ function connected:draw_debug_info()
 	if state.debug then
 		local fps = love.timer.getFPS()
 		local mem = collectgarbage("count")
-        local text = ("upd: %.2fms, drw: %.2fms, fps: %d, mem: %.2fMB, tex_mem: %.2f MB"):format(stats.time_update, stats.time_draw, fps, mem / 1024, love_graphics.getStats().texturememory / 1024 / 1024)
+		local text = ("upd: %.2fms, drw: %.2fms, fps: %d, mem: %.2fMB, tex_mem: %.2fMB, ping: %.0fms")
+			:format(connected.stats.time_update, connected.stats.time_draw, fps, mem / 1024, love.graphics.getStats().texturememory / 1024 / 1024, connection.server:round_trip_time())
         
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
