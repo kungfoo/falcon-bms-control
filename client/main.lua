@@ -55,7 +55,8 @@ function love.load()
 	tick.rate = 0.016
 
 	State.registerEvents()
-	State.switch(connecting, "127.0.0.1")
+	-- State.switch(connecting, "127.0.0.1")
+	State.switch(broadcasting)
 
 	Signal.register("send-to-server", function(message)
 		connection.server:send(msgpack.pack(message))
