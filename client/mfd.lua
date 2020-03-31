@@ -68,6 +68,7 @@ end
 local Mfd = Class {}
 
 function Mfd:init(identifier, x, y)
+	self.id = identifier
 	self.position = {
 		x = x or 0,
 		y = y or 0
@@ -111,9 +112,27 @@ function Mfd:draw()
 	for _,button in ipairs(self.buttons) do
 		button:draw()
 	end
+	if self.image then
+		love.graphics.setColor(1,1,1)
+		love.graphics.draw(self.image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
+	else
+		-- draw no data string here.
+	end
 end
 
 function Mfd:update(dt)
+	local message = {
+		type = "streamed-texture",
+		identifier = self.id
+	}
+	Signal.emit("send-to-server", message)
+end
+
+function Mfd:consume(message)
+	if message.type == "streamed-texture" then
+		local data = love.image.newImageData(love.data.newByteData(message.payload))
+		self.image = love.graphics.newImage(data)
+	end
 end
 
 function Mfd:mousepressed(x, y, button, isTouch, presses)

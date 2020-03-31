@@ -55,10 +55,9 @@ function love.load()
 	tick.rate = 0.016
 
 	State.registerEvents()
-	State.switch(broadcasting)
+	State.switch(connecting, "127.0.0.1")
 
 	Signal.register("send-to-server", function(message)
-		print("Sending to server:\n" .. inspect(message))
 		connection.server:send(msgpack.pack(message))
 	end)
 
@@ -128,12 +127,18 @@ end
 function connected:init()
 	local leftMfd = Mfd("f16/left-mfd", 20, 30)
 	local rightMfd = Mfd("f16/right-mfd", 520, 30)
+
 	table.insert(components, leftMfd)
 	table.insert(components, rightMfd)
 end
 
 function connected:update(dt)
 	local t1 = love.timer.getTime()
+
+	for _,component in ipairs(components) do
+		component:update(dt);
+	end
+
 	local event = connection.host:service()
 	while event do
         if event.type == "disconnect" then
@@ -141,10 +146,13 @@ function connected:update(dt)
 			State.switch(connecting)
 		elseif event.type == "receive" then
 			local payload = msgpack.unpack(event.data)
-			if payload.type == "image-payload" then
-				local bytes = love.data.newByteData(payload.data)
-				data.image = love.graphics.newImage(love.image.newImageData(bytes))
-
+			if payload.type == "streamed-texture" then
+				-- figure out which component to emit to.
+				for _,component in ipairs(components) do
+					if component.id == payload.identifier then
+						component:consume(payload)
+					end
+				end
 			else
 				print("Received: ", inspect(payload))
 			end

@@ -103,7 +103,7 @@ namespace FalconBmsUniversalServer
                     var osbButtonMessage = Unpack<OsbButtonMessage>(e);
                     Logger.Debug("Osb message received: {0}:{1}:{2}", osbButtonMessage.type,osbButtonMessage.mfd, osbButtonMessage.osb);
                     break;
-                case "stream-texture":
+                case "streamed-texture":
                     var streamedTextureRequest = Unpack<StreamedTextureRequest>(e);
                     SendStreamedTexture(streamedTextureRequest, peer);
                     break;
@@ -115,7 +115,7 @@ namespace FalconBmsUniversalServer
 
         private void SendStreamedTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
         {
-            if (!_extractor.Offers(streamedTextureRequest.identifier)) return;
+            if (!_extractor.Offers(streamedTextureRequest.identifier) || !_extractor.IsDataAvailable) return;
             var encoded = _extractor.GetEncoded(streamedTextureRequest.identifier);
             var message = new StreamedTextureReply
             {
@@ -265,9 +265,9 @@ namespace FalconBmsUniversalServer
 
             private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
             {
-                System.Drawing.Bitmap left_mfd = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
+                System.Drawing.Bitmap image = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
                 MemoryStream buffer = new MemoryStream();
-                left_mfd.Save(buffer, ImageFormat.Jpeg);
+                image.Save(buffer, ImageFormat.Jpeg);
                 return buffer.ToArray();
             }
         }
