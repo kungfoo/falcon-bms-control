@@ -5,44 +5,73 @@ using System.IO;
 using System.Net;
 using System.Collections.Generic;
 using MsgPack.Serialization;
+using System.Net.Sockets;
+using System;
+using System.Threading.Tasks;
 
 namespace FalconBmsUniversalServer
 {
-    class FalconBmsUniversalServer {
+    class FalconBmsUniversalServer
+    {
 
-        private static readonly NLog.Logger logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
-
-        private readonly OffersClientRequestables[] requestables = new OffersClientRequestables[] {
-            new SharedTexttureMemoryExtractor(new Reader())
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
+        
+        private readonly SerializationContext _context = new SerializationContext
+        {
+            SerializationMethod = SerializationMethod.Map
         };
-
-        private static readonly SerializationContext context = new SerializationContext();
-        public static readonly MessagePackSerializer<Message> serializer = MessagePackSerializer.Get<Message>(context);
-        public static readonly MessagePackSerializer<MessageWithPayload> msgWPSerializer = MessagePackSerializer.Get<MessageWithPayload>(context);
 
         static void Main(string[] args)
         {
-            logger.Info("Starting up...");
-            context.SerializationMethod = SerializationMethod.Map;
+            Logger.Info("Starting up...");
             new FalconBmsUniversalServer().Run();
         }
 
         private void Run()
         {
+            StartUdpListener();
+            StartEnetHost();
+        }
+
+        private void StartEnetHost()
+        {
             ManagedENet.Startup();
 
-            var endpoint = new IPEndPoint(IPAddress.Any, 6789);
-            logger.Info("Running on {0}", endpoint);
+            var endpoint = new IPEndPoint(IPAddress.Any, 9022);
+            Logger.Info("Running on {0}", endpoint);
 
-            ENetHost host = new ENetHost(endpoint,  ENetHost.MaximumPeers, 1);
-            host.CompressWithRangeCoder();
+            var host = new ENetHost(endpoint, ENetHost.MaximumPeers, 1);
             host.OnConnect += Host_OnConnect;
             host.Service();
         }
 
+        private void StartUdpListener()
+        {
+            var broadcastAddress = new IPEndPoint(IPAddress.Any, 9020);
+            Logger.Info("Listening for broadcast packets on: {0}", broadcastAddress);
+            var udpClient = new UdpClient();
+            udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            udpClient.Client.Bind(broadcastAddress);
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    var result = await udpClient.ReceiveAsync();
+                    Logger.Debug("Received {0} bytes from {1}", result.Buffer.Length, result.RemoteEndPoint);
+
+                    var message = Unpack<Message>(result.Buffer);
+                    if (message.type == "hello")
+                    {
+                        var buffer = Pack<Message>(new Message {type = "ack"});
+                        udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
+                    }
+                }
+            });
+        }
+
         private void Host_OnConnect(object sender, ENetConnectEventArgs e)
         {
-            logger.Info("Peer connected from {0}", e.Peer.RemoteEndPoint);
+            Logger.Info("Peer connected from {0}", e.Peer.RemoteEndPoint);
 
             e.Peer.OnReceive += Peer_OnReceive;
             e.Peer.OnDisconnect += Peer_OnDisconnect;
@@ -51,28 +80,48 @@ namespace FalconBmsUniversalServer
         private void Peer_OnDisconnect(object sender, uint e)
         {
             var peer = sender as ENetPeer;
-            logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
+            Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
         }
 
         private void Peer_OnReceive(object sender, ENetPacket e)
         {
             var peer = sender as ENetPeer;
 
-                var message = serializer.Unpack(e.GetPayloadStream(false));
-                var identifier = message.identifier;
-                foreach (OffersClientRequestables offering in requestables)
-                {
-                    if(offering.Offers(identifier) && offering.IsDataAvailable) {
-                        byte[] encoded = offering.GetEncoded(identifier);
-                        MessageWithPayload reply = new MessageWithPayload("response", message.kind, message.identifier, encoded);
-                        var buffer = new MemoryStream();
-                        msgWPSerializer.Pack(buffer, reply);
-                        peer.Send(buffer.ToArray(), 0, 0);
-                    }
-                }
+            Message message = Unpack<Message>(e);
+
+            switch (message.type)
+            {
+                case string s when s.StartsWith("osb"):
+                    OsbButtonMessage osbButtonMessage = Unpack<OsbButtonMessage>(e);
+                    Logger.Debug("Osb message received: {0}:{1}", osbButtonMessage.mfd, osbButtonMessage.osb);
+                    break;
+
+                default:
+                    Logger.Error("Rceived unhandled message type {0}", message.type);
+                    break;
             }
         }
-    
+
+        private T Unpack<T>(byte[] buffer)
+        {
+            var serializer = MessagePackSerializer.Get<T>(_context);
+            return serializer.Unpack(new MemoryStream(buffer));
+        }
+
+        private T Unpack<T>(ENetPacket e)
+        {
+            var serializer = MessagePackSerializer.Get<T>(_context);
+            return serializer.Unpack(e.GetPayloadStream(false));
+        }
+
+        private byte[] Pack<T>(T thing)
+        {
+            var buffer = new MemoryStream();
+            var serializer = MessagePackSerializer.Get<T>(_context);
+            serializer.Pack(buffer, thing);
+            return buffer.ToArray();
+        }
+    }
 
     /*
     * Something the client can request and we know how to get it from BMS.
@@ -116,15 +165,13 @@ namespace FalconBmsUniversalServer
     public struct Message {
 
         // lowercase property names, because message pack works automagic like this.
-        public string type { get; }
-        public string kind { get; }
-        public string identifier { get; }
+        public string type { get; set; }
+    }
 
-        public Message(string type, string kind, string identifier) {
-            this.type = type;
-            this.kind = kind;
-            this.identifier = identifier;
-        }
+    public struct OsbButtonMessage {
+        public string type { get; set; }
+        public string mfd { get; set; }
+        public string osb { get; set; }
     }
 
     public struct MessageWithPayload {
