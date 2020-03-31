@@ -8,6 +8,8 @@ using MsgPack.Serialization;
 using System.Net.Sockets;
 using System;
 using System.Threading.Tasks;
+using FalconBmsUniversalServer.Messages;
+using FalconBmsUniversalServer.SharedTextureMemory;
 
 namespace FalconBmsUniversalServer
 {
@@ -21,7 +23,9 @@ namespace FalconBmsUniversalServer
             SerializationMethod = SerializationMethod.Map
         };
 
-        private static void Main(string[] args)
+        private readonly SharedTextureMemoryExtractor _extractor = new SharedTextureMemoryExtractor(new Reader());
+
+        private static void Main()
         {
             Logger.Info("Starting up...");
             var server = new FalconBmsUniversalServer();
@@ -39,10 +43,10 @@ namespace FalconBmsUniversalServer
         private void Run()
         {
             StartUdpListener();
-            StartEnetHost();
+            StartENetHost();
         }
 
-        private void StartEnetHost()
+        private void StartENetHost()
         {
             ManagedENet.Startup();
 
@@ -70,7 +74,7 @@ namespace FalconBmsUniversalServer
 
                     var message = Unpack<Message>(result.Buffer);
                     if (message.type != "hello") continue;
-                    var buffer = Pack<Message>(new Message {type = "ack"});
+                    var buffer = Pack(new Message {type = "ack"});
                     udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
                 }
             });
@@ -86,8 +90,7 @@ namespace FalconBmsUniversalServer
 
         private void Peer_OnDisconnect(object sender, uint e)
         {
-            var peer = sender as ENetPeer;
-            Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
+            if (sender is ENetPeer peer) Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
         }
 
         private void Peer_OnReceive(object sender, ENetPacket e)
@@ -98,13 +101,30 @@ namespace FalconBmsUniversalServer
             {
                 case string s when s.StartsWith("osb"):
                     var osbButtonMessage = Unpack<OsbButtonMessage>(e);
-                    Logger.Debug("Osb message received: {0}:{1}", osbButtonMessage.mfd, osbButtonMessage.osb);
+                    Logger.Debug("Osb message received: {0}:{1}:{2}", osbButtonMessage.type,osbButtonMessage.mfd, osbButtonMessage.osb);
                     break;
-
+                case "stream-texture":
+                    var streamedTextureRequest = Unpack<StreamedTextureRequest>(e);
+                    SendStreamedTexture(streamedTextureRequest, peer);
+                    break;
                 default:
-                    Logger.Error("Rceived unhandled message type {0}", message.type);
+                    Logger.Error("Received unhandled message type {0}", message.type);
                     break;
             }
+        }
+
+        private void SendStreamedTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
+        {
+            if (!_extractor.Offers(streamedTextureRequest.identifier)) return;
+            var encoded = _extractor.GetEncoded(streamedTextureRequest.identifier);
+            var message = new StreamedTextureReply
+            {
+                type = streamedTextureRequest.type,
+                identifier = streamedTextureRequest.identifier,
+                kind = streamedTextureRequest.kind,
+                payload = encoded
+            };
+            peer.Send(Pack(message), 0, ENetPacketFlags.UnreliableFragment);
         }
 
         private T Unpack<T>(byte[] buffer)
@@ -145,107 +165,111 @@ namespace FalconBmsUniversalServer
         byte[] GetEncoded(string identifier);
     }
 
-    struct SharedTextureMemory : ClientRequestable
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable UnusedAutoPropertyAccessor.Global
+    // lowercase property names, because message pack works automagic like this.
+    namespace Messages
     {
-        public int X { get; }
-        public int Y { get; }
-        public int Height { get; }
-        public int Width { get; }
-
-        public string Identifier { get; }
-
-        public SharedTextureMemory(string identifier, int x, int y, int width, int height)
+         public struct Message
         {
-            Identifier = identifier;
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
+            public string type { get; set; }
         }
 
-        public System.Drawing.Rectangle ToRect()
+        public struct OsbButtonMessage
         {
-            return new System.Drawing.Rectangle(X, Y, Width, Height);
+            public string type { get; set; }
+            public string mfd { get; set; }
+            public string osb { get; set; }
+        }
+
+        public struct StreamedTextureRequest
+        {
+            public string type { get; set; }
+            public string kind { get; set; }
+            public string identifier { get; set; }
+        }
+
+        public struct StreamedTextureReply
+        {
+            public string type { get; set; }
+            public string kind { get; set; }
+            public string identifier { get; set; }
+            public byte[] payload { get; set; }
         }
     }
 
-    public struct Message
+    namespace SharedTextureMemory
     {
-        // lowercase property names, because message pack works automagic like this.
-        public string type { get; set; }
-    }
-
-    public struct OsbButtonMessage
-    {
-        public string type { get; set; }
-        public string mfd { get; set; }
-        public string osb { get; set; }
-    }
-
-    public struct MessageWithPayload
-    {
-        // lowercase property names, because message pack works automagic like this.
-        public string type { get; }
-        public string kind { get; }
-        public string identifier { get; }
-        public byte[] payload { get; }
-
-        public MessageWithPayload(string type, string kind, string identifier, byte[] payload)
+        struct SharedTextureMemory : ClientRequestable
         {
-            this.type = type;
-            this.kind = kind;
-            this.identifier = identifier;
-            this.payload = payload;
-        }
-    }
+            private int X { get; }
+            private int Y { get; }
+            private int Height { get; }
+            private int Width { get; }
 
-    class SharedTexttureMemoryExtractor : OffersClientRequestables
-    {
-        private static readonly SharedTextureMemory leftMfd =
-            new SharedTextureMemory("f16/left-mfd", 753, 753, 443, 443);
+            public string Identifier { get; }
 
-        private static readonly SharedTextureMemory rightMfd =
-            new SharedTextureMemory("f16/right-mfd", 753, 293, 443, 443);
+            public SharedTextureMemory(string identifier, int x, int y, int width, int height)
+            {
+                Identifier = identifier;
+                X = x;
+                Y = y;
+                Width = width;
+                Height = height;
+            }
 
-        private static readonly SharedTextureMemory rwr = new SharedTextureMemory("f16/rwr", 960, 0, 240, 240);
-        private static readonly SharedTextureMemory ded = new SharedTextureMemory("f16/ded", 575, 140, 400, 150);
-
-        private readonly Dictionary<string, SharedTextureMemory> offered = new Dictionary<string, SharedTextureMemory>()
-        {
-            {leftMfd.Identifier, leftMfd},
-            {rightMfd.Identifier, rightMfd},
-            {rwr.Identifier, rwr},
-            {ded.Identifier, ded}
-        };
-
-        private readonly Reader reader;
-
-        public SharedTexttureMemoryExtractor(Reader reader)
-        {
-            this.reader = reader;
+            public System.Drawing.Rectangle ToRect()
+            {
+                return new System.Drawing.Rectangle(X, Y, Width, Height);
+            }
         }
 
-        public bool IsDataAvailable
+        internal class SharedTextureMemoryExtractor : OffersClientRequestables
         {
-            get => reader.IsDataAvailable;
-        }
+            private static readonly SharedTextureMemory LeftMfd =
+                new SharedTextureMemory("f16/left-mfd", 753, 753, 443, 443);
 
-        public bool Offers(string identifier)
-        {
-            return offered.ContainsKey(identifier);
-        }
+            private static readonly SharedTextureMemory RightMfd =
+                new SharedTextureMemory("f16/right-mfd", 753, 293, 443, 443);
 
-        public byte[] GetEncoded(string identifier)
-        {
-            return ReadSharedTextureMemory(offered[identifier]);
-        }
+            private static readonly SharedTextureMemory Rwr = new SharedTextureMemory("f16/rwr", 960, 0, 240, 240);
+            private static readonly SharedTextureMemory Ded = new SharedTextureMemory("f16/ded", 575, 140, 400, 150);
 
-        private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
-        {
-            System.Drawing.Bitmap left_mfd = reader.GetImage(sharedTextureMemoryPosition.ToRect());
-            MemoryStream buffer = new MemoryStream();
-            left_mfd.Save(buffer, ImageFormat.Jpeg);
-            return buffer.ToArray();
+            private readonly Dictionary<string, SharedTextureMemory> _offered =
+                new Dictionary<string, SharedTextureMemory>()
+                {
+                    {LeftMfd.Identifier, LeftMfd},
+                    {RightMfd.Identifier, RightMfd},
+                    {Rwr.Identifier, Rwr},
+                    {Ded.Identifier, Ded}
+                };
+
+            private readonly Reader _reader;
+
+            public SharedTextureMemoryExtractor(Reader reader)
+            {
+                _reader = reader;
+            }
+
+            public bool IsDataAvailable => _reader.IsDataAvailable;
+
+            public bool Offers(string identifier)
+            {
+                return _offered.ContainsKey(identifier);
+            }
+
+            public byte[] GetEncoded(string identifier)
+            {
+                return ReadSharedTextureMemory(_offered[identifier]);
+            }
+
+            private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
+            {
+                System.Drawing.Bitmap left_mfd = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
+                MemoryStream buffer = new MemoryStream();
+                left_mfd.Save(buffer, ImageFormat.Jpeg);
+                return buffer.ToArray();
+            }
         }
     }
 }
