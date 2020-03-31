@@ -13,18 +13,27 @@ namespace FalconBmsUniversalServer
 {
     class FalconBmsUniversalServer
     {
-
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
-        
+        private bool _running = true;
+
         private readonly SerializationContext _context = new SerializationContext
         {
             SerializationMethod = SerializationMethod.Map
         };
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Logger.Info("Starting up...");
-            new FalconBmsUniversalServer().Run();
+            var server = new FalconBmsUniversalServer();
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => { server.Stop(); };
+            server.Run();
+        }
+
+        private void Stop()
+        {
+            Logger.Info("Server is shutting down...");
+            _running = false;
+            ManagedENet.Shutdown(true);
         }
 
         private void Run()
@@ -54,17 +63,15 @@ namespace FalconBmsUniversalServer
             udpClient.Client.Bind(broadcastAddress);
             Task.Run(async () =>
             {
-                while (true)
+                while (_running)
                 {
                     var result = await udpClient.ReceiveAsync();
                     Logger.Debug("Received {0} bytes from {1}", result.Buffer.Length, result.RemoteEndPoint);
 
                     var message = Unpack<Message>(result.Buffer);
-                    if (message.type == "hello")
-                    {
-                        var buffer = Pack<Message>(new Message {type = "ack"});
-                        udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
-                    }
+                    if (message.type != "hello") continue;
+                    var buffer = Pack<Message>(new Message {type = "ack"});
+                    udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
                 }
             });
         }
@@ -86,13 +93,11 @@ namespace FalconBmsUniversalServer
         private void Peer_OnReceive(object sender, ENetPacket e)
         {
             var peer = sender as ENetPeer;
-
-            Message message = Unpack<Message>(e);
-
+            var message = Unpack<Message>(e);
             switch (message.type)
             {
                 case string s when s.StartsWith("osb"):
-                    OsbButtonMessage osbButtonMessage = Unpack<OsbButtonMessage>(e);
+                    var osbButtonMessage = Unpack<OsbButtonMessage>(e);
                     Logger.Debug("Osb message received: {0}:{1}", osbButtonMessage.mfd, osbButtonMessage.osb);
                     break;
 
@@ -126,11 +131,13 @@ namespace FalconBmsUniversalServer
     /*
     * Something the client can request and we know how to get it from BMS.
     */
-    interface ClientRequestable {
+    interface ClientRequestable
+    {
         string Identifier { get; }
     }
 
-    interface OffersClientRequestables {
+    interface OffersClientRequestables
+    {
         bool Offers(string identifier);
 
         bool IsDataAvailable { get; }
@@ -138,9 +145,8 @@ namespace FalconBmsUniversalServer
         byte[] GetEncoded(string identifier);
     }
 
-    struct SharedTextureMemory: ClientRequestable
+    struct SharedTextureMemory : ClientRequestable
     {
-
         public int X { get; }
         public int Y { get; }
         public int Height { get; }
@@ -157,32 +163,34 @@ namespace FalconBmsUniversalServer
             Height = height;
         }
 
-        public System.Drawing.Rectangle ToRect() {
+        public System.Drawing.Rectangle ToRect()
+        {
             return new System.Drawing.Rectangle(X, Y, Width, Height);
         }
     }
 
-    public struct Message {
-
+    public struct Message
+    {
         // lowercase property names, because message pack works automagic like this.
         public string type { get; set; }
     }
 
-    public struct OsbButtonMessage {
+    public struct OsbButtonMessage
+    {
         public string type { get; set; }
         public string mfd { get; set; }
         public string osb { get; set; }
     }
 
-    public struct MessageWithPayload {
-
+    public struct MessageWithPayload
+    {
         // lowercase property names, because message pack works automagic like this.
         public string type { get; }
         public string kind { get; }
         public string identifier { get; }
         public byte[] payload { get; }
 
-        public MessageWithPayload(string type, string kind, string identifier, byte[] payload) 
+        public MessageWithPayload(string type, string kind, string identifier, byte[] payload)
         {
             this.type = type;
             this.kind = kind;
@@ -191,17 +199,23 @@ namespace FalconBmsUniversalServer
         }
     }
 
-    class SharedTexttureMemoryExtractor: OffersClientRequestables {
-        private static readonly SharedTextureMemory leftMfd = new SharedTextureMemory( "f16/left-mfd", 753, 753, 443, 443);
-        private static readonly SharedTextureMemory rightMfd = new SharedTextureMemory("f16/right-mfd", 753, 293, 443, 443);
-        private static readonly SharedTextureMemory rwr = new SharedTextureMemory( "f16/rwr", 960, 0, 240, 240);
+    class SharedTexttureMemoryExtractor : OffersClientRequestables
+    {
+        private static readonly SharedTextureMemory leftMfd =
+            new SharedTextureMemory("f16/left-mfd", 753, 753, 443, 443);
+
+        private static readonly SharedTextureMemory rightMfd =
+            new SharedTextureMemory("f16/right-mfd", 753, 293, 443, 443);
+
+        private static readonly SharedTextureMemory rwr = new SharedTextureMemory("f16/rwr", 960, 0, 240, 240);
         private static readonly SharedTextureMemory ded = new SharedTextureMemory("f16/ded", 575, 140, 400, 150);
 
-        private readonly Dictionary<string, SharedTextureMemory> offered = new Dictionary<string, SharedTextureMemory>(){
+        private readonly Dictionary<string, SharedTextureMemory> offered = new Dictionary<string, SharedTextureMemory>()
+        {
             {leftMfd.Identifier, leftMfd},
             {rightMfd.Identifier, rightMfd},
             {rwr.Identifier, rwr},
-            {ded.Identifier, ded} 
+            {ded.Identifier, ded}
         };
 
         private readonly Reader reader;
@@ -211,7 +225,10 @@ namespace FalconBmsUniversalServer
             this.reader = reader;
         }
 
-        public bool IsDataAvailable { get => reader.IsDataAvailable; }
+        public bool IsDataAvailable
+        {
+            get => reader.IsDataAvailable;
+        }
 
         public bool Offers(string identifier)
         {
@@ -232,5 +249,3 @@ namespace FalconBmsUniversalServer
         }
     }
 }
-
-
