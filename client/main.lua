@@ -49,14 +49,37 @@ local state = {
 
 local components = {}
 
+local channels = {
+    -- general purpose reliable channel
+    [0] = function(event)
+        local payload = msgpack.unpack(event.data)
+        print("Received general purpose event: ", inspect(payload))
+    end,
+
+    -- texture memory channels are unrealiable and pure image data.
+    [1] = function(event)
+        components["f16/left-mfd"]:consume(event.data)
+    end,
+    [2] = function(event)
+        components["f16/right-mfd"]:consume(event.data)
+    end,
+    [3] =  function(event)
+        components["f16/ded"]:consume(event.data)
+    end,
+    [4] = function(event)
+        components["f16/rwr"]:consume(event.data)
+    end
+}
+
 function love.load()
 	love.graphics.setFont(love.graphics.newFont("fonts/falconded.ttf", 20, 'normal'))
 	tick.framerate = 60 -- Limit framerate to 60 frames per second.
-	tick.rate = 0.016
+	tick.rate = 0.02 -- 50 updates per second
 
-	State.registerEvents()
-	-- State.switch(connecting, "127.0.0.1")
-	State.switch(broadcasting)
+    State.registerEvents()
+    -- can bypass broadcast, if server ip is known
+	State.switch(connecting, "127.0.0.1")
+	-- State.switch(broadcasting)
 
 	Signal.register("send-to-server", function(message)
 		connection.server:send(msgpack.pack(message))
@@ -104,8 +127,9 @@ function broadcasting:draw()
 end
 
 function connecting:enter(previous, serverIp)
-	connection.ip = serverIp or connection.ip
-	connection.host = enet.host_create()
+    connection.ip = serverIp or connection.ip
+    print("Using " .. #channels+1 .. " channels.")
+	connection.host = enet.host_create(nil, nil, #channels+1)
 	connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port)
 end
 
@@ -127,16 +151,15 @@ end
 
 function connected:init()
 	local leftMfd = Mfd("f16/left-mfd", 20, 30)
-	local rightMfd = Mfd("f16/right-mfd", 520, 30)
-
-	table.insert(components, leftMfd)
-	table.insert(components, rightMfd)
+    local rightMfd = Mfd("f16/right-mfd", 520, 30)
+    components[leftMfd.id] = leftMfd
+    components[rightMfd.id] = rightMfd
 end
 
 function connected:update(dt)
 	local t1 = love.timer.getTime()
 
-	for _,component in ipairs(components) do
+	for _,component in pairs(components) do
 		component:update(dt);
 	end
 
@@ -145,20 +168,8 @@ function connected:update(dt)
         if event.type == "disconnect" then
 			print("Disconnected.")
 			State.switch(connecting)
-		elseif event.type == "receive" then
-			local payload = msgpack.unpack(event.data)
-			if payload.type == "streamed-texture" then
-				-- figure out which component to emit to.
-				for _,component in ipairs(components) do
-					if component.id == payload.identifier then
-						component:consume(payload)
-					end
-				end
-			else
-				print("Received: ", inspect(payload))
-			end
-        else
-            print("Not handled: ", event.type)
+        elseif event.type == "receive" then
+            channels[event.channel](event)
         end
 		event = connection.host:service()
 	end
@@ -170,7 +181,7 @@ function connected:draw()
 	local t1 = love.timer.getTime()
 
 	love.graphics.setColor(1,1,1)
-	for _,component in ipairs(components) do
+	for _,component in pairs(components) do
 		component:draw()
 	end
 
@@ -200,13 +211,13 @@ function connected:leave()
 end
 
 function connected:mousepressed(x, y, button, isTouch, presses)
-	for _,component in ipairs(components) do
+	for _,component in pairs(components) do
 		component:mousepressed(x, y, button, isTouch, presses)
 	end
 end
 
 function connected:mousereleased(x, y, button, isTouch, presses)
-	for _,component in ipairs(components) do
+	for _,component in pairs(components) do
 		component:mousereleased(x, y, button, isTouch, presses)
 	end
 end

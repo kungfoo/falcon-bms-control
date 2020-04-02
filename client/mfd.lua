@@ -112,9 +112,10 @@ function Mfd:draw()
 	for _,button in ipairs(self.buttons) do
 		button:draw()
 	end
-	if self.image then
+	if self.imageData then
 		love.graphics.setColor(1,1,1)
-		love.graphics.draw(self.image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
+		local image = love.graphics.newImage(self.imageData)
+		love.graphics.draw(image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
 	else
 		-- draw no data string here.
 	end
@@ -128,11 +129,8 @@ function Mfd:update(dt)
 	Signal.emit("send-to-server", message)
 end
 
-function Mfd:consume(message)
-	if message.type == "streamed-texture" then
-		local data = love.image.newImageData(love.data.newByteData(message.payload))
-		self.image = love.graphics.newImage(data)
-	end
+function Mfd:consume(data)
+	self.imageData = love.image.newImageData(love.data.newByteData(data))
 end
 
 function Mfd:mousepressed(x, y, button, isTouch, presses)
