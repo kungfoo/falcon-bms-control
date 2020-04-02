@@ -53,7 +53,7 @@ namespace FalconBmsUniversalServer
             var endpoint = new IPEndPoint(IPAddress.Any, 9022);
             Logger.Info("Running on {0}", endpoint);
 
-            var host = new ENetHost(endpoint, ENetHost.MaximumPeers, 1);
+            var host = new ENetHost(endpoint, ENetHost.MaximumPeers, 10);
             host.OnConnect += Host_OnConnect;
             host.Service();
         }
@@ -101,7 +101,7 @@ namespace FalconBmsUniversalServer
             {
                 case string s when s.StartsWith("osb"):
                     var osbButtonMessage = Unpack<OsbButtonMessage>(e);
-                    Logger.Debug("Osb message received: {0}:{1}:{2}", osbButtonMessage.type,osbButtonMessage.mfd, osbButtonMessage.osb);
+                    Logger.Debug("MFD OSB message received: {0}:{1}:{2}", osbButtonMessage.type,osbButtonMessage.mfd, osbButtonMessage.osb);
                     break;
                 case "streamed-texture":
                     var streamedTextureRequest = Unpack<StreamedTextureRequest>(e);
@@ -117,14 +117,27 @@ namespace FalconBmsUniversalServer
         {
             if (!_extractor.Offers(streamedTextureRequest.identifier) || !_extractor.IsDataAvailable) return;
             var encoded = _extractor.GetEncoded(streamedTextureRequest.identifier);
-            var message = new StreamedTextureReply
+            var channel = ChannelFor(streamedTextureRequest);
+            peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+        }
+
+        private byte ChannelFor(StreamedTextureRequest request)
+        {
+            switch (request.identifier)
             {
-                type = streamedTextureRequest.type,
-                identifier = streamedTextureRequest.identifier,
-                kind = streamedTextureRequest.kind,
-                payload = encoded
-            };
-            peer.Send(Pack(message), 0, ENetPacketFlags.UnreliableFragment);
+                case "f16/left-mfd":
+                    return 1;
+                case "f16/right-mfd":
+                    return 2;
+                case "f16/ded":
+                    return 3;
+                case "f16/rwr":
+                    return 4;
+                default:
+                    Logger.Error("Request {0} has no mapped channel!", request.identifier);
+                    // assume this can be sent on channel 0
+                    return 0;
+            }
         }
 
         private T Unpack<T>(byte[] buffer)
