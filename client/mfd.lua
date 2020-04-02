@@ -53,7 +53,6 @@ function MfdButton:released()
 end
 
 --- Mfd
-
 local Mfd = Class {}
 
 function Mfd:init(identifier, x, y)
@@ -98,8 +97,11 @@ function Mfd:draw()
   for _, button in ipairs(self.buttons) do button:draw() end
   if self.imageData then
     love.graphics.setColor(1, 1, 1)
-    local image = love.graphics.newImage(self.imageData)
-    love.graphics.draw(image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
+    if not self.image then
+      -- only load image if it is a new frame.
+      self.image = love.graphics.newImage(self.imageData)
+    end
+    love.graphics.draw(self.image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
   else
     -- draw no data string here.
   end
@@ -112,6 +114,7 @@ end
 
 function Mfd:consume(data)
   self.imageData = love.image.newImageData(love.data.newByteData(data))
+  self.image = nil
 end
 
 function Mfd:mousepressed(x, y, button, isTouch, presses)

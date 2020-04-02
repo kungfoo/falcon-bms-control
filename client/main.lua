@@ -58,8 +58,8 @@ function love.load()
 
   State.registerEvents()
   -- can bypass broadcast, if server ip is known
-  State.switch(connecting, "127.0.0.1")
-  -- State.switch(broadcasting)
+  -- State.switch(connecting, "127.0.0.1")
+  State.switch(broadcasting)
 
   Signal.register("send-to-server", function(message)
     connection.server:send(msgpack.pack(message))
@@ -107,8 +107,8 @@ end
 function connecting:enter(previous, serverIp)
   connection.ip = serverIp or connection.ip
   print("Using " .. #channels + 1 .. " channels.")
-  connection.host = enet.host_create(nil, nil, #channels + 1)
-  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port)
+  connection.host = enet.host_create()
+  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, 10)
 end
 
 function connecting:update(dt)
