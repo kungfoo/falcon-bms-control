@@ -112,14 +112,14 @@ function connecting:enter(previous, serverIp)
 end
 
 function connecting:update(dt)
-  local event = connection.host:service()
-  while event do
+  local success, event = pcall(connection.service)
+  while success and event do
     if event.type == "connect" then
       print("Connected ...")
       connection.peer = event.peer
       State.switch(connected)
     end
-    event = connection.host:service()
+    success, event = pcall(connection.service)
   end
 end
 
@@ -139,18 +139,22 @@ function connected:update(dt)
 
   for _, component in pairs(components) do component:update(dt) end
 
-  local event = connection.host:service()
-  while event do
+  local success, event = pcall(connection.service)
+  while success and event do
     if event.type == "disconnect" then
       print("Disconnected.")
       State.switch(connecting)
     elseif event.type == "receive" then
       channels[event.channel](event)
     end
-    event = connection.host:service()
+    success, event = pcall(connection.service)
   end
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
+end
+
+function connection:service()
+  return connection.host:service()
 end
 
 function connected:draw()

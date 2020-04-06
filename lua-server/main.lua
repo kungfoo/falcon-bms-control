@@ -83,9 +83,8 @@ end
 
 function love.update(dt)
     Timer.update(dt)
-
-    local event = server.host:service()
-    while event do
+    local success, event = pcall(server.service)
+    while success and event do
         if event.type == "connect" then
             server.clients[event.peer] = event.peer:connect_id()
             print("Connected, clients are now:")
@@ -116,8 +115,12 @@ function love.update(dt)
         else
             print("Not handled: ", event.type)
         end
-        event = server.host:service()
+        success, event = pcall(server.service)
     end
+end
+
+function server:service()
+    return server.host:service()
 end
 
 function love.quit()
