@@ -10,8 +10,9 @@ local Switcher = Class {
   },
 }
 
-function Switcher:init(leftMargin, bottomMargin)
+function Switcher:init(leftMargin, bottomMargin, currentScreen)
   self.margins = {leftMargin = leftMargin, bottomMargin = bottomMargin}
+  self.currentScreen = currentScreen
 end
 
 function Switcher:draw()
@@ -22,12 +23,7 @@ function Switcher:draw()
   end
   love.graphics.rectangle("line", self.x, self.y, self.width, self.height, self.radius)
 
-  local highlight = {
-    width = (self.width / 2) - 20,
-    height = self.height - 20,
-    x = self.x + 10,
-    y = self.y + 10,
-  }
+  local highlight = {width = (self.width / 2) - 20, height = self.height - 20, x = self.x + 10, y = self.y + 10}
   if self.currentScreen == "icp" then highlight.x = highlight.x + (self.width / 2) end
   love.graphics.setColor(0.3, 0.6, 0.3)
   love.graphics.rectangle("line", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
