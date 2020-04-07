@@ -18,18 +18,12 @@ function icp:update(dt)
 
   for _, component in pairs(self.components) do component:update(dt) end
 
-  local success, event = pcall(self.connection.service)
-  while success and event do
-    if event.type == "disconnect" then
-      print("Disconnected.")
-      State.switch(connecting)
-    elseif event.type == "receive" then
-      channels[event.channel](event)
-    end
-    success, event = pcall(self.connection.service)
-  end
   local t2 = love.timer.getTime()
   stats.time_update = (t2 - t1) * 1000
+end
+
+function icp:handleReceive(event)
+  -- TODO: handle callback channels and data channels here.
 end
 
 function icp:draw()
@@ -40,8 +34,6 @@ function icp:draw()
 
   local t2 = love.timer.getTime()
   stats.time_draw = (t2 - t1) * 1000
-
-  self:draw_debug_info()
 end
 
 function icp:leave()

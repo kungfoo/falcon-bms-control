@@ -24,9 +24,10 @@ local icp = require("icp")
 local connection = {ip = nil, server = nil, host = nil, peer = nil}
 local shine = {dots = {".", "..", "..."}, position = 1}
 
+local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
+
 -- switcher component is present on all screens
 local Switcher = require("switcher")
-
 local switcher = nil
 
 function love.load()
@@ -90,17 +91,7 @@ function connecting:enter(previous, serverIp)
   connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, 255)
 end
 
-function connecting:update(dt)
-  local success, event = pcall(connection.service)
-  while success and event do
-    if event.type == "connect" then
-      print("Connected ...")
-      connection.peer = event.peer
-      print(inspect(connection))
-      State.switch(mfds, connection)
-    end
-    success, event = pcall(connection.service)
-  end
+function connecting:handleReceive(event)
 end
 
 function connecting:draw()
@@ -114,19 +105,39 @@ end
 function love.update(dt)
   -- always update timers
   Timer.update(dt)
-  switcher:update(dt)
+
+  -- service enet host.
+  local success, event = pcall(connection.service)
+  while success and event do
+    if event.type == "disconnect" then
+      print("Disconnected.")
+      State.switch(connecting)
+    elseif event.type == "connect" then
+      print("Connected ...")
+      connection.peer = event.peer
+      State.switch(mfds, debug.stats, switcher)
+    elseif event.type == "receive" then
+      State.current():handleReceive(event)
+    end
+    success, event = pcall(connection.service)
+  end
 end
 
 function love.draw()
-  switcher:draw()
-end
+  if debug.enabled then
+    local fps = love.timer.getFPS()
+    local mem = collectgarbage("count")
 
-function love.mousepressed(x, y, button, isTouch, presses)
-  switcher:mousepressed(x, y, button, isTouch, presses)
-end
+    local ping = 0
+    if connection.server then ping = connection.server:round_trip_time() end
 
-function love.mousereleased(x, y, button, isTouch, presses)
-  switcher:mousereleased(x, y, button, isTouch, presses)
+    local text = ("upd: %2.2fMS, drw: %2.2fMS, fps: %d, mem: %2.2fMB, tex_mem: %2.2fMB, ping: %dMS"):format(
+                   debug.stats.time_update, debug.stats.time_draw, fps, mem / 1024,
+                   love.graphics.getStats().texturememory / 1024 / 1024, ping)
+
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
+  end
 end
 
 function love.keypressed(key, scancode, isrepeat)

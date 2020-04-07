@@ -4,8 +4,6 @@ local inspect = require("lib.inspect")
 local Mfd = require("mfd")
 
 local mfds = {
-  debug = true,
-  stats = {time_update = 0, time_draw = 0},
   components = {},
   channels = {
     -- general purpose reliable channel
@@ -36,9 +34,13 @@ function mfds:init()
   self.components[rightMfd.id] = rightMfd
 end
 
-function mfds:enter(previous, connection, switcher)
-  self.connection = connection
+function mfds:enter(previous, stats, switcher)
+  self.stats = stats or {}
   self.components["switcher"] = switcher
+end
+
+function mfds:leave()
+  -- TODO: deregister MFD updates from server
 end
 
 function mfds:update(dt)
@@ -46,18 +48,12 @@ function mfds:update(dt)
 
   for _, component in pairs(self.components) do component:update(dt) end
 
-  local success, event = pcall(self.connection.service)
-  while success and event do
-    if event.type == "disconnect" then
-      print("Disconnected.")
-      State.switch(connecting)
-    elseif event.type == "receive" then
-      self.channels[event.channel](event)
-    end
-    success, event = pcall(self.connection.service)
-  end
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
+end
+
+function mfds:handleReceive(event)
+  self.channels[event.channel](event)
 end
 
 function mfds:draw()
@@ -68,25 +64,6 @@ function mfds:draw()
 
   local t2 = love.timer.getTime()
   self.stats.time_draw = (t2 - t1) * 1000
-
-  self:draw_debug_info()
-end
-
-function mfds:draw_debug_info()
-  if self.debug then
-    local fps = love.timer.getFPS()
-    local mem = collectgarbage("count")
-    local text = ("upd: %.2fms, drw: %.2fms, fps: %d, mem: %.2fMB, tex_mem: %.2fMB, ping: %.0fms"):format(
-                   self.stats.time_update, self.stats.time_draw, fps, mem / 1024,
-                   love.graphics.getStats().texturememory / 1024 / 1024, self.connection.server:round_trip_time())
-
-    love.graphics.setColor(255, 255, 255)
-    love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
-  end
-end
-
-function mfds:leave()
-  -- TODO: deregister MFD updates from server
 end
 
 function mfds:mousepressed(x, y, button, isTouch, presses)
