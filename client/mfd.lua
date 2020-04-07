@@ -1,5 +1,4 @@
 local layout = require("lib.suit.layout").new()
-local inspect = require("lib.inspect")
 
 -- MfdButton
 
@@ -94,6 +93,7 @@ function Mfd:createButtons(identifier)
 end
 
 function Mfd:draw()
+  -- TODO: draw stencil for mfd border here.
   for _, button in ipairs(self.buttons) do button:draw() end
   if self.imageData then
     love.graphics.setColor(1, 1, 1)
@@ -103,7 +103,7 @@ function Mfd:draw()
     end
     love.graphics.draw(self.image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
   else
-    -- draw no data string here.
+    -- TODO: draw no data string here.
   end
 end
 

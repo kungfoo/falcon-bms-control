@@ -11,7 +11,10 @@ local enet = require("enet")
 local msgpack = require("lib.msgpack")
 local tick = require("lib.tick")
 local inspect = require("lib.inspect")
-local suit = require("lib.suit")
+
+-- components
+local Mfd = require("mfd")
+local Switcher = require("switcher")
 
 -- connection states
 local broadcasting = {port = 9020}
@@ -20,7 +23,7 @@ local connecting = {port = 9022}
 
 local connected = {stats = {time_update = 0, time_draw = 0}}
 
-local Mfd = require("mfd")
+-- data
 
 local connection = {ip = nil, server = nil, host = nil, peer = nil}
 
@@ -132,6 +135,9 @@ function connected:init()
   local rightMfd = Mfd("f16/right-mfd", 520, 30)
   components[leftMfd.id] = leftMfd
   components[rightMfd.id] = rightMfd
+
+  local switcher = Switcher(50, 50)
+  components["switcher"] = switcher
 end
 
 function connected:update(dt)

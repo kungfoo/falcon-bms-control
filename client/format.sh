@@ -1,3 +1,3 @@
 #!/bin/bash
 
-lua-format -vi main.lua mfd.lua
+lua-format -vi main.lua mfd.lua switcher.lua
