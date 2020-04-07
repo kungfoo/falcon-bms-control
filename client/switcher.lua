@@ -1,8 +1,7 @@
 local Switcher = Class {
-  width = 300,
-  height = 100,
+  width = 150,
+  height = 60,
   radius = 5,
-  screens = {["mfds"] = {image = love.graphics.newImage("images/mfds.png")}, ["icp"] = {}},
   currentScreen = "mfds",
   sounds = {
     pressed = love.audio.newSource("sounds/A/button-pressed.ogg", "static"),
@@ -26,7 +25,9 @@ function Switcher:draw()
   local highlight = {width = (self.width / 2) - 20, height = self.height - 20, x = self.x + 10, y = self.y + 10}
   if self.currentScreen == "icp" then highlight.x = highlight.x + (self.width / 2) end
   love.graphics.setColor(0.3, 0.6, 0.3)
-  love.graphics.rectangle("line", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
+  love.graphics.rectangle("fill", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
+
+  love.graphics.setColor(1, 1, 1)
 end
 
 function Switcher:update(dt)

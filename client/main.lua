@@ -24,6 +24,11 @@ local icp = require("icp")
 local connection = {ip = nil, server = nil, host = nil, peer = nil}
 local shine = {dots = {".", "..", "..."}, position = 1}
 
+-- switcher component is present on all screens
+local Switcher = require("switcher")
+
+local switcher = nil
+
 function love.load()
   love.graphics.setFont(love.graphics.newFont("fonts/falconded.ttf", 20, "normal"))
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
@@ -41,6 +46,8 @@ function love.load()
   Timer.every(0.5, function()
     shine.position = ((shine.position + 1) % #shine.dots) + 1
   end)
+
+  switcher = Switcher(50, 50, "mfds")
 end
 
 function broadcasting:enter()
@@ -107,6 +114,19 @@ end
 function love.update(dt)
   -- always update timers
   Timer.update(dt)
+  switcher:update(dt)
+end
+
+function love.draw()
+  switcher:draw()
+end
+
+function love.mousepressed(x, y, button, isTouch, presses)
+  switcher:mousepressed(x, y, button, isTouch, presses)
+end
+
+function love.mousereleased(x, y, button, isTouch, presses)
+  switcher:mousereleased(x, y, button, isTouch, presses)
 end
 
 function love.keypressed(key, scancode, isrepeat)
