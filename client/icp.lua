@@ -1,15 +1,12 @@
 local msgpack = require("lib.msgpack")
 local inspect = require("lib.inspect")
 
-local icp = {components = {}}
+local icp = {components = {}, stats = {}}
 
 function icp:init()
-  local switcher = Switcher(50, 50, "icp")
-  self.components["switcher"] = switcher
 end
 
-function icp:enter(previous, connection, switcher)
-  self.connection = connection
+function icp:enter(previous, switcher)
   self.components["switcher"] = switcher
 end
 
@@ -19,7 +16,7 @@ function icp:update(dt)
   for _, component in pairs(self.components) do component:update(dt) end
 
   local t2 = love.timer.getTime()
-  stats.time_update = (t2 - t1) * 1000
+  self.stats.time_update = (t2 - t1) * 1000
 end
 
 function icp:handleReceive(event)
@@ -32,8 +29,10 @@ function icp:draw()
   love.graphics.setColor(1, 1, 1)
   for _, component in pairs(self.components) do component:draw() end
 
+  love.graphics.printf("ICP placeholder", 20, 50, 500, "left")
+
   local t2 = love.timer.getTime()
-  stats.time_draw = (t2 - t1) * 1000
+  self.stats.time_draw = (t2 - t1) * 1000
 end
 
 function icp:leave()

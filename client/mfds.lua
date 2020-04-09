@@ -4,6 +4,7 @@ local inspect = require("lib.inspect")
 local Mfd = require("mfd")
 
 local mfds = {
+  stats = {},
   components = {},
   channels = {
     -- general purpose reliable channel
@@ -34,8 +35,7 @@ function mfds:init()
   self.components[rightMfd.id] = rightMfd
 end
 
-function mfds:enter(previous, stats, switcher)
-  self.stats = stats or {}
+function mfds:enter(previous, switcher)
   self.components["switcher"] = switcher
 end
 

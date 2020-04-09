@@ -3,7 +3,10 @@ Class = require("lib.hump.class")
 Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
+
 require("lib.interpolate")
+require("lib.core.table")
+require("lib.core.math")
 
 -- libraries
 local socket = require("socket")
@@ -28,7 +31,7 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
 local Switcher = require("switcher")
-local switcher = nil
+local switcher = Switcher(20, 50, { mfds, icp })
 
 function love.load()
   love.graphics.setFont(love.graphics.newFont("fonts/falconded.ttf", 20, "normal"))
@@ -47,8 +50,6 @@ function love.load()
   Timer.every(0.5, function()
     shine.position = ((shine.position + 1) % #shine.dots) + 1
   end)
-
-  switcher = Switcher(50, 50, "mfds")
 end
 
 function broadcasting:enter()
@@ -115,7 +116,8 @@ function love.update(dt)
     elseif event.type == "connect" then
       print("Connected ...")
       connection.peer = event.peer
-      State.switch(mfds, debug.stats, switcher)
+      -- switch to first screen
+      switcher:switch()
     elseif event.type == "receive" then
       State.current():handleReceive(event)
     end
