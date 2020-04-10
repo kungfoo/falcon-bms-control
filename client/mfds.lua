@@ -1,11 +1,13 @@
 local msgpack = require("lib.msgpack")
 local inspect = require("lib.inspect")
 
-local Mfd = require("mfd")
+local Mfd = require("components.mfd")
+
+local components = {}
 
 local mfds = {
   stats = {},
-  components = {},
+  components = components,
   channels = {
     -- general purpose reliable channel
     [0] = function(event)

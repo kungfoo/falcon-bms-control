@@ -30,7 +30,7 @@ local shine = {dots = {".", "..", "..."}, position = 1}
 local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
-local Switcher = require("switcher")
+local Switcher = require("components.switcher")
 local switcher = Switcher(20, 50, { mfds, icp })
 
 function love.load()
