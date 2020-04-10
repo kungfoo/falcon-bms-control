@@ -2,12 +2,11 @@ local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
 
-local Mfd = Class {}
+local Mfd = Class {buttons = {}}
 
 function Mfd:init(identifier, x, y)
   self.id = identifier
   self.position = {x = x or 0, y = y or 0}
-  self.buttons = {}
   self:createButtons(identifier)
 end
 

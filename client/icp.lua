@@ -1,9 +1,12 @@
 local msgpack = require("lib.msgpack")
 local inspect = require("lib.inspect")
 
+local Icp = require("components.icp")
+
 local icp = {components = {}, stats = {}}
 
 function icp:init()
+  self.components["icp"] = Icp("f16/icp", 20, 30)
 end
 
 function icp:enter(previous, switcher)
@@ -28,8 +31,6 @@ function icp:draw()
 
   love.graphics.setColor(1, 1, 1)
   for _, component in pairs(self.components) do component:draw() end
-
-  love.graphics.printf("ICP placeholder", 20, 50, 500, "left")
 
   local t2 = love.timer.getTime()
   self.stats.time_draw = (t2 - t1) * 1000

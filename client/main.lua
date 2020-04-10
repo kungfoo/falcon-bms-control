@@ -13,7 +13,6 @@ local socket = require("socket")
 local enet = require("enet")
 local msgpack = require("lib.msgpack")
 local tick = require("lib.tick")
-local inspect = require("lib.inspect")
 
 -- connecting states
 local broadcasting = {port = 9020}
@@ -31,10 +30,11 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
 local Switcher = require("components.switcher")
-local switcher = Switcher(20, 50, { mfds, icp })
+local switcher = Switcher(20, 50, {mfds, icp})
+
+local font = love.graphics.newFont("fonts/slkscr.ttf", 20, "normal")
 
 function love.load()
-  love.graphics.setFont(love.graphics.newFont("fonts/falconded.ttf", 20, "normal"))
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second
 
@@ -127,6 +127,7 @@ end
 
 function love.draw()
   if debug.enabled then
+    love.graphics.setFont(font)
     local fps = love.timer.getFPS()
     local mem = collectgarbage("count")
 

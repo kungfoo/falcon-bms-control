@@ -30,14 +30,13 @@ function Switcher:draw()
   end
   love.graphics.rectangle("line", self.x, self.y, self.width, self.height, self.radius)
 
-
   love.graphics.setColor(0.3, 0.6, 0.3)
 
   local highlight = {
     width = (self.width / #self.states) - 20,
     height = self.height - 20,
     x = (self.x + 10) + (self.index * (self.width / #self.states)),
-    y = self.y + 10
+    y = self.y + 10,
   }
   love.graphics.rectangle("fill", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
   love.graphics.setColor(1, 1, 1)
