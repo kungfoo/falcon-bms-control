@@ -11,15 +11,24 @@ end
 
 function Icp:createButtons(id)
   layout:reset(self.position.x, self.position.y):padding(30, 30)
-  layout:push(self.position.x, self.position.y)
+  table.insert(self.buttons, IcpButton(id, "COM1", {label = "COM", number = 1, type = "round"},
+                                       layout:col(IcpButton.size, IcpButton.size)))
+  table.insert(self.buttons, IcpButton(id, "COM2", {label = "COM", number = 2, type = "round"}, layout:col()))
+  table.insert(self.buttons, IcpButton(id, "IFF", {label = "IFF", type = "round"}, layout:col()))
+  table.insert(self.buttons, IcpButton(id, "LIST", {label = "LIST", type = "round"}, layout:col()))
+  table.insert(self.buttons, IcpButton(id, "A-A", {label = "A-A", type = "round"}, layout:col()))
+  table.insert(self.buttons, IcpButton(id, "A-G", {label = "A-G", type = "round"}, layout:col()))
+
+  local keypad = {x = self.position.x, y = self.position.y + IcpButton.size + 30}
+  layout:push(keypad.x, keypad.y)
   table.insert(self.buttons,
-               IcpButton(id, "1", {label = "T/ILS", number = 1}, layout:col(IcpButton.size, IcpButton.size)))
+               IcpButton(id, "1", {label = "T-ILS", number = 1}, layout:col(IcpButton.size, IcpButton.size)))
   table.insert(self.buttons, IcpButton(id, "2", {label = "ALOW", number = 2}, layout:col()))
   table.insert(self.buttons, IcpButton(id, "3", {number = 3}, layout:col()))
   table.insert(self.buttons, IcpButton(id, "RCL", {label = "RCL"}, layout:col()))
 
   layout:pop()
-  layout:push(self.position.x, self.position.y)
+  layout:push(keypad.x, keypad.y)
   layout:row(IcpButton.size, IcpButton.size)
   layout:row()
   layout:left()
@@ -29,20 +38,18 @@ function Icp:createButtons(id)
   table.insert(self.buttons, IcpButton(id, "ENTER", {label = "ENTER"}, layout:col()))
 
   layout:pop()
-  layout:push(self.position.x, self.position.y)
+  layout:push(keypad.x, keypad.y)
   layout:row(IcpButton.size, IcpButton.size)
   layout:row()
   layout:row()
   layout:left()
   table.insert(self.buttons, IcpButton(id, "7", {label = "MARK", number = 7}, layout:col()))
   table.insert(self.buttons, IcpButton(id, "8", {label = "FIX", number = 8}, layout:col()))
-  table.insert(self.buttons, IcpButton(id, "9", {label = "A/CAL", number = 9}, layout:col()))
-  table.insert(self.buttons, IcpButton(id, "0", {label = "M/SEL", number = 0}, layout:col()))
-
+  table.insert(self.buttons, IcpButton(id, "9", {label = "A-CAL", number = 9}, layout:col()))
+  table.insert(self.buttons, IcpButton(id, "0", {label = "M-SEL", number = 0}, layout:col()))
 end
 
 function Icp:update(dt)
-
 end
 
 function Icp:draw()
