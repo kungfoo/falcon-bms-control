@@ -1,9 +1,9 @@
 local inspect = require("lib.inspect")
 
 local IcpButton = Class {
-  smallFont = love.graphics.newFont("fonts/DINRegular.ttf", 22, "normal"),
-  largeFont = love.graphics.newFont("fonts/DINRegular.ttf", 32, "normal"),
-  size = 80,
+  smallFont = love.graphics.newFont("fonts/DINRegular.ttf", 18, "normal"),
+  largeFont = love.graphics.newFont("fonts/DINRegular.ttf", 24, "normal"),
+  size = 60,
   isPressed = false,
   sounds = {
     pressed = love.audio.newSource("sounds/A/button-pressed.ogg", "static"),
@@ -42,7 +42,7 @@ function IcpButton:drawSquare()
   if self.options.number then
     love.graphics.setFont(self.largeFont)
     local x = self:hcentered(self.largeFont, self.options.number, self.x, self.size)
-    local y = (self.y + self.size / 2) - 5
+    local y = (self.y + self.size / 2)
     love.graphics.printf(self.options.number, x, y, self.size)
   end
 
@@ -72,7 +72,7 @@ function IcpButton:drawRound()
   if self.options.number then
     love.graphics.setFont(self.largeFont)
     local x = self:hcentered(self.largeFont, self.options.number, self.x, self.size)
-    local y = (self.y + self.size / 2) - 5
+    local y = (self.y + self.size / 2)
     love.graphics.printf(self.options.number, x, y, self.size)
   end
 
