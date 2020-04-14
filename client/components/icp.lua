@@ -10,7 +10,7 @@ function Icp:init(id, x, y)
 end
 
 function Icp:createButtons(id)
-  layout:reset(self.position.x, self.position.y):padding(30, 30)
+  layout:reset(self.position.x, self.position.y):padding(25, 25)
   table.insert(self.buttons, IcpButton(id, "COM1", {label = "COM", number = 1, type = "round"},
                                        layout:col(IcpButton.size, IcpButton.size)))
   table.insert(self.buttons, IcpButton(id, "COM2", {label = "COM", number = 2, type = "round"}, layout:col()))
