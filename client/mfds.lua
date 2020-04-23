@@ -20,13 +20,7 @@ local mfds = {
     end,
     [2] = function(event)
       components["f16/right-mfd"]:consume(event.data)
-    end,
-    [3] = function(event)
-      components["f16/ded"]:consume(event.data)
-    end,
-    [4] = function(event)
-      components["f16/rwr"]:consume(event.data)
-    end,
+    end
   },
 }
 

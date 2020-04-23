@@ -3,10 +3,26 @@ local inspect = require("lib.inspect")
 
 local Icp = require("components.icp")
 
-local icp = {components = {}, stats = {}}
+local components = {}
+
+local icp = {components = components, stats = {}, channels = {
+  -- general purpose reliable channel
+  [0] = function(event)
+    local payload = msgpack.unpack(event.data)
+    print("Received general purpose event: ", inspect(payload))
+  end,
+  -- texture memory channels are unrealiable and pure image data.
+  [3] = function(event)
+    components["f16/ded"]:consume(event.data)
+  end,
+  [4] = function(event)
+    components["f16/rwr"]:consume(event.data)
+  end,
+}}
 
 function icp:init()
   self.components["icp"] = Icp("f16/icp", 20, 30)
+  self.components["f16/ded"] = Ded()
 end
 
 function icp:enter(previous, switcher)
