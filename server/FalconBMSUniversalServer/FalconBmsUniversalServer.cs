@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using MsgPack.Serialization;
 using System.Net.Sockets;
 using System;
+using System.Data.HashFunction;
+using System.Data.HashFunction.xxHash;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Security;
@@ -190,10 +192,12 @@ namespace FalconBmsUniversalServer
     internal class StreamedTextureThread
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("StreamedTextureThread");
+        private readonly IxxHash hasher = xxHashFactory.Instance.Create();
         private readonly StreamedTextureRequest _request;
         private readonly ENetPeer _peer;
         private readonly SharedTextureMemoryExtractor _extractor;
         private readonly CancellationTokenSource _cancellationToken;
+        private IHashValue _oldHash = null;
 
         public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer,
             SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken)
@@ -218,7 +222,12 @@ namespace FalconBmsUniversalServer
             if (!_extractor.Offers(_request.identifier) || !_extractor.IsDataAvailable) return;
             var encoded = _extractor.GetEncoded(_request.identifier);
             var channel = ChannelFor(_request);
-            _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+            var newHash = hasher.ComputeHash(encoded);
+            if (!newHash.Equals(_oldHash))
+            {
+                _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+                _oldHash = newHash;
+            }
         }
         
         private static byte ChannelFor(StreamedTextureRequest request)
