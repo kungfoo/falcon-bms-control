@@ -39,10 +39,22 @@ end
 
 function mfds:enter(previous, switcher)
   self.components["switcher"] = switcher
+  Signal.emit("send-to-server", start("f16/left-mfd"))
+  Signal.emit("send-to-server", start("f16/right-mfd"))
 end
 
 function mfds:leave()
-  -- TODO: deregister MFD updates from server
+  local message = 
+  Signal.emit("send-to-server", stop("f16/left-mfd"))
+  Signal.emit("send-to-server", stop("f16/right-mfd"))
+end
+
+function start(identifier)
+  return {type = "streamed-texture", identifier = identifier, command = "start"}
+end
+
+function stop(identifier)
+  return {type = "streamed-texture", identifier = identifier, command = "stop"}
 end
 
 function mfds:update(dt)

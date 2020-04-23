@@ -7,6 +7,12 @@ using System.Collections.Generic;
 using MsgPack.Serialization;
 using System.Net.Sockets;
 using System;
+using System.Data.HashFunction;
+using System.Data.HashFunction.xxHash;
+using System.Linq;
+using System.Runtime.Remoting.Channels;
+using System.Security;
+using System.Threading;
 using System.Threading.Tasks;
 using FalconBmsUniversalServer.Messages;
 using FalconBmsUniversalServer.SharedTextureMemory;
@@ -17,6 +23,7 @@ namespace FalconBmsUniversalServer
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
         private bool _running = true;
+        private readonly Dictionary<StreamKey, CancellationTokenSource> runningStreams = new Dictionary<StreamKey, CancellationTokenSource>();
 
         private readonly SerializationContext _context = new SerializationContext
         {
@@ -90,7 +97,15 @@ namespace FalconBmsUniversalServer
 
         private void Peer_OnDisconnect(object sender, uint e)
         {
-            if (sender is ENetPeer peer) Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
+            if (sender is ENetPeer peer)
+            {
+                Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
+                foreach (var key in runningStreams.Keys.Where(key => key.Peer == peer))
+                {
+                    runningStreams.TryGetValue(key, out var cancellationTokenSource);
+                    cancellationTokenSource?.Cancel();
+                }
+            }
         }
 
         private void Peer_OnReceive(object sender, ENetPacket e)
@@ -99,13 +114,11 @@ namespace FalconBmsUniversalServer
             var message = Unpack<Message>(e);
             switch (message.type)
             {
-                case string s when s.StartsWith("osb"):
-                    var osbButtonMessage = Unpack<OsbButtonMessage>(e);
-                    Logger.Debug("MFD OSB message received: {0}:{1}:{2}", osbButtonMessage.type,osbButtonMessage.mfd, osbButtonMessage.osb);
+                case string type when OsbButtonMessage.IsType(type):
+                    HandleOsbButtonMessage( Unpack<OsbButtonMessage>(e));
                     break;
-                case "streamed-texture":
-                    var streamedTextureRequest = Unpack<StreamedTextureRequest>(e);
-                    SendStreamedTexture(streamedTextureRequest, peer);
+                case string type when StreamedTextureRequest.IsType(type):
+                    HandleStreamedTextureRequest(Unpack<StreamedTextureRequest>(e), peer);
                     break;
                 default:
                     Logger.Error("Received unhandled message type {0}", message.type);
@@ -113,31 +126,46 @@ namespace FalconBmsUniversalServer
             }
         }
 
-        private void SendStreamedTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
+        private static void HandleOsbButtonMessage(OsbButtonMessage osbButtonMessage)
         {
-            if (!_extractor.Offers(streamedTextureRequest.identifier) || !_extractor.IsDataAvailable) return;
-            var encoded = _extractor.GetEncoded(streamedTextureRequest.identifier);
-            var channel = ChannelFor(streamedTextureRequest);
-            peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+            Logger.Debug("MFD OSB message received: {0}:{1}:{2}", osbButtonMessage.type, osbButtonMessage.mfd, osbButtonMessage.osb);
         }
 
-        private byte ChannelFor(StreamedTextureRequest request)
+        private void HandleStreamedTextureRequest(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
         {
-            switch (request.identifier)
+            switch (streamedTextureRequest.command)
             {
-                case "f16/left-mfd":
-                    return 1;
-                case "f16/right-mfd":
-                    return 2;
-                case "f16/ded":
-                    return 3;
-                case "f16/rwr":
-                    return 4;
+                case "start":
+                    StartStreamingTexture(streamedTextureRequest, peer);
+                    break;
+                case "stop":
+                    StopStreamingTexture(streamedTextureRequest, peer);
+                    break;
                 default:
-                    Logger.Error("Request {0} has no mapped channel!", request.identifier);
-                    // assume this can be sent on channel 0
-                    return 0;
+                    Logger.Error("Unhandled streamed texture command {0}", streamedTextureRequest.command);
+                    break;
             }
+        }
+
+        private void StartStreamingTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
+        {
+            Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
+            var cancellationToken = new CancellationTokenSource();
+            var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken);
+            var thread = new Thread(streamer.Run);
+            thread.Start();
+            
+            var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
+            runningStreams.Add(streamKey, cancellationToken);
+        }
+        
+        private void StopStreamingTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
+        {
+            Logger.Debug("Stopping to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
+            var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
+            if (!runningStreams.TryGetValue(streamKey, out var cancellationTokenSource)) return;
+            cancellationTokenSource.Cancel();
+            runningStreams.Remove(streamKey);
         }
 
         private T Unpack<T>(byte[] buffer)
@@ -159,6 +187,73 @@ namespace FalconBmsUniversalServer
             serializer.Pack(buffer, thing);
             return buffer.ToArray();
         }
+    }
+
+    internal class StreamedTextureThread
+    {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("StreamedTextureThread");
+        private readonly IxxHash hasher = xxHashFactory.Instance.Create();
+        private readonly StreamedTextureRequest _request;
+        private readonly ENetPeer _peer;
+        private readonly SharedTextureMemoryExtractor _extractor;
+        private readonly CancellationTokenSource _cancellationToken;
+        private IHashValue _oldHash = null;
+
+        public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer,
+            SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken)
+        {
+            _request = request;
+            _peer = peer;
+            _extractor = extractor;
+            _cancellationToken = cancellationToken;
+        }
+
+        public void Run()
+        {
+            while (!_cancellationToken.IsCancellationRequested)
+            {
+                SendOneChunk();
+                Thread.Sleep(33);
+            }
+        }
+
+        private void SendOneChunk()
+        {
+            if (!_extractor.Offers(_request.identifier) || !_extractor.IsDataAvailable) return;
+            var encoded = _extractor.GetEncoded(_request.identifier);
+            var channel = ChannelFor(_request);
+            var newHash = hasher.ComputeHash(encoded);
+            if (!newHash.Equals(_oldHash))
+            {
+                _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+                _oldHash = newHash;
+            }
+        }
+        
+        private static byte ChannelFor(StreamedTextureRequest request)
+        {
+            switch (request.identifier)
+            {
+                case "f16/left-mfd":
+                    return 1;
+                case "f16/right-mfd":
+                    return 2;
+                case "f16/ded":
+                    return 3;
+                case "f16/rwr":
+                    return 4;
+                default:
+                    Logger.Error("Request {0} has no mapped channel!", request.identifier);
+                    // assume this can be sent on channel 0
+                    return 0;
+            }
+        }
+    }
+
+    internal struct StreamKey
+    {
+        public string Identifier;
+        public ENetPeer Peer;
     }
 
     /*
@@ -183,26 +278,42 @@ namespace FalconBmsUniversalServer
     // lowercase property names, because message pack works automagic like this.
     namespace Messages
     {
-         public struct Message
+
+        public interface IMessage
+        {
+            string type { get; }
+        }
+
+        public struct Message: IMessage
         {
             public string type { get; set; }
         }
 
-        public struct OsbButtonMessage
+        public struct OsbButtonMessage: IMessage
         {
             public string type { get; set; }
             public string mfd { get; set; }
             public string osb { get; set; }
+
+            public static bool IsType(string type)
+            {
+                return type.StartsWith("osb");
+            }
         }
 
-        public struct StreamedTextureRequest
+        public struct StreamedTextureRequest: IMessage
         {
             public string type { get; set; }
-            public string kind { get; set; }
+            public string command { get; set; }
             public string identifier { get; set; }
+            
+            public static bool IsType(string type)
+            {
+                return type == "streamed-texture";
+            }
         }
 
-        public struct StreamedTextureReply
+        public struct StreamedTextureReply : IMessage
         {
             public string type { get; set; }
             public string kind { get; set; }

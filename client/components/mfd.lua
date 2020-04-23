@@ -57,8 +57,6 @@ function Mfd:draw()
 end
 
 function Mfd:update(dt)
-  local message = {type = "streamed-texture", identifier = self.id}
-  Signal.emit("send-to-server", message)
 end
 
 function Mfd:consume(data)
