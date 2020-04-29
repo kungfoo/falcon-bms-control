@@ -2,6 +2,9 @@ local msgpack = require("lib.msgpack")
 local inspect = require("lib.inspect")
 
 local Icp = require("components.icp")
+local Ded = require("components.ded")
+
+local StreamedTexture = require("util.streamed-texture")
 
 local components = {}
 
@@ -21,12 +24,17 @@ local icp = {components = components, stats = {}, channels = {
 }}
 
 function icp:init()
-  self.components["icp"] = Icp("f16/icp", 20, 30)
-  self.components["f16/ded"] = Ded()
+  self.components["f16/ded"] = Ded("f16/ded", 20, 30)
+  self.components["icp"] = Icp("f16/icp", 20, 175)
 end
 
 function icp:enter(previous, switcher)
   self.components["switcher"] = switcher
+  StreamedTexture.start("f16/ded")
+end
+
+function icp:leave()
+  StreamedTexture.stop("f16/ded")
 end
 
 function icp:update(dt)
@@ -39,7 +47,10 @@ function icp:update(dt)
 end
 
 function icp:handleReceive(event)
-  -- TODO: handle callback channels and data channels here.
+  local handler = self.channels[event.channel]
+  if handler then
+    handler(event)
+  end
 end
 
 function icp:draw()
@@ -50,11 +61,6 @@ function icp:draw()
 
   local t2 = love.timer.getTime()
   self.stats.time_draw = (t2 - t1) * 1000
-end
-
-function icp:leave()
-  -- TODO: deregister DED updates from server
-
 end
 
 function icp:mousepressed(x, y, button, isTouch, presses)
