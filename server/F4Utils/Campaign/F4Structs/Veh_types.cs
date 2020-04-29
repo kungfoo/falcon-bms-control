@@ -1,0 +1,35 @@
+namespace F4Utils.Campaign.F4Structs
+{
+    public enum Veh_types
+    {
+        A10_DEF,
+        An2_DEF,
+        B1B_DEF,
+        B52_DEF,
+        C130_DEF,
+        EA6_DEF,
+        F111_DEF,
+        F14_DEF,
+        F15_DEF,
+        F16_DEF,
+        F18_DEF,
+        F22_DEF,
+        F4_DEF,
+        F5_DEF,
+        GEN_BOMBER_DEF,
+        GEN_FIGHTER_DEF,
+        GEN_TANKER_DEF,
+        KC10_DEF,
+        Mig19_DEF,
+        Mig21_DEF,
+        Mig23_DEF,
+        Mig25_DEF,
+        Mig27_DEF,
+        Mig29_DEF,
+        Mig31_DEF,
+        Su25_DEF,
+        Su27_DEF,
+        Tu16_DEF,
+        TU95_DEF,
+    }
+}

@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5649A340-1475-4116-B5A1-CD21A99387F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Common.Drawing</RootNamespace>
+    <AssemblyName>Common.Drawing</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Costura, Version=4.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Costura.Fody.4.0.0\lib\net40\Costura.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bitmap.cs" />
+    <Compile Include="Brush.cs" />
+    <Compile Include="Brushes.cs" />
+    <Compile Include="CharacterRange.cs" />
+    <Compile Include="Color.cs" />
+    <Compile Include="CopyPixelOperation.cs" />
+    <Compile Include="Drawing2D\Blend.cs" />
+    <Compile Include="Drawing2D\ColorBlend.cs" />
+    <Compile Include="Drawing2D\CombineMode.cs" />
+    <Compile Include="Drawing2D\CompositingMode.cs" />
+    <Compile Include="Drawing2D\CompositingQuality.cs" />
+    <Compile Include="Drawing2D\CoordinateSpace.cs" />
+    <Compile Include="Drawing2D\CustomLineCap.cs" />
+    <Compile Include="Drawing2D\DashCap.cs" />
+    <Compile Include="Drawing2D\DashStyle.cs" />
+    <Compile Include="Drawing2D\FillMode.cs" />
+    <Compile Include="Drawing2D\FlushIntention.cs" />
+    <Compile Include="Drawing2D\GraphicsContainer.cs" />
+    <Compile Include="Drawing2D\GraphicsPath.cs" />
+    <Compile Include="Drawing2D\GraphicsState.cs" />
+    <Compile Include="Drawing2D\HatchBrush.cs" />
+    <Compile Include="Drawing2D\HatchStyle.cs" />
+    <Compile Include="Drawing2D\InterpolationMode.cs" />
+    <Compile Include="Drawing2D\LinearGradientBrush.cs" />
+    <Compile Include="Drawing2D\LinearGradientMode.cs" />
+    <Compile Include="Drawing2D\LineCap.cs" />
+    <Compile Include="Drawing2D\LineJoin.cs" />
+    <Compile Include="Drawing2D\Matrix.cs" />
+    <Compile Include="Drawing2D\MatrixOrder.cs" />
+    <Compile Include="Drawing2D\PathData.cs" />
+    <Compile Include="Drawing2D\PathGradientBrush.cs" />
+    <Compile Include="Drawing2D\PenType.cs" />
+    <Compile Include="Drawing2D\PenAlignment.cs" />
+    <Compile Include="Drawing2D\PixelOffsetMode.cs" />
+    <Compile Include="Drawing2D\RegionData.cs" />
+    <Compile Include="Drawing2D\SmoothingMode.cs" />
+    <Compile Include="Drawing2D\WarpMode.cs" />
+    <Compile Include="Drawing2D\WrapMode.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Font.cs" />
+    <Compile Include="FontFamily.cs" />
+    <Compile Include="FontStyle.cs" />
+    <Compile Include="Graphics.cs" />
+    <Compile Include="GraphicsUnit.cs" />
+    <Compile Include="Icon.cs" />
+    <Compile Include="IDeviceContext.cs" />
+    <Compile Include="Image.cs" />
+    <Compile Include="Imaging\BitmapData.cs" />
+    <Compile Include="Imaging\ColorAdjustType.cs" />
+    <Compile Include="Imaging\ColorChannelFlag.cs" />
+    <Compile Include="Imaging\ColorMap.cs" />
+    <Compile Include="Imaging\ColorMatrix.cs" />
+    <Compile Include="Imaging\ColorMatrixFlag.cs" />
+    <Compile Include="Imaging\ColorPalette.cs" />
+    <Compile Include="Imaging\EmfPlusRecordType.cs" />
+    <Compile Include="Imaging\EmfType.cs" />
+    <Compile Include="Imaging\Encoder.cs" />
+    <Compile Include="Imaging\EncoderParameter.cs" />
+    <Compile Include="Imaging\EncoderParameters.cs" />
+    <Compile Include="Imaging\EncoderParameterValueType.cs" />
+    <Compile Include="Imaging\EncoderValue.cs" />
+    <Compile Include="Imaging\FrameDimension.cs" />
+    <Compile Include="Imaging\ImageAttributes.cs" />
+    <Compile Include="Imaging\ImageCodecFlags.cs" />
+    <Compile Include="Imaging\ImageCodecInfo.cs" />
+    <Compile Include="Imaging\ImageFormat.cs" />
+    <Compile Include="Imaging\ImageLockMode.cs" />
+    <Compile Include="Imaging\Metafile.cs" />
+    <Compile Include="Imaging\MetafileFrameUnit.cs" />
+    <Compile Include="Imaging\MetafileHeader.cs" />
+    <Compile Include="Imaging\MetafileType.cs" />
+    <Compile Include="Imaging\MetaHeader.cs" />
+    <Compile Include="Imaging\PixelFormat.cs" />
+    <Compile Include="Imaging\PlayRecordCallback.cs" />
+    <Compile Include="Imaging\PropertyItem.cs" />
+    <Compile Include="Imaging\WmfPlaceableFileHeader.cs" />
+    <Compile Include="KnownColor.cs" />
+    <Compile Include="Pen.cs" />
+    <Compile Include="Pens.cs" />
+    <Compile Include="Point.cs" />
+    <Compile Include="PointF.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="RectangleF.cs" />
+    <Compile Include="Region.cs" />
+    <Compile Include="RotateFlipType.cs" />
+    <Compile Include="Size.cs" />
+    <Compile Include="SizeF.cs" />
+    <Compile Include="SolidBrush.cs" />
+    <Compile Include="StringAlignment.cs" />
+    <Compile Include="StringDigitSubstitute.cs" />
+    <Compile Include="StringFormat.cs" />
+    <Compile Include="StringFormatFlags.cs" />
+    <Compile Include="StringTrimming.cs" />
+    <Compile Include="SystemColors.cs" />
+    <Compile Include="SystemPens.cs" />
+    <Compile Include="TextureBrush.cs" />
+    <Compile Include="Text\FontCollection.cs" />
+    <Compile Include="Text\GenericFontFamilies.cs" />
+    <Compile Include="Text\HotkeyPrefix.cs" />
+    <Compile Include="Text\PrivateFontCollection.cs" />
+    <Compile Include="Text\TextRenderingHint.cs" />
+    <Compile Include="ToolboxBitmapAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props'))" />
+  </Target>
+  <Import Project="$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets" Condition="'$(Configuration)' == 'Release' and Exists('$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets')" />
+  <Import Project="$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props" Condition="'$(Configuration)' == 'Release' and Exists('$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

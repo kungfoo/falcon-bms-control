@@ -14,16 +14,19 @@ using System.Runtime.Remoting.Channels;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
+using F4Utils.Process;
 using FalconBmsUniversalServer.Messages;
 using FalconBmsUniversalServer.SharedTextureMemory;
 
 namespace FalconBmsUniversalServer
 {
-    class FalconBmsUniversalServer
+    internal class FalconBmsUniversalServer
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
         private bool _running = true;
         private readonly Dictionary<StreamKey, CancellationTokenSource> runningStreams = new Dictionary<StreamKey, CancellationTokenSource>();
+        private readonly IcpButtonHandler _icpButtonHandler = new IcpButtonHandler();
+        private readonly OsbButtonHandler _osbButtonHandler = new OsbButtonHandler();
 
         private readonly SerializationContext _context = new SerializationContext
         {
@@ -115,7 +118,10 @@ namespace FalconBmsUniversalServer
             switch (message.type)
             {
                 case string type when OsbButtonMessage.IsType(type):
-                    HandleOsbButtonMessage( Unpack<OsbButtonMessage>(e));
+                    _osbButtonHandler.handle(Unpack<OsbButtonMessage>(e));
+                    break;
+                case string type when IcpButtonMessage.IsType(type):
+                    _icpButtonHandler.handle(Unpack<IcpButtonMessage>(e));
                     break;
                 case string type when StreamedTextureRequest.IsType(type):
                     HandleStreamedTextureRequest(Unpack<StreamedTextureRequest>(e), peer);
@@ -124,11 +130,6 @@ namespace FalconBmsUniversalServer
                     Logger.Error("Received unhandled message type {0}", message.type);
                     break;
             }
-        }
-
-        private static void HandleOsbButtonMessage(OsbButtonMessage osbButtonMessage)
-        {
-            Logger.Debug("MFD OSB message received: {0}:{1}:{2}", osbButtonMessage.type, osbButtonMessage.mfd, osbButtonMessage.osb);
         }
 
         private void HandleStreamedTextureRequest(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
@@ -192,7 +193,7 @@ namespace FalconBmsUniversalServer
     internal class StreamedTextureThread
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("StreamedTextureThread");
-        private readonly IxxHash hasher = xxHashFactory.Instance.Create();
+        private readonly IxxHash _hasher = xxHashFactory.Instance.Create();
         private readonly StreamedTextureRequest _request;
         private readonly ENetPeer _peer;
         private readonly SharedTextureMemoryExtractor _extractor;
@@ -222,7 +223,7 @@ namespace FalconBmsUniversalServer
             if (!_extractor.Offers(_request.identifier) || !_extractor.IsDataAvailable) return;
             var encoded = _extractor.GetEncoded(_request.identifier);
             var channel = ChannelFor(_request);
-            var newHash = hasher.ComputeHash(encoded);
+            var newHash = _hasher.ComputeHash(encoded);
             if (!newHash.Equals(_oldHash))
             {
                 _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
@@ -301,6 +302,17 @@ namespace FalconBmsUniversalServer
             }
         }
 
+        public struct IcpButtonMessage : IMessage
+        {
+            public string type { get; set; }
+            public string button { get; set; }
+
+            public static bool IsType(string type)
+            {
+                return type.StartsWith("icp");
+            }
+        }
+
         public struct StreamedTextureRequest: IMessage
         {
             public string type { get; set; }
@@ -311,14 +323,6 @@ namespace FalconBmsUniversalServer
             {
                 return type == "streamed-texture";
             }
-        }
-
-        public struct StreamedTextureReply : IMessage
-        {
-            public string type { get; set; }
-            public string kind { get; set; }
-            public string identifier { get; set; }
-            public byte[] payload { get; set; }
         }
     }
 

@@ -39,9 +39,6 @@
     <Reference Include="ENet.Managed, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ENet.Managed.3.0.2\lib\net45\ENet.Managed.dll</HintPath>
     </Reference>
-    <Reference Include="F4TexSharedMem">
-      <HintPath>..\F4TexSharedMem\bin\x64\Release\F4TexSharedMem.dll</HintPath>
-    </Reference>
     <Reference Include="MsgPack, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
       <HintPath>packages\MsgPack.Cli.1.0.1\lib\net46\MsgPack.dll</HintPath>
     </Reference>
@@ -82,6 +79,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FalconBmsUniversalServer.cs" />
+    <Compile Include="IcpButtonHandler.cs" />
+    <Compile Include="OsbButtonHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +91,24 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\F4KeyFile\F4KeyFile.csproj">
+      <Project>{eeed5595-6eb8-473d-b487-334b45d753a6}</Project>
+      <Name>F4KeyFile</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\F4SharedMem\F4SharedMem.csproj">
+      <Project>{517d1b4d-e8c7-4331-bbe7-300fd6b78441}</Project>
+      <Name>F4SharedMem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\F4TexSharedMem\F4TexSharedMem.csproj">
+      <Project>{e930ba7b-7474-49d7-b7cf-25106c450190}</Project>
+      <Name>F4TexSharedMem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\F4Utils\Process\F4Utils.Process.csproj">
+      <Project>{66242024-b7e5-4f66-ac1a-f0e2f1d70899}</Project>
+      <Name>F4Utils.Process</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

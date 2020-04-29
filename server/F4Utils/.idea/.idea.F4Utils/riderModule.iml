@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RIDER_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../../BIUSBWrapper" />
+    <content url="file://$MODULE_DIR$/../../../Common" />
+    <content url="file://$MODULE_DIR$/../../../F4KeyFile" />
+    <content url="file://$MODULE_DIR$/../../../F4SharedMem" />
+    <content url="file://$MODULE_DIR$/../.." />
+    <content url="file://$MODULE_DIR$/../../../Lzss/LzssManaged" />
+    <content url="file://$MODULE_DIR$/../../../PHCC" />
+    <content url="file://$MODULE_DIR$/../../../PPJoyWrapper" />
+    <content url="file://$MODULE_DIR$/../../../SpeexInvoke/SpeexInvoke" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
