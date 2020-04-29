@@ -1,6 +1,8 @@
 local msgpack = require("lib.msgpack")
 local inspect = require("lib.inspect")
 
+local StreamedTexture = require("util.streamed-texture")
+
 local Mfd = require("components.mfd")
 
 local components = {}
@@ -20,13 +22,7 @@ local mfds = {
     end,
     [2] = function(event)
       components["f16/right-mfd"]:consume(event.data)
-    end,
-    [3] = function(event)
-      components["f16/ded"]:consume(event.data)
-    end,
-    [4] = function(event)
-      components["f16/rwr"]:consume(event.data)
-    end,
+    end
   },
 }
 
@@ -39,22 +35,13 @@ end
 
 function mfds:enter(previous, switcher)
   self.components["switcher"] = switcher
-  Signal.emit("send-to-server", start("f16/left-mfd"))
-  Signal.emit("send-to-server", start("f16/right-mfd"))
+  StreamedTexture.start("f16/left-mfd")
+  StreamedTexture.start("f16/right-mfd")
 end
 
 function mfds:leave()
-  local message = 
-  Signal.emit("send-to-server", stop("f16/left-mfd"))
-  Signal.emit("send-to-server", stop("f16/right-mfd"))
-end
-
-function start(identifier)
-  return {type = "streamed-texture", identifier = identifier, command = "start"}
-end
-
-function stop(identifier)
-  return {type = "streamed-texture", identifier = identifier, command = "stop"}
+  StreamedTexture.stop("f16/left-mfd")
+  StreamedTexture.stop("f16/right-mfd")
 end
 
 function mfds:update(dt)
@@ -67,7 +54,10 @@ function mfds:update(dt)
 end
 
 function mfds:handleReceive(event)
-  self.channels[event.channel](event)
+  local handler = self.channels[event.channel]
+  if handler then
+    handler(event)
+  end
 end
 
 function mfds:draw()
