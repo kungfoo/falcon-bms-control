@@ -6,9 +6,14 @@ namespace F4SharedMem.Headers
     [Serializable]
     public class StringData
     {
+        // changelog:
+        // 1: initial BMS 4.34 version
+        // 2: added 3dbuttons.dat/3dckpit.dat file paths
+        // 3: added NavPoints
+
         public const uint STRINGDATA_AREA_SIZE_MAX = 1024 * 1024;
 
-        public int VersionNum;  // Version of the StringData shared memory area - only indicates changes to the StringIdentifier enum
+        public uint VersionNum;  // Version of the StringData shared memory area - only indicates changes to the StringIdentifier enum
         public uint NoOfStrings;       // How many strings do we have in the area?
         public uint dataSize;          // the overall size of the StringData/FalconSharedMemoryAreaString shared memory area
         public IEnumerable<StringStruct> data = new List<StringStruct>();
@@ -18,8 +23,8 @@ namespace F4SharedMem.Headers
             if (data == null) return null;
             int offset = 0;
             var toReturn = new StringData();
-            toReturn.VersionNum = BitConverter.ToInt32(data, offset);
-            offset += sizeof(int);
+            toReturn.VersionNum = BitConverter.ToUInt32(data, offset);
+            offset += sizeof(uint);
             toReturn.NoOfStrings = BitConverter.ToUInt32(data, offset);
             offset += sizeof(uint);
             toReturn.dataSize = BitConverter.ToUInt32(data, offset);
@@ -30,6 +35,7 @@ namespace F4SharedMem.Headers
                 var sStruct = new StringStruct();
                 sStruct.strId = BitConverter.ToUInt32(data, offset);
                 offset += sizeof(uint);
+                if (offset >= data.Length - sizeof(uint)) break;
                 sStruct.strLength = BitConverter.ToUInt32(data, offset);
                 offset += sizeof(uint);
                 sStruct.strData = new byte[sStruct.strLength];

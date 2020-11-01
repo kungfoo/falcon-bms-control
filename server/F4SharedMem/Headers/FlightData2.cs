@@ -23,6 +23,8 @@ namespace F4SharedMem.Headers
         // 13: added IFF panel backup digits
         // 14: added instrument backlight brightness
         // 15: added MiscBits, BettyBits, radar altitude, bingo fuel, cara alow, bullseye, BMS version information, string area size/time, drawing area size
+        // 16: added turn rate
+        // 17: added Flcs_Flcc, SolenoidStatus to MiscBits
 
         public const int RWRINFO_SIZE = 512;
         public const int MAX_CALLSIGNS = 32;

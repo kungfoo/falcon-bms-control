@@ -35,6 +35,9 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ENet.Managed, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ENet.Managed.3.0.2\lib\net45\ENet.Managed.dll</HintPath>
@@ -71,6 +74,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -79,12 +83,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FalconBmsUniversalServer.cs" />
+    <Compile Include="FalconKeyCallback.cs" />
+    <Compile Include="FalconKeyFile.cs" />
     <Compile Include="IcpButtonHandler.cs" />
+    <Compile Include="KeyboardEmulator.cs" />
+    <Compile Include="KeyboardThread.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="OsbButtonHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="app.manifest" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +103,14 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{aba9cc75-b778-4e46-a6f6-afec27f2eb59}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Win32\Common.Win32.csproj">
+      <Project>{188090e9-8b00-457b-85eb-f48bcdd94b0b}</Project>
+      <Name>Common.Win32</Name>
+    </ProjectReference>
     <ProjectReference Include="..\F4KeyFile\F4KeyFile.csproj">
       <Project>{eeed5595-6eb8-473d-b487-334b45d753a6}</Project>
       <Name>F4KeyFile</Name>

@@ -36,8 +36,7 @@ namespace F4KeyFile
             lock (KeySenderLock)
             {
                 var primaryKeyWithModifiers = keyBinding.Key;
-                var comboKeyWithModifiers = keyBinding.ComboKey;
-
+                var comboKeyWithModifiers = keyBinding.ComboKey; 
                 SendClearingKeystrokes();
                 WaitToSendNextKeystrokes();
 

@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System;
 using System.Data.HashFunction;
 using System.Data.HashFunction.xxHash;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Security;
@@ -120,8 +121,8 @@ namespace FalconBmsUniversalServer
                 case string type when OsbButtonMessage.IsType(type):
                     _osbButtonHandler.handle(Unpack<OsbButtonMessage>(e));
                     break;
-                case string type when IcpButtonMessage.IsType(type):
-                    _icpButtonHandler.handle(Unpack<IcpButtonMessage>(e));
+                case string type when IcpButtonMessage.IsType(type): 
+                    Task.Run(async () => await _icpButtonHandler.Handle(Unpack<IcpButtonMessage>(e)));
                     break;
                 case string type when StreamedTextureRequest.IsType(type):
                     HandleStreamedTextureRequest(Unpack<StreamedTextureRequest>(e), peer);

@@ -12,6 +12,7 @@ namespace F4SharedMem.Headers
     // 115: renamed "real" WOW in MLGWOW, added NLGWOW
     // 116: bitfields are now unsigned instead of signed
     // 117: added ATF_Not_Engaged to LightBits3
+    // 118: added Inlet_Icing to LightBits3
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

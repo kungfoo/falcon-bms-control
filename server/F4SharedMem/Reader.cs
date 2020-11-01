@@ -289,7 +289,7 @@ namespace F4SharedMem
 
         public FlightData GetCurrentData()
         {
-            var dataType = typeof(BMS4FlightData);
+           var dataType = typeof(BMS4FlightData);
 
             if (_hPrimarySharedMemoryAreaFileMappingObject.Equals(IntPtr.Zero))
             {
