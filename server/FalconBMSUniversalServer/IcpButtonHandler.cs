@@ -33,7 +33,9 @@ namespace FalconBmsUniversalServer
             {"IFF", "SimICPIFF"},
             {"LIST", "SimICPLIST"},
             {"A-A", "SimICPAA"},
-            {"A-G", "SimICPAG"}
+            {"A-G", "SimICPAG"},
+            {"NEXT", "SimICPNext"},
+            {"PREVIOUS", "SimICPPrevious"}
         };
 
         private static readonly string FALCON_BMS_PROCESS_NAME = "Falcon BMS";
@@ -71,7 +73,7 @@ namespace FalconBmsUniversalServer
 
             return Task.Run(() =>
             {
-                Logger.Debug("MFD OSB message received: {0}:{1}", message.type, message.button);
+                Logger.Info("MFD OSB message received: {0}:{1}", message.type, message.button);
                 switch (message.type)
                 {
                     case "icp-pressed":

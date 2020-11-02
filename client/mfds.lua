@@ -63,7 +63,7 @@ end
 function mfds:draw()
   local t1 = love.timer.getTime()
 
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.setColor(Colors.white)
   for _, component in pairs(self.components) do component:draw() end
 
   local t2 = love.timer.getTime()

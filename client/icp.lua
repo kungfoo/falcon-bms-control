@@ -56,7 +56,6 @@ end
 function icp:draw()
   local t1 = love.timer.getTime()
 
-  love.graphics.setColor(1, 1, 1)
   for _, component in pairs(self.components) do component:draw() end
 
   local t2 = love.timer.getTime()

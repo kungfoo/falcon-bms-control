@@ -3,9 +3,10 @@ local Ded = Class {
     imageData = nil
 }
 
-function Ded:init(id, x, y)
+function Ded:init(id, x, y, width, height)
     self.id = id
     self.position = {x = x or 0, y = y or 0}
+    self.dim = { width = width or 400, height = height or 130}
 end
 
 function Ded:update(dt)
@@ -13,14 +14,19 @@ end
 
 function Ded:draw()
     if self.imageData then
-        love.graphics.setColor(1, 1, 1)
+        love.graphics.setColor(Colors.white)
         if not self.image then
           -- only load image if it is a new frame.
           self.image = love.graphics.newImage(self.imageData)
         end
-        love.graphics.draw(self.image, self.position.x, self.position.y, 0, 0.85, 0.85)
+        local dw = self.dim.width / self.image:getWidth()
+        local dh = self.dim.height / self.image:getHeight()
+        local scale = math.min(dw, dh)
+        love.graphics.draw(self.image, self.position.x, self.position.y, 0, scale, scale)
       else
-        -- TODO: draw no data string here.
+        love.graphics.setColor(Colors.white)
+        love.graphics.rectangle("line", self.position.x, self.position.y, self.dim.width, self.dim.height, 0)
+        love.graphics.print("DED data...", self.position.x + 10, self.position.y + self.dim.height/2 - 10)
       end
 end
 

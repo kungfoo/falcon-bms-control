@@ -1,5 +1,7 @@
 local layout = require("lib.suit.layout").new()
 local IcpButton = require("components.icp-button")
+local Rocker = require("components.rocker")
+local IcpDedRocker = require("components.ded-rocker")
 
 local Icp = Class {buttons = {}}
 
@@ -47,6 +49,16 @@ function Icp:createButtons(id)
   table.insert(self.buttons, IcpButton(id, "8", {label = "FIX", number = 8}, layout:col()))
   table.insert(self.buttons, IcpButton(id, "9", {label = "A-CAL", number = 9}, layout:col()))
   table.insert(self.buttons, IcpButton(id, "0", {label = "M-SEL", number = 0}, layout:col()))
+
+  layout:pop()
+  layout:push(keypad.x, keypad.y)
+  layout:row(IcpButton.size, IcpButton.size)
+  layout:row()
+  layout:row()
+  layout:left()
+  layout:row(IcpButton.size, IcpButton.size * 2)
+  table.insert(self.buttons, Rocker("icp-wpt-select", layout:col()))
+  table.insert(self.buttons, IcpDedRocker("icp-ded-rocker", layout:col(IcpButton.size * 2 + 25, IcpButton.size * 2)))
 end
 
 function Icp:update(dt)

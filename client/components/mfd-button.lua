@@ -2,10 +2,7 @@ local MfdButton = Class {
   size = 50,
   lineOffset = 8,
   isPressed = false,
-  sounds = {
-    pressed = love.audio.newSource("sounds/A/button-pressed.ogg", "static"),
-    released = love.audio.newSource("sounds/A/button-released.ogg", "static"),
-  },
+  sounds = Sounds.button,
 }
 
 function MfdButton:init(mfd, id, x, y, w, h)
@@ -19,12 +16,12 @@ end
 
 function MfdButton:draw()
   if self.isPressed then
-    love.graphics.setColor(0.3, 0.6, 0.3)
+    love.graphics.setColor(Colors.green)
   else
-    love.graphics.setColor(0.3, 0.3, 0.3)
+    love.graphics.setColor(Colors.grey)
   end
   love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, 5, 5)
-  love.graphics.setColor(.8, 1, 1)
+  love.graphics.setColor(Colors.cyan)
   love.graphics.rectangle("line", self.x + self.lineOffset, self.y + self.lineOffset, self.w - self.lineOffset * 2,
                           self.h - self.lineOffset * 2, 3, 3)
 end

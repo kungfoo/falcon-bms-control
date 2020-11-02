@@ -45,7 +45,7 @@ function Mfd:draw()
   -- TODO: draw stencil for mfd border here.
   for _, button in ipairs(self.buttons) do button:draw() end
   if self.imageData then
-    love.graphics.setColor(1, 1, 1)
+    love.graphics.setColor(Colors.white)
     if not self.image then
       -- only load image if it is a new frame.
       self.image = love.graphics.newImage(self.imageData)

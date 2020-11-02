@@ -4,10 +4,7 @@ local Switcher = Class {
   radius = 5,
   currentState = nil,
   index = 0,
-  sounds = {
-    pressed = love.audio.newSource("sounds/A/button-pressed.ogg", "static"),
-    released = love.audio.newSource("sounds/A/button-released.ogg", "static"),
-  },
+  sounds = Sounds.button,
 }
 
 function Switcher:init(leftMargin, bottomMargin, states)
@@ -24,13 +21,13 @@ end
 
 function Switcher:draw()
   if self.isPressed then
-    love.graphics.setColor(0.3, 0.6, 0.3)
+    love.graphics.setColor(Colors.green)
   else
-    love.graphics.setColor(1, 1, 1)
+    love.graphics.setColor(Colors.white)
   end
   love.graphics.rectangle("line", self.x, self.y, self.width, self.height, self.radius)
 
-  love.graphics.setColor(0.3, 0.6, 0.3)
+  love.graphics.setColor(Colors.green)
 
   local highlight = {
     width = (self.width / #self.states) - 20,
@@ -39,7 +36,6 @@ function Switcher:draw()
     y = self.y + 10,
   }
   love.graphics.rectangle("fill", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
-  love.graphics.setColor(1, 1, 1)
 end
 
 function Switcher:update(dt)

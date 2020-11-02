@@ -4,6 +4,9 @@ Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
 
+Colors = require("lib.colors")
+Sounds = require("lib.sounds")
+
 require("lib.interpolate")
 require("lib.core.table")
 require("lib.core.math")
@@ -30,7 +33,7 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
 local Switcher = require("components.switcher")
-local switcher = Switcher(20, 50, {mfds, icp})
+local switcher = Switcher(20, 30, {mfds, icp})
 
 local font = love.graphics.newFont("fonts/slkscr.ttf", 20, "normal")
 
@@ -40,8 +43,8 @@ function love.load()
 
   State.registerEvents()
   -- can bypass broadcast, if server ip is known
-  -- State.switch(connecting, "127.0.0.1")
-  State.switch(broadcasting)
+  State.switch(connecting, "127.0.0.1")
+  -- State.switch(broadcasting)
 
   Signal.register("send-to-server", function(message)
     connection.server:send(msgpack.pack(message))
@@ -138,7 +141,7 @@ function love.draw()
                    debug.stats.time_update, debug.stats.time_draw, fps, mem / 1024,
                    love.graphics.getStats().texturememory / 1024 / 1024, ping)
 
-    love.graphics.setColor(255, 255, 255)
+    love.graphics.setColor(Colors.white)
     love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
   end
 end
