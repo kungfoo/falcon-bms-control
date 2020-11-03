@@ -43,8 +43,8 @@ function love.load()
 
   State.registerEvents()
   -- can bypass broadcast, if server ip is known
-  State.switch(connecting, "127.0.0.1")
-  -- State.switch(broadcasting)
+  --State.switch(connecting, "127.0.0.1")
+  State.switch(broadcasting)
 
   Signal.register("send-to-server", function(message)
     connection.server:send(msgpack.pack(message))

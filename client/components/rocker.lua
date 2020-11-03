@@ -1,22 +1,32 @@
-local RockerButton = Class {radius = 5, sounds = Sounds.button, isPressed = false}
+local triangles = require("lib.triangles")
+local RockerButton = Class {radius = 5, sounds = Sounds.button, isPressed = false, size = 30}
 
-function RockerButton:init(opts)
-  self.id = opts.id
-  self.x, self.y, self.width, self.height = opts.x, opts.y, opts.width, opts.height
+function RockerButton:init(id, opts, x, y, width, height)
+  opts = opts or {}
+  self.id = id
+  self.x, self.y, self.w, self.h = x, y, width, height
+  self.direction = opts.direction or "UP"
 end
 
 function RockerButton:draw()
   if self.isPressed then
     love.graphics.setColor(Colors.green)
   else
-    love.graphics.setColor(Colors.white)
+    love.graphics.setColor(Colors.grey)
   end
-  love.graphics.rectangle("line", self.x, self.y, self.width, self.height, self.radius)
-  love.graphics.printf(self.id, self.x, self.y, self.height - 5)
+  love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, 5, 5)
+  love.graphics.setColor(Colors.cyan)
+  love.graphics.rectangle("line", self.x, self.y, self.w, self.h, 5, 5)
+  
+  -- direction indicator
+  local points = triangles:fit(self.direction, self.x, self.y, self.w, self.h)
+  love.graphics.setColor(Colors.white)
+  love.graphics.polygon("fill", points.p1.x, points.p1.y, points.p2.x, points.p2.y, points.p3.x, points.p3.y)
 end
 
+
 function RockerButton:hit(x, y)
-  return x >= self.x and x <= self.x + self.width and y >= self.y and y <= self.y + self.height
+  return x >= self.x and x <= self.x + self.w and y >= self.y and y <= self.y + self.h
 end
 
 function RockerButton:pressed()
@@ -33,51 +43,4 @@ function RockerButton:released()
   Signal.emit("send-to-server", message)
 end
 
---
-
-local Rocker = Class {padding = 25}
-
-function Rocker:init(id, x, y, width, height)
-  self.id = id
-  self.x, self.y = x, y
-  self.width, self.height = width, height
-  local next = {id = "NEXT", x = x, y = y, width = width, height = (height - self.padding) / 2}
-
-  local previous = {
-    id = "PREVIOUS",
-    x = x,
-    y = y + height / 2 + self.padding / 2,
-    width = width,
-    height = (height - self.padding) / 2,
-  }
-  self.buttons = {RockerButton(next), RockerButton(previous)}
-end
-
-function Rocker:draw()
-  for _, button in ipairs(self.buttons) do button:draw() end
-end
-
-function Rocker:update(dt)
-end
-
-function Rocker:hit(x, y)
-  for _, button in ipairs(self.buttons) do
-    if button:hit(x, y) then
-      self.pressed = button
-      button:pressed()
-    end
-  end
-end
-
-function Rocker:pressed()
-  -- intentionally left blank
-end
-
-function Rocker:released()
-  if self.pressed then
-    self.pressed:released()
-    self.pressed = nil
-  end
-end
-
-return Rocker
+return RockerButton
