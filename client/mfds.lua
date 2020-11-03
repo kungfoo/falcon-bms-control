@@ -22,7 +22,7 @@ local mfds = {
     end,
     [2] = function(event)
       components["f16/right-mfd"]:consume(event.data)
-    end
+    end,
   },
 }
 
@@ -55,9 +55,7 @@ end
 
 function mfds:handleReceive(event)
   local handler = self.channels[event.channel]
-  if handler then
-    handler(event)
-  end
+  if handler then handler(event) end
 end
 
 function mfds:draw()
