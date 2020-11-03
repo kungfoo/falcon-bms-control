@@ -34,8 +34,12 @@ namespace FalconBmsUniversalServer
             {"LIST", "SimICPLIST"},
             {"A-A", "SimICPAA"},
             {"A-G", "SimICPAG"},
-            {"NEXT", "SimICPNext"},
-            {"PREVIOUS", "SimICPPrevious"}
+            {"icp-wpt-next", "SimICPNext"},
+            {"icp-wpt-previous", "SimICPPrevious"},
+            {"icp-ded-up", "SimICPDEDUP"},
+            {"icp-ded-down", "SimICPDEDDOWN"},
+            {"icp-ded-seq", "SimICPDEDSEQ"},
+            {"icp-ded-return", "SimICPResetDED"},
         };
 
         private static readonly string FALCON_BMS_PROCESS_NAME = "Falcon BMS";
@@ -73,7 +77,7 @@ namespace FalconBmsUniversalServer
 
             return Task.Run(() =>
             {
-                Logger.Info("MFD OSB message received: {0}:{1}", message.type, message.button);
+                Logger.Info("icp-button: {0}:{1}", message.type, message.button);
                 switch (message.type)
                 {
                     case "icp-pressed":
