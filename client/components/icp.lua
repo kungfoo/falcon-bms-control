@@ -2,10 +2,7 @@ local layout = require("lib.suit.layout").new()
 local IcpButton = require("components.icp-button")
 local RockerButton = require("components.rocker")
 
-local Icp = Class {
-  buttons = {}, 
-  padding = 25
-}
+local Icp = Class {buttons = {}, padding = 25}
 
 function Icp:init(id, x, y)
   self.id = id
@@ -54,12 +51,14 @@ function Icp:createButtons(id)
   layout:row(IcpButton.size, IcpButton.size)
   layout:row()
   layout:row()
-  table.insert(self.buttons, RockerButton("icp-wpt-next", {direction = "UP"}, layout:row(IcpButton.size, IcpButton.size)))
+  table.insert(self.buttons,
+               RockerButton("icp-wpt-next", {direction = "UP"}, layout:row(IcpButton.size, IcpButton.size)))
   table.insert(self.buttons, RockerButton("icp-wpt-previous", {direction = "DOWN"}, layout:row()))
 
   -- ded 4-way rocker
-  layout:reset(keypad.x + IcpButton.size + self.padding, keypad.y + (4*IcpButton.size + self.padding/2), self.padding/3)
-  layout:col(IcpButton.size*2/3, IcpButton.size*2/3)
+  layout:reset(keypad.x + IcpButton.size + self.padding, keypad.y + (4 * IcpButton.size + self.padding / 2),
+               self.padding / 3)
+  layout:col(IcpButton.size * 2 / 3, IcpButton.size * 2 / 3)
   table.insert(self.buttons, RockerButton("icp-ded-up", {direction = "UP"}, layout:col()))
   layout:left()
   table.insert(self.buttons, RockerButton("icp-ded-return", {direction = "LEFT"}, layout:row()))

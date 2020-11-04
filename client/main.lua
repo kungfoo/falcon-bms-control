@@ -35,7 +35,7 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 local Switcher = require("components.switcher")
 local switcher = Switcher(20, 30, {mfds, icp})
 
-local font = love.graphics.newFont("fonts/slkscr.ttf", 20, "normal")
+local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
 function love.load()
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
@@ -43,7 +43,7 @@ function love.load()
 
   State.registerEvents()
   -- can bypass broadcast, if server ip is known
-  --State.switch(connecting, "127.0.0.1")
+  -- State.switch(connecting, "127.0.0.1")
   State.switch(broadcasting)
 
   Signal.register("send-to-server", function(message)
@@ -142,7 +142,7 @@ function love.draw()
                    love.graphics.getStats().texturememory / 1024 / 1024, ping)
 
     love.graphics.setColor(Colors.white)
-    love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
+    love.graphics.printf(text, 10, love.graphics.getHeight() - 26, love.graphics.getWidth(), "left")
   end
 end
 

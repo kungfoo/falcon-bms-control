@@ -1,8 +1,8 @@
 local inspect = require("lib.inspect")
 
 local IcpButton = Class {
-  smallFont = love.graphics.newFont("fonts/DINRegular.ttf", 18, "normal"),
-  largeFont = love.graphics.newFont("fonts/DINRegular.ttf", 24, "normal"),
+  smallFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 18, "normal"),
+  largeFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 24, "normal"),
   size = 60,
   isPressed = false,
   sounds = Sounds.button,

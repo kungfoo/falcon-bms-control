@@ -17,13 +17,12 @@ function RockerButton:draw()
   love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, 5, 5)
   love.graphics.setColor(Colors.cyan)
   love.graphics.rectangle("line", self.x, self.y, self.w, self.h, 5, 5)
-  
+
   -- direction indicator
   local points = triangles:fit(self.direction, self.x, self.y, self.w, self.h)
   love.graphics.setColor(Colors.white)
   love.graphics.polygon("fill", points.p1.x, points.p1.y, points.p2.x, points.p2.y, points.p3.x, points.p3.y)
 end
-
 
 function RockerButton:hit(x, y)
   return x >= self.x and x <= self.x + self.w and y >= self.y and y <= self.y + self.h
