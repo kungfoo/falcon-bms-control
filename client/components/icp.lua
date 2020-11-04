@@ -2,11 +2,12 @@ local layout = require("lib.suit.layout").new()
 local IcpButton = require("components.icp-button")
 local RockerButton = require("components.rocker")
 
-local Icp = Class {buttons = {}, padding = 25}
+local Icp = Class {padding = 25}
 
 function Icp:init(id, x, y)
   self.id = id
   self.position = {x = x or 0, y = y or 0}
+  self.buttons = {}
   self:createButtons(id)
 end
 

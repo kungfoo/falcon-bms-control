@@ -75,14 +75,13 @@ function love.update(dt)
             print(inspect(server.clients))
         elseif event.type == "receive" then
             local payload = msgpack.unpack(event.data)
+            print(inspect(payload))
 
-            if string.match(payload.type, "osb") then
-                print(inspect(payload))
+            if string.match(payload.type, "osb-") then
                 event.peer:send(msgpack.pack({type = "ack", payload = payload}))
             end
 
-            if string.match(payload.type, "icp") then
-                print(inspect(payload))
+            if string.match(payload.type, "icp-") then
                 event.peer:send(msgpack.pack({type = "ack", payload = payload}))
             end
 

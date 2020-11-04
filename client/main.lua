@@ -6,6 +6,7 @@ Timer = require("lib.hump.timer")
 
 Colors = require("lib.colors")
 Sounds = require("lib.sounds")
+inspect = require("lib.inspect")
 
 require("lib.interpolate")
 require("lib.core.table")

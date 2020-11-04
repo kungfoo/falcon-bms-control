@@ -1,10 +1,9 @@
-local Ded = Class {
-  image = nil, -- drawable image
-  imageData = nil,
-}
+local Ded = Class {}
 
 function Ded:init(id, x, y, width, height)
   self.id = id
+  self.image = nil -- drawable image
+  self.imageData = nil -- pure image data received from server
   self.position = {x = x or 0, y = y or 0}
   self.dim = {width = width or 400, height = height or 130}
 end

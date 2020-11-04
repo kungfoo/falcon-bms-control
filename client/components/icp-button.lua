@@ -4,7 +4,6 @@ local IcpButton = Class {
   smallFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 18, "normal"),
   largeFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 24, "normal"),
   size = 60,
-  isPressed = false,
   sounds = Sounds.button,
 }
 
@@ -15,6 +14,7 @@ function IcpButton:init(icp, id, options, x, y, w, h)
   self.y = y
   self.w = w
   self.h = h
+  self.isPressed = false
   self.options = options
   self.options.type = options.type or "square"
 end

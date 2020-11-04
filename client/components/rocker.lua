@@ -1,11 +1,12 @@
 local triangles = require("lib.triangles")
-local RockerButton = Class {radius = 5, sounds = Sounds.button, isPressed = false, size = 30}
+local RockerButton = Class {radius = 5, sounds = Sounds.button, size = 30}
 
 function RockerButton:init(id, opts, x, y, width, height)
   opts = opts or {}
   self.id = id
   self.x, self.y, self.w, self.h = x, y, width, height
   self.direction = opts.direction or "UP"
+  self.isPressed = false
 end
 
 function RockerButton:draw()

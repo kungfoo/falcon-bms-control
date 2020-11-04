@@ -1,8 +1,10 @@
-local Switcher = Class {width = 150, height = 60, radius = 5, currentState = nil, index = 0, sounds = Sounds.button}
+local Switcher = Class {width = 150, height = 60, radius = 5, sounds = Sounds.button}
 
 function Switcher:init(leftMargin, bottomMargin, states)
   self.margins = {leftMargin = leftMargin, bottomMargin = bottomMargin}
   self.states = states
+  self.currentState = nil
+  self.index = 0
 end
 
 function Switcher:switch()
