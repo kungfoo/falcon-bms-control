@@ -20,7 +20,7 @@ local tick = require("lib.tick")
 
 -- connecting states
 local broadcasting = {port = 9020}
-local connecting = {port = 9022}
+local connecting = {port = 9022, channels = 255}
 
 -- connected screen states
 local mfds = require("mfds")
@@ -93,7 +93,7 @@ end
 function connecting:enter(previous, serverIp)
   connection.ip = serverIp or connection.ip
   connection.host = enet.host_create()
-  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, 255)
+  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, connecting.channels)
 end
 
 function connecting:handleReceive(event)
