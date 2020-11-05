@@ -17,13 +17,13 @@ function Mfd:createButtons(identifier)
   -- top row of buttons
   layout:push(self.position.x, self.position.y)
   layout:col(MfdButton.size, MfdButton.size)
-  for _, osb in ipairs {"OSB1", "OSB2", "OSB3", "OSB4", "OSB5"} do
+  for _, osb in ipairs {"OSB_1", "OSB_2", "OSB_3", "OSB_4", "OSB_5"} do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:col()))
   end
 
   -- right column
   layout:right()
-  for _, osb in ipairs {"OSB6", "OSB7", "OSB8", "OSB9", "OSB10"} do
+  for _, osb in ipairs {"OSB_6", "OSB_7", "OSB_8", "OSB_9", "OSB_10"} do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:row()))
   end
 
@@ -31,13 +31,13 @@ function Mfd:createButtons(identifier)
   layout:pop()
   layout:push(self.position.x, self.position.y)
   layout:col(MfdButton.size, MfdButton.size)
-  for _, osb in ipairs {"OSB20", "OSB19", "OSB18", "OSB17", "OSB16"} do
+  for _, osb in ipairs {"OSB_20", "OSB_19", "OSB_18", "OSB_17", "OSB_16"} do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:row()))
   end
 
   -- bottom row
   layout:down()
-  for _, osb in ipairs {"OSB15", "OSB14", "OSB13", "OSB12", "OSB11"} do
+  for _, osb in ipairs {"OSB_15", "OSB_14", "OSB_13", "OSB_12", "OSB_11"} do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:col()))
   end
 end
