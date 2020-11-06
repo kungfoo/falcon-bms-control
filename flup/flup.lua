@@ -1,5 +1,3 @@
-local Class = require("class")
-
 local flup = {split = Class {}, fixed = Class {}, internal = {}}
 
 function flup.split:init(options)

@@ -3,6 +3,7 @@ Class = require("lib.hump.class")
 Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
+Flup = require("lib.flup")
 
 Colors = require("lib.colors")
 Sounds = require("lib.sounds")
