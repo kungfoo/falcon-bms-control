@@ -1,3 +1,4 @@
+local StreamedTexture = require("util.streamed-texture")
 local Ded = Class {}
 
 function Ded:init(id, x, y, width, height)
@@ -32,6 +33,14 @@ end
 function Ded:consume(data)
   self.imageData = love.image.newImageData(love.data.newByteData(data))
   self.image = nil
+end
+
+function Ded:start()
+  StreamedTexture.start(self.id)
+end
+
+function Ded:stop()
+  StreamedTexture.stop()
 end
 
 function Ded:mousepressed(x, y, button, isTouch, presses)

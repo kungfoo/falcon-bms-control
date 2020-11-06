@@ -1,15 +1,12 @@
-local msgpack = require("lib.msgpack")
-local inspect = require("lib.inspect")
-
-local StreamedTexture = require("util.streamed-texture")
-
 local Mfd = require("components.mfd")
+local Flup = require("lib.flup")
 
-local components = {}
+local leftMfd = Mfd("f16/left-mfd", 20, 30)
+local rightMfd = Mfd("f16/right-mfd", 520, 30)
 
-local mfds = {
+local mfds = Class {
   stats = {},
-  components = components,
+  components = {},
   channels = {
     -- general purpose reliable channel
     [0] = function(event)
@@ -18,30 +15,28 @@ local mfds = {
     end,
     -- texture memory channels are unrealiable and pure image data.
     [1] = function(event)
-      components["f16/left-mfd"]:consume(event.data)
+      leftMfd:consume(event.data)
     end,
     [2] = function(event)
-      components["f16/right-mfd"]:consume(event.data)
+      rightMfd:consume(event.data)
     end,
   },
 }
 
 function mfds:init()
-  local leftMfd = Mfd("f16/left-mfd", 20, 30)
-  local rightMfd = Mfd("f16/right-mfd", 520, 30)
   self.components[leftMfd.id] = leftMfd
   self.components[rightMfd.id] = rightMfd
 end
 
 function mfds:enter(previous, switcher)
   self.components["switcher"] = switcher
-  StreamedTexture.start("f16/left-mfd")
-  StreamedTexture.start("f16/right-mfd")
+  leftMfd:start()
+  rightMfd:start()
 end
 
 function mfds:leave()
-  StreamedTexture.stop("f16/left-mfd")
-  StreamedTexture.stop("f16/right-mfd")
+  leftMfd:stop()
+  rightMfd:stop()
 end
 
 function mfds:update(dt)

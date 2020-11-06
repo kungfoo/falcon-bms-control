@@ -1,3 +1,4 @@
+local StreamedTexture = require("util.streamed-texture")
 local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
@@ -63,6 +64,14 @@ end
 function Mfd:consume(data)
   self.imageData = love.image.newImageData(love.data.newByteData(data))
   self.image = nil
+end
+
+function Mfd:start()
+  StreamedTexture.start(self.id)
+end
+
+function Mfd:stop()
+  StreamedTexture.stop(self.id)
 end
 
 function Mfd:mousepressed(x, y, button, isTouch, presses)

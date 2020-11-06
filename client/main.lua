@@ -7,6 +7,7 @@ Flup = require("lib.flup")
 
 Colors = require("lib.colors")
 Sounds = require("lib.sounds")
+msgpack = require("lib.msgpack")
 inspect = require("lib.inspect")
 
 require("lib.interpolate")
@@ -16,7 +17,6 @@ require("lib.core.math")
 -- libraries
 local socket = require("socket")
 local enet = require("enet")
-local msgpack = require("lib.msgpack")
 local tick = require("lib.tick")
 
 -- connecting states
