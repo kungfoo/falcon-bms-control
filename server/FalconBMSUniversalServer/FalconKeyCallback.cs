@@ -123,7 +123,7 @@ namespace FalconBMSUniversalServer
             {221, "{APPS}"}
         };
 
-        private string _callbackName;
+        private readonly string _callbackName;
         private string _description;
         private int _keyCode;
         private int _modifiers;
@@ -277,16 +277,14 @@ namespace FalconBMSUniversalServer
         public void Press()
         {
             GenerateStrings();
-            if (_keyString.Length > 0)
+            if (_keyString.Length <= 0) return;
+            if (_comboKeyString.Length > 0)
             {
-                if (_comboKeyString.Length > 0)
-                {
-                    KeyboardEmulator.KeyPress(_comboKeyString + " " + _keyString);
-                }
-                else
-                {
-                    KeyboardEmulator.KeyPress(_keyString);
-                }
+                KeyboardEmulator.KeyPress(_comboKeyString + " " + _keyString);
+            }
+            else
+            {
+                KeyboardEmulator.KeyPress(_keyString);
             }
         }
 
@@ -323,13 +321,7 @@ namespace FalconBMSUniversalServer
 
         public override bool Equals(object obj)
         {
-            FalconKeyCallback other = obj as FalconKeyCallback;
-            if (other == null)
-            {
-                return false;
-            }
-
-            return Name.Equals(other.Name);
+            return obj is FalconKeyCallback other && Name.Equals(other.Name);
         }
 
         public override int GetHashCode()
@@ -339,7 +331,7 @@ namespace FalconBMSUniversalServer
 
         public int CompareTo(FalconKeyCallback other)
         {
-            return Description.CompareTo(other.Description);
+            return String.Compare(Description, other.Description, StringComparison.Ordinal);
         }
     }
 }

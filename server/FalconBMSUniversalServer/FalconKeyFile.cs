@@ -23,9 +23,9 @@
     public class FalconKeyFile
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconKeyFile");
-        private string _fileName;
+        private readonly string _fileName;
         private bool _parsed = false;
-        private Dictionary<string, FalconKeyCallback> _callbacks = new Dictionary<string, FalconKeyCallback>();
+        private readonly Dictionary<string, FalconKeyCallback> _callbacks = new Dictionary<string, FalconKeyCallback>();
         private List<FalconKeyCallback> _callbackList;
 
         public FalconKeyFile(string keyFile)

@@ -23,8 +23,8 @@
     {
         private readonly Thread _thread;
 
-        public Queue<NativeMethods.INPUT> _events = new Queue<NativeMethods.INPUT>();
-        public int _keyDelay = 30;
+        private readonly Queue<NativeMethods.Input> _events = new Queue<NativeMethods.Input>();
+        private int _keyDelay;
 
         public KeyboardThread(int keyDelay)
         {
@@ -59,13 +59,13 @@
 
         #endregion
 
-        internal void AddEvents(List<NativeMethods.INPUT> events)
+        internal void AddEvents(List<NativeMethods.Input> events)
         {
             lock (typeof(KeyboardThread))
             {
                 bool interrupt = (_events.Count == 0);
 
-                foreach (NativeMethods.INPUT keyEvent in events)
+                foreach (NativeMethods.Input keyEvent in events)
                 {
                     _events.Enqueue(keyEvent);
                 }
@@ -76,7 +76,7 @@
             }
         }
 
-        public void Run()
+        private void Run()
         {        
             while (true)
             {
@@ -88,7 +88,7 @@
                     if (_events.Count > 0)
                     {
                         sleepTime = _keyDelay;
-                        NativeMethods.INPUT keyEvent = _events.Dequeue();
+                        NativeMethods.Input keyEvent = _events.Dequeue();
                         NativeMethods.SendInput(1, new[] { keyEvent }, Marshal.SizeOf(keyEvent));
                     }
                 }
@@ -99,7 +99,7 @@
                 }
                 catch (ThreadInterruptedException)
                 {
-                    // NO-Op
+                    
                 }
             }
         }

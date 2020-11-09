@@ -1,47 +1,15 @@
-//  Copyright 2014 Craig Courtney
-//    
-//  Helios is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  Helios is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace FalconBMSUniversalServer
 {
-    /// <summary>
-    /// Keyboard emulator which can send keyboard events to the application with focus.  Special keys can be sent by
-    /// sending their names in brackets.
-    /// 
-    /// BACKSPACE, TAB, CLEAR, RETURN, LSHIFT, RSHIFT, LCONTROL, RCONTROL, LALT, RALT, PAUSE, CAPSLOCK, ESCAPE, SPACE,
-    /// PAGEUP, PAGEDOWN, END, HOME, LEFT, UP, RIGHT, DOWN, PRINTSCREEN, INSERT, DELETE, LWIN, RWIN, APPS, NUMPAD0,
-    /// NUMPAD1, NUMPAD2, NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9, MULTIPLY, ADD, SEPARATOR,
-    /// SUBTRACT, DECIMAL, DIVIDE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19,
-    /// F20, F21, F22, F23, F24, NUMLOCK, SCROLLLOCK
-    /// </summary>
-    public class KeyboardEmulator
+    public static class KeyboardEmulator
     {
-        // selected keyboard layout for mapping of characters to key codes
-        private static IntPtr _hkl;
+        private static readonly IntPtr KeyboardLayout;
+        private static readonly KeyboardThread KeyboardThread;
 
-        // keyboard layout of current thread at static init
-        private static IntPtr _defaultLayout;
-
-        private static bool _forceQwerty;
-
-        private static KeyboardThread _keyboardThread;
-
-        private static Dictionary<string, ushort> _keycodes = new Dictionary<string, ushort>{
+        private static readonly Dictionary<string, ushort> Keycodes = new Dictionary<string, ushort>{
             {"BACKSPACE", 0x08},
             {"TAB", 0x09},
             {"CLEAR", 0x0C},
@@ -112,38 +80,22 @@ namespace FalconBMSUniversalServer
             {"F24", 0x87},
             {"NUMLOCK", 0x90},
             {"SCROLLLOCK", 0x91},
-            {"ENTER", 0x0D},                  // synonym for "RETURN".  This is deliberate. 
-            {"NUMENTER", 0x10D },             // not a real keycode, high byte used to indicate an extended mapping which results in the scancode for ENTER on the numeric keypad.
+            {"ENTER", 0x0D},     
+            // high byte set is numpad
+            {"NUMENTER", 0x10D },
             {"NUMPADENTER", 0x10D }
         };
 
         static KeyboardEmulator()
         {
-            _keyboardThread = new KeyboardThread(30);
-
-            _defaultLayout = NativeMethods.GetKeyboardLayout(0);
-            _hkl = _defaultLayout;
+            KeyboardThread = new KeyboardThread(30);
+            KeyboardLayout = NativeMethods.GetKeyboardLayout(0);
         }
 
-        private KeyboardEmulator()
-        {
-        }
 
-        public static int KeyDelay
+        private static List<NativeMethods.Input> CreateEvents(string keys, bool keyDown, bool reverse)
         {
-            get
-            {
-                return _keyboardThread.KeyDelay;
-            }
-            set
-            {
-                _keyboardThread.KeyDelay = value;
-            }
-        }
-
-        private static List<NativeMethods.INPUT> CreateEvents(string keys, bool keyDown, bool reverse)
-        {
-            List<NativeMethods.INPUT> eventList = new List<NativeMethods.INPUT>();
+            List<NativeMethods.Input> eventList = new List<NativeMethods.Input>();
             int length = keys.Length;
             for (int index = 0; index < length; index++)
             {
@@ -154,9 +106,9 @@ namespace FalconBMSUniversalServer
                     if (endIndex > -1)
                     {
                         string keycode = keys.Substring(index + 1, endIndex - index - 1).ToUpper();
-                        if (_keycodes.ContainsKey(keycode))
+                        if (Keycodes.ContainsKey(keycode))
                         {
-                            eventList.Add(CreateInput(_keycodes[keycode], keyDown));
+                            eventList.Add(CreateInput(Keycodes[keycode], keyDown));
                         }
                         index = endIndex;
                     }
@@ -167,7 +119,7 @@ namespace FalconBMSUniversalServer
                 }
                 else
                 {
-                    eventList.Add(CreateInput((ushort)NativeMethods.VkKeyScanEx(character, _hkl), keyDown));
+                    eventList.Add(CreateInput((ushort)NativeMethods.VkKeyScanEx(character, KeyboardLayout), keyDown));
                 }
             }
 
@@ -179,20 +131,20 @@ namespace FalconBMSUniversalServer
             return eventList;
         }
 
-        private static NativeMethods.INPUT CreateInput(ushort virtualKeyCode, bool keyDown)
+        private static NativeMethods.Input CreateInput(ushort virtualKeyCode, bool keyDown)
         {
             ushort ourCode = virtualKeyCode;
             if (ourCode > 0xff)
             {
                 virtualKeyCode = (ushort)(virtualKeyCode & 0x00ff);
             }
-            NativeMethods.INPUT input = new NativeMethods.INPUT();
-            input.type = NativeMethods.INPUT_KEYBOARD;
-            input.mkhi.ki.wVk = virtualKeyCode;
-            input.mkhi.ki.time = 0;
-            input.mkhi.ki.wScan = 0;
-            input.mkhi.ki.dwExtraInfo = IntPtr.Zero;
-            input.mkhi.ki.dwFlags = NativeMethods.KEY_SCANCODE;
+            NativeMethods.Input input = new NativeMethods.Input();
+            input.Type = NativeMethods.InputKeyboard;
+            input.inputs.ki.wVk = virtualKeyCode;
+            input.inputs.ki.time = 0;
+            input.inputs.ki.wScan = 0;
+            input.inputs.ki.dwExtraInfo = IntPtr.Zero;
+            input.inputs.ki.dwFlags = NativeMethods.KeyScanCode;
 
             if (ourCode > 0xff ||
                 (virtualKeyCode >= 0x21 && virtualKeyCode <= 0x28) ||
@@ -204,10 +156,10 @@ namespace FalconBMSUniversalServer
                 virtualKeyCode == 0xA3 ||
                 virtualKeyCode == 0xA5)
             {
-                input.mkhi.ki.dwFlags |= NativeMethods.KEY_EXTENDED;
+                input.inputs.ki.dwFlags |= NativeMethods.KeyExtended;
             }
 
-            uint scanCode = NativeMethods.MapVirtualKeyEx(virtualKeyCode, 0, _hkl);
+            uint scanCode = NativeMethods.MapVirtualKeyEx(virtualKeyCode, 0, KeyboardLayout);
             if (virtualKeyCode == 0x13)
             {
                 scanCode = 0x04C5;                  // extended scancode for Pause
@@ -215,50 +167,38 @@ namespace FalconBMSUniversalServer
 
             if (keyDown)
             {
-                input.mkhi.ki.wScan = (ushort)(scanCode & 0xFF);
+                input.inputs.ki.wScan = (ushort)(scanCode & 0xFF);
             }
             else
             {
-                input.mkhi.ki.wScan = (ushort)scanCode;
-                input.mkhi.ki.dwFlags |= NativeMethods.KEY_UP;
+                input.inputs.ki.wScan = (ushort)scanCode;
+                input.inputs.ki.dwFlags |= NativeMethods.KeyUp;
             }
 
             return input;
         }
 
-        /// <summary>
-        /// Sends key down events for the given keys.
-        /// </summary>
-        /// <param name="keys">Keys to send keydown events for.</param>
         public static void KeyDown(string keys)
         {            
             string[] keyList = Regex.Split(keys, @"\s+");
             foreach (string keyCombo in keyList)
             {
-                _keyboardThread.AddEvents(CreateEvents(keys, true, false));
+                KeyboardThread.AddEvents(CreateEvents(keys, true, false));
             }
         }
-
-        /// <summary>
-        /// Sends key up events for the given keys.
-        /// </summary>
-        /// <param name="keys">Keys to send keyup events for.</param>
+        
         public static void KeyUp(string keys)
         {
             string[] keyList = Regex.Split(keys, @"\s+");
             foreach (string keyCombo in keyList)
             {
-                _keyboardThread.AddEvents(CreateEvents(keys, false, false));
+                KeyboardThread.AddEvents(CreateEvents(keys, false, false));
             }
         }
-
-        /// <summary>
-        /// Sends key down and up events for the given keys.
-        /// </summary>
-        /// <param name="keys">Keys to send key presses for.</param>
+        
         public static void KeyPress(string keys)
         {
-            List<NativeMethods.INPUT> events = new List<NativeMethods.INPUT>();
+            List<NativeMethods.Input> events = new List<NativeMethods.Input>();
 
             string[] keyList = Regex.Split(keys, @"\s+");
             foreach (string keyCombo in keyList)
@@ -267,7 +207,7 @@ namespace FalconBMSUniversalServer
                 events.AddRange(CreateEvents(keyCombo, false, true));
             }
 
-            _keyboardThread.AddEvents(events);
+            KeyboardThread.AddEvents(events);
         }
     }
 }
