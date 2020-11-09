@@ -6,7 +6,7 @@ local rightMfd = Mfd("f16/right-mfd", 520, 30)
 
 local mfds = Class {
   stats = {},
-  components = {},
+  components = {leftMfd, rightMfd},
   channels = {
     -- general purpose reliable channel
     [0] = function(event)
@@ -21,11 +21,14 @@ local mfds = Class {
       rightMfd:consume(event.data)
     end,
   },
+  dimensions = {
+    w = 0,
+    h = 0
+  }
 }
 
 function mfds:init()
-  self.components[leftMfd.id] = leftMfd
-  self.components[rightMfd.id] = rightMfd
+  self.flup = Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}}
 end
 
 function mfds:enter(previous, switcher)
@@ -41,6 +44,13 @@ end
 
 function mfds:update(dt)
   local t1 = love.timer.getTime()
+
+  local w,h = love.graphics.getDimensions()
+  if self.dimensions.w ~= w or self.dimensions.h ~= h then
+    self.flup:fill(0, 0, w, h - 60)
+    self.dimensions.w = w
+    self.dimensions.h = h 
+  end
 
   for _, component in pairs(self.components) do component:update(dt) end
 

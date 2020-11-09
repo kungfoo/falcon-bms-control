@@ -13,6 +13,7 @@ function Mfd:init(identifier, x, y)
 end
 
 function Mfd:createButtons(identifier)
+  self.buttons = {}
   layout:reset(self.position.x, self.position.y):padding(20, 20)
 
   -- top row of buttons
@@ -59,6 +60,12 @@ function Mfd:draw()
 end
 
 function Mfd:update(dt)
+end
+
+function Mfd:updateGeometry(x,y,w,h)
+  self.position.x = x
+  self.position.y = y
+  self:createButtons()
 end
 
 function Mfd:consume(data)
