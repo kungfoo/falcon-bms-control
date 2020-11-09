@@ -53,6 +53,7 @@ function Mfd:draw()
       -- only load image if it is a new frame.
       self.image = love.graphics.newImage(self.imageData)
     end
+    -- TODO: scale image according to component width and height, not a fixed scale.
     love.graphics.draw(self.image, self.position.x + MfdButton.size, self.position.y + MfdButton.size, 0, 0.85, 0.85)
   else
     -- TODO: draw no data string here.
