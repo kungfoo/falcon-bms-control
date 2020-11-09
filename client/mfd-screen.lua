@@ -4,7 +4,7 @@ local Flup = require("lib.flup")
 local leftMfd = Mfd("f16/left-mfd", 20, 30)
 local rightMfd = Mfd("f16/right-mfd", 520, 30)
 
-local mfds = Class {
+local Screen = Class {
   stats = {},
   components = {leftMfd, rightMfd},
   channels = {
@@ -27,22 +27,22 @@ local mfds = Class {
   }
 }
 
-function mfds:init()
+function Screen:init()
   self.flup = Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}}
 end
 
-function mfds:enter(previous, switcher)
+function Screen:enter(previous, switcher)
   self.components["switcher"] = switcher
   leftMfd:start()
   rightMfd:start()
 end
 
-function mfds:leave()
+function Screen:leave()
   leftMfd:stop()
   rightMfd:stop()
 end
 
-function mfds:update(dt)
+function Screen:update(dt)
   local t1 = love.timer.getTime()
 
   local w,h = love.graphics.getDimensions()
@@ -58,12 +58,12 @@ function mfds:update(dt)
   self.stats.time_update = (t2 - t1) * 1000
 end
 
-function mfds:handleReceive(event)
+function Screen:handleReceive(event)
   local handler = self.channels[event.channel]
   if handler then handler(event) end
 end
 
-function mfds:draw()
+function Screen:draw()
   local t1 = love.timer.getTime()
 
   love.graphics.setColor(Colors.white)
@@ -73,12 +73,12 @@ function mfds:draw()
   self.stats.time_draw = (t2 - t1) * 1000
 end
 
-function mfds:mousepressed(x, y, button, isTouch, presses)
+function Screen:mousepressed(x, y, button, isTouch, presses)
   for _, component in pairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
 end
 
-function mfds:mousereleased(x, y, button, isTouch, presses)
+function Screen:mousereleased(x, y, button, isTouch, presses)
   for _, component in pairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
 end
 
-return mfds
+return Screen

@@ -8,7 +8,7 @@ local components = {}
 local ded = Ded("f16/ded", 20, 30)
 local icp = Icp("f16/icp", 20, 175)
 
-local icp = Class {
+local Screen = Class {
   components = {icp, ded},
   stats = {},
   channels = {
@@ -27,19 +27,19 @@ local icp = Class {
   },
 }
 
-function icp:init()
+function Screen:init()
 end
 
-function icp:enter(previous, switcher)
+function Screen:enter(previous, switcher)
   self.components["switcher"] = switcher
   ded:start()
 end
 
-function icp:leave()
+function Screen:leave()
   ded:stop()
 end
 
-function icp:update(dt)
+function Screen:update(dt)
   local t1 = love.timer.getTime()
 
   for _, component in pairs(self.components) do component:update(dt) end
@@ -48,12 +48,12 @@ function icp:update(dt)
   self.stats.time_update = (t2 - t1) * 1000
 end
 
-function icp:handleReceive(event)
+function Screen:handleReceive(event)
   local handler = self.channels[event.channel]
   if handler then handler(event) end
 end
 
-function icp:draw()
+function Screen:draw()
   local t1 = love.timer.getTime()
 
   for _, component in pairs(self.components) do component:draw() end
@@ -62,12 +62,12 @@ function icp:draw()
   self.stats.time_draw = (t2 - t1) * 1000
 end
 
-function icp:mousepressed(x, y, button, isTouch, presses)
+function Screen:mousepressed(x, y, button, isTouch, presses)
   for _, component in pairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
 end
 
-function icp:mousereleased(x, y, button, isTouch, presses)
+function Screen:mousereleased(x, y, button, isTouch, presses)
   for _, component in pairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
 end
 
-return icp
+return Screen

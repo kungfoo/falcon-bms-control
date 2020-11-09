@@ -24,8 +24,8 @@ local broadcasting = {port = 9020}
 local connecting = {port = 9022, channels = 255}
 
 -- connected screen states
-local mfds = require("mfds")
-local icp = require("icp")
+local mfd_screen = require("mfd-screen")
+local icp_and_rwr = require("icp-and-rwr-screen")
 
 -- data
 local connection = {ip = nil, server = nil, host = nil, peer = nil}
@@ -35,7 +35,7 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
 local Switcher = require("components.switcher")
-local switcher = Switcher(20, 30, {mfds, icp})
+local switcher = Switcher(20, 30, {mfd_screen, icp_and_rwr})
 
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
