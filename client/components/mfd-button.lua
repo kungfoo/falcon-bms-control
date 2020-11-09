@@ -1,4 +1,4 @@
-local MfdButton = Class {size = 50, lineOffset = 8, sounds = Sounds.button}
+local MfdButton = Class {size = 46, lineOffset = 8, sounds = Sounds.button}
 
 function MfdButton:init(mfd, id, x, y, w, h)
   self.mfd = mfd

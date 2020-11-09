@@ -21,10 +21,7 @@ local Screen = Class {
       rightMfd:consume(event.data)
     end,
   },
-  dimensions = {
-    w = 0,
-    h = 0
-  }
+  dimensions = {w = 0, h = 0},
 }
 
 function Screen:init()
@@ -45,11 +42,11 @@ end
 function Screen:update(dt)
   local t1 = love.timer.getTime()
 
-  local w,h = love.graphics.getDimensions()
+  local w, h = love.graphics.getDimensions()
   if self.dimensions.w ~= w or self.dimensions.h ~= h then
     self.flup:fill(0, 0, w, h - 60)
     self.dimensions.w = w
-    self.dimensions.h = h 
+    self.dimensions.h = h
   end
 
   for _, component in pairs(self.components) do component:update(dt) end
