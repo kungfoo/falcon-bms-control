@@ -25,9 +25,16 @@ end
 function Snip:draw()
   if self.x then
     love.graphics.setColor(self.r, self.g, self.b)
-    love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, 0, 0)
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.printf(self.label, math.floor(self.x + 10), math.floor(self.y + 10), self.w)
+    love.graphics.rectangle("line", self.x, self.y, self.w, self.h, 10, 10)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf(self.label .. " " .. self.w .. "x" ..self.h, math.floor(self.x + 10), math.floor(self.y + 10), self.w)
+
+    love.graphics.push()
+    local scale = self.w / 500
+    love.graphics.scale(scale)
+    love.graphics.setColor(0, 0.8, 0.1)
+    love.graphics.rectangle("line",self.x/scale, self.y/scale, 500, 500, 0, 0);
+    love.graphics.pop()
   end
 end
 
@@ -54,6 +61,14 @@ local flup1 = Flup.split {
   },
 }
 
+local flup2 = Flup.split {
+  direction = "x",
+  components = {
+    left = Snip("Left"),
+    right = Snip("Right")
+  }
+}
+
 function love.load()
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.016
@@ -62,13 +77,13 @@ end
 function love.update(dt)
   local w, h = love.graphics.getDimensions()
   if width ~= w or height ~= h then
-    flup1:fill(0, 0, w, h - 100)
+    flup2:fill(0, 0, w, h - 100)
     width, height = w, h
   end
 end
 
 function love.draw()
-  flup1:draw()
+  flup2:draw()
   love.graphics.setColor(0.3, 0.8, 0.5)
   love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), 100, 0, 0)
 end
