@@ -16,7 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FalconBmsUniversalServer.Messages;
 using FalconBmsUniversalServer.SharedTextureMemory;
-using NLog;
 
 
 namespace FalconBmsUniversalServer
@@ -93,7 +92,7 @@ namespace FalconBmsUniversalServer
                     var message = Unpack<Message>(result.Buffer);
                     if (message.type != "hello") continue;
                     var buffer = Pack(new Message {type = "ack"});
-                    udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
+                    await udpClient.SendAsync(buffer, buffer.Length, result.RemoteEndPoint);
                 }
             });
         }
@@ -230,7 +229,7 @@ namespace FalconBmsUniversalServer
         private readonly SharedTextureMemoryExtractor _extractor;
         private readonly CancellationTokenSource _cancellationToken;
         private IHashValue _oldHash = null;
-        private int failedChunks = 0;
+        private int _failedChunks = 0;
 
         public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer,
             SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken)
@@ -266,8 +265,8 @@ namespace FalconBmsUniversalServer
                 catch (Exception e)
                 {
                     Logger.Error(e, "Failed to send one chunk.");
-                    failedChunks++;
-                    if (failedChunks > 60)
+                    _failedChunks++;
+                    if (_failedChunks > 60)
                     {
                         // probably this peer has died.
                         _cancellationToken.Cancel();
@@ -443,8 +442,8 @@ namespace FalconBmsUniversalServer
             }
             private static byte[] ToJpeg(Bitmap image, long quality)
             {
-                using (EncoderParameters encoderParameters = new EncoderParameters(1))
-                using (EncoderParameter encoderParameter = new EncoderParameter(Encoder.Quality, quality))
+                using (var encoderParameters = new EncoderParameters(1))
+                using (var encoderParameter = new EncoderParameter(Encoder.Quality, quality))
                 {
                     var buffer = new MemoryStream();
                     var codecInfo = ImageCodecInfo.GetImageDecoders().First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);

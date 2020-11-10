@@ -20,7 +20,7 @@ namespace FalconBMSUniversalServer
 {
     public class FalconKeyCallback : IComparable<FalconKeyCallback>
     {
-        private static Dictionary<int, string> _keyCodes = new Dictionary<int, string>{
+        private static readonly Dictionary<int, string> _keyCodes = new Dictionary<int, string>{
             {1, "{ESCAPE}"},
             {2, "1"},
             {3, "2"},
@@ -331,7 +331,7 @@ namespace FalconBMSUniversalServer
 
         public int CompareTo(FalconKeyCallback other)
         {
-            return String.Compare(Description, other.Description, StringComparison.Ordinal);
+            return string.Compare(Description, other.Description, StringComparison.Ordinal);
         }
     }
 }

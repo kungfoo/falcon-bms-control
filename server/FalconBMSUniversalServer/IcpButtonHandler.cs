@@ -9,7 +9,7 @@ namespace FalconBmsUniversalServer
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("IcpButtonHandler");
 
-        private static readonly Dictionary<String, String> CallbacksForButtons = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> CallbacksForButtons = new Dictionary<string, string>
         {
             {"1", "SimICPTILS"},
             {"2", "SimICPALOW"},
