@@ -84,7 +84,7 @@ function Mfd:updateGeometry(x, y, w, h)
   local scale = self:determineScale(w, h)
   self.transform = love.math.newTransform()
   self.transform:translate(x, y):scale(scale)
-  self:createButtons()
+  self:createButtons(self.id)
 end
 
 function Mfd:consume(data)
