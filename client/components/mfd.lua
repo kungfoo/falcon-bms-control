@@ -59,7 +59,7 @@ function Mfd:draw()
     end
     -- TODO: scale image according to component width and height, not a fixed scale.
     local texture_scale = 410 / self.image:getWidth()
-    love.graphics.draw(self.image, MfdButton.size,MfdButton.size, 0, texture_scale, texture_scale)
+    love.graphics.draw(self.image, MfdButton.size, MfdButton.size, 0, texture_scale, texture_scale)
   else
     -- TODO: draw no data string here.
   end
@@ -67,12 +67,12 @@ function Mfd:draw()
   love.graphics.pop()
 end
 
-function Mfd:determineScale(w,h)
+function Mfd:determineScale(w, h)
   if w >= 500 and h >= 500 then
     -- do not scale up
     return 1.0
   else
-    local d = math.min(w,h)
+    local d = math.min(w, h)
     return d / 500
   end
 end
@@ -83,7 +83,7 @@ end
 function Mfd:updateGeometry(x, y, w, h)
   local scale = self:determineScale(w, h)
   self.transform = love.math.newTransform()
-  self.transform:translate(x,y):scale(scale)
+  self.transform:translate(x, y):scale(scale)
   self:createButtons()
 end
 
@@ -101,8 +101,7 @@ function Mfd:stop()
 end
 
 function Mfd:mousepressed(x, y, button, isTouch, presses)
-  local dx, dy = self.transform:inverseTransformPoint(x,y)
-  print("Relative point: ", dx, dy)
+  local dx, dy = self.transform:inverseTransformPoint(x, y)
   for _, button in ipairs(self.buttons) do
     if button:hit(dx, dy) then
       self.pressed = button
