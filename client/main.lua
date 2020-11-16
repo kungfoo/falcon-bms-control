@@ -122,7 +122,7 @@ function love.update(dt)
       print("Connected ...")
       connection.peer = event.peer
       -- switch to first screen
-      switcher:switch()
+      switcher:switch(icp_and_rwr)
     elseif event.type == "receive" then
       State.current():handleReceive(event)
     end

@@ -7,9 +7,15 @@ function Switcher:init(leftMargin, bottomMargin, states)
   self.index = 0
 end
 
-function Switcher:switch()
-  self.currentState = table.shift(self.states)
-  table.push(self.states, self.currentState)
+function Switcher:switch(state)
+  if state then
+    self.currentState = state
+    table.remove_value(self.states, state)
+    table.push(self.states, state)
+  else
+    self.currentState = table.shift(self.states)
+    table.push(self.states, self.currentState)
+  end
   State.switch(self.currentState, self)
   self.index = math.wrap(self.index + 1, 0, #self.states)
 end
