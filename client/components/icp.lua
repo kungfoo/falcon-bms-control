@@ -6,13 +6,13 @@ local Icp = Class {padding = 25}
 
 function Icp:init(id, x, y)
   self.id = id
-  self.transform = love.math.newTransform():translate(x, y)
+  self.transform = love.math.newTransform():translate(x or 0, y or 0)
   self.buttons = {}
   self:createButtons(id)
 end
 
 function Icp:createButtons(id)
-  layout:reset(0, 0, self.padding)
+  layout:reset(0, 0, self.padding - 5, self.padding)
   table.insert(self.buttons, IcpButton(id, "COM1", {label = "COM", number = 1, type = "round"},
                                        layout:col(IcpButton.size, IcpButton.size)))
   table.insert(self.buttons, IcpButton(id, "COM2", {label = "COM", number = 2, type = "round"}, layout:col()))
@@ -22,6 +22,7 @@ function Icp:createButtons(id)
   table.insert(self.buttons, IcpButton(id, "A-G", {label = "A-G", type = "round"}, layout:col()))
 
   local keypad = {x = 0, y = IcpButton.size + 30}
+  layout:reset(0, 0, self.padding)
   layout:push(keypad.x, keypad.y)
   table.insert(self.buttons,
                IcpButton(id, "1", {label = "T-ILS", number = 1}, layout:col(IcpButton.size, IcpButton.size)))
@@ -77,10 +78,28 @@ end
 function Icp:draw()
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
-  
+
   for _, button in ipairs(self.buttons) do button:draw() end
-  
+
   love.graphics.pop()
+end
+
+function Icp:updateGeometry(x, y, w, h)
+  local scale = self:determineScale(w, h)
+  self.transform = love.math.newTransform()
+  self.transform:translate(x, y):scale(scale)
+  self:createButtons(self.id)
+end
+
+function Icp:determineScale(w, h)
+  -- turns out this is nicely square as well
+  if w >= 460 and h >= 460 then
+    -- do not scale up
+    return 1.0
+  else
+    local d = math.min(w, h)
+    return d / 460
+  end
 end
 
 function Icp:mousepressed(x, y, button, isTouch, presses)

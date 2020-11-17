@@ -1,8 +1,8 @@
 local Mfd = require("components.mfd")
 local Flup = require("lib.flup")
 
-local leftMfd = Mfd("f16/left-mfd", 20, 30)
-local rightMfd = Mfd("f16/right-mfd", 520, 30)
+local leftMfd = Mfd("f16/left-mfd")
+local rightMfd = Mfd("f16/right-mfd")
 
 local Screen = Class {
   stats = {},

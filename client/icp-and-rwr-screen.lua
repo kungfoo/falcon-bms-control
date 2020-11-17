@@ -5,8 +5,8 @@ local StreamedTexture = require("util.streamed-texture")
 
 local components = {}
 
-local ded = Ded("f16/ded", 20, 30)
-local icp = Icp("f16/icp", 20, 175)
+local ded = Ded("f16/ded")
+local icp = Icp("f16/icp")
 
 local Screen = Class {
   components = {icp, ded},
@@ -25,6 +25,7 @@ local Screen = Class {
       components["f16/rwr"]:consume(event.data)
     end,
   },
+  dimensions = {w = 0, h = 0},
 }
 
 function Screen:init()
@@ -42,10 +43,23 @@ end
 function Screen:update(dt)
   local t1 = love.timer.getTime()
 
+  local w, h = love.graphics.getDimensions()
+  if self.dimensions.w ~= w or self.dimensions.h ~= h then
+    self:adjustLayoutIfNeeded(w, h)
+    self.flup:fill(0, 0, w, h - 60)
+    self.dimensions.w = w
+    self.dimensions.h = h
+  end
+
   for _, component in pairs(self.components) do component:update(dt) end
 
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
+end
+
+function Screen:adjustLayoutIfNeeded(w, h)
+  -- currently nothing to display besides these two
+  self.flup = Flup.split {direction = "y", ratio = 0.2, components = {top = ded, bottom = icp}}
 end
 
 function Screen:handleReceive(event)
