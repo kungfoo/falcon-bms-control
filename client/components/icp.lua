@@ -6,13 +6,13 @@ local Icp = Class {padding = 25}
 
 function Icp:init(id, x, y)
   self.id = id
-  self.position = {x = x or 0, y = y or 0}
+  self.transform = love.math.newTransform():translate(x, y)
   self.buttons = {}
   self:createButtons(id)
 end
 
 function Icp:createButtons(id)
-  layout:reset(self.position.x, self.position.y, self.padding)
+  layout:reset(0, 0, self.padding)
   table.insert(self.buttons, IcpButton(id, "COM1", {label = "COM", number = 1, type = "round"},
                                        layout:col(IcpButton.size, IcpButton.size)))
   table.insert(self.buttons, IcpButton(id, "COM2", {label = "COM", number = 2, type = "round"}, layout:col()))
@@ -21,7 +21,7 @@ function Icp:createButtons(id)
   table.insert(self.buttons, IcpButton(id, "A-A", {label = "A-A", type = "round"}, layout:col()))
   table.insert(self.buttons, IcpButton(id, "A-G", {label = "A-G", type = "round"}, layout:col()))
 
-  local keypad = {x = self.position.x, y = self.position.y + IcpButton.size + 30}
+  local keypad = {x = 0, y = IcpButton.size + 30}
   layout:push(keypad.x, keypad.y)
   table.insert(self.buttons,
                IcpButton(id, "1", {label = "T-ILS", number = 1}, layout:col(IcpButton.size, IcpButton.size)))
@@ -75,12 +75,18 @@ function Icp:update(dt)
 end
 
 function Icp:draw()
+  love.graphics.push()
+  love.graphics.applyTransform(self.transform)
+  
   for _, button in ipairs(self.buttons) do button:draw() end
+  
+  love.graphics.pop()
 end
 
 function Icp:mousepressed(x, y, button, isTouch, presses)
+  local dx, dy = self.transform:inverseTransformPoint(x, y)
   for _, button in ipairs(self.buttons) do
-    if button:hit(x, y) then
+    if button:hit(dx, dy) then
       self.pressed = button
       button:pressed()
     end
