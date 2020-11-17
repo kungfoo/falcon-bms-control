@@ -25,7 +25,6 @@ local Screen = Class {
 }
 
 function Screen:init()
-  self.flup = Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}}
 end
 
 function Screen:enter(previous, switcher)
@@ -44,6 +43,7 @@ function Screen:update(dt)
 
   local w, h = love.graphics.getDimensions()
   if self.dimensions.w ~= w or self.dimensions.h ~= h then
+    self:adjustLayoutIfNeeded(w, h)
     self.flup:fill(0, 0, w, h - 60)
     self.dimensions.w = w
     self.dimensions.h = h
@@ -53,6 +53,14 @@ function Screen:update(dt)
 
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
+end
+
+function Screen:adjustLayoutIfNeeded(w, h)
+  if (w >= h) then
+    self.flup = Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}}
+  else
+    self.flup = Flup.split {direction = "y", components = {top = leftMfd, bottom = rightMfd}}
+  end
 end
 
 function Screen:handleReceive(event)
