@@ -3,7 +3,6 @@ using F4TexSharedMem;
 using System.IO;
 using System.Net;
 using System.Collections.Generic;
-using MsgPack.Serialization;
 using System.Net.Sockets;
 using System;
 using System.Data.HashFunction;
@@ -11,11 +10,11 @@ using System.Data.HashFunction.xxHash;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-
 using System.Threading;
 using System.Threading.Tasks;
 using FalconBmsUniversalServer.Messages;
 using FalconBmsUniversalServer.SharedTextureMemory;
+using MessagePack;
 
 
 namespace FalconBmsUniversalServer
@@ -24,20 +23,18 @@ namespace FalconBmsUniversalServer
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
         private bool _running = true;
-        private readonly Dictionary<StreamKey, CancellationTokenSource> _runningStreams = new Dictionary<StreamKey, CancellationTokenSource>();
+
+        private readonly Dictionary<StreamKey, CancellationTokenSource> _runningStreams =
+            new Dictionary<StreamKey, CancellationTokenSource>();
+
         private readonly IcpButtonHandler _icpButtonHandler;
         private readonly OsbButtonHandler _osbButtonHandler;
-
-        private readonly SerializationContext _context = new SerializationContext
-        {
-            SerializationMethod = SerializationMethod.Map
-        };
 
         private readonly SharedTextureMemoryExtractor _extractor = new SharedTextureMemoryExtractor(new Reader());
 
         private FalconBmsUniversalServer()
         {
-            var sender  = new CallbackSender();
+            var sender = new CallbackSender();
             _icpButtonHandler = new IcpButtonHandler(sender);
             _osbButtonHandler = new OsbButtonHandler(sender);
         }
@@ -92,7 +89,7 @@ namespace FalconBmsUniversalServer
                     var message = Unpack<Message>(result.Buffer);
                     if (message.type != "hello") continue;
                     var buffer = Pack(new Message {type = "ack"});
-                    await udpClient.SendAsync(buffer, buffer.Length, result.RemoteEndPoint);
+                    udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
                 }
             });
         }
@@ -127,7 +124,7 @@ namespace FalconBmsUniversalServer
                 case string type when OsbButtonMessage.IsType(type):
                     Task.Run(async () => await _osbButtonHandler.Handle(Unpack<OsbButtonMessage>(e)));
                     break;
-                case string type when IcpButtonMessage.IsType(type): 
+                case string type when IcpButtonMessage.IsType(type):
                     Task.Run(async () => await _icpButtonHandler.Handle(Unpack<IcpButtonMessage>(e)));
                     break;
                 case string type when StreamedTextureRequest.IsType(type):
@@ -178,10 +175,10 @@ namespace FalconBmsUniversalServer
             }
             finally
             {
-                _mutex.ReleaseMutex();   
+                _mutex.ReleaseMutex();
             }
         }
-        
+
         private void StopStreamingTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
         {
             try
@@ -201,21 +198,18 @@ namespace FalconBmsUniversalServer
 
         private T Unpack<T>(byte[] buffer)
         {
-            var serializer = MessagePackSerializer.Get<T>(_context);
-            return serializer.Unpack(new MemoryStream(buffer));
+            return MessagePackSerializer.Deserialize<T>(new MemoryStream(buffer));
         }
 
         private T Unpack<T>(ENetPacket e)
         {
-            var serializer = MessagePackSerializer.Get<T>(_context);
-            return serializer.Unpack(e.GetPayloadStream(false));
+            return MessagePackSerializer.Deserialize<T>(e.GetPayloadStream(false));
         }
 
         private byte[] Pack<T>(T thing)
         {
             var buffer = new MemoryStream();
-            var serializer = MessagePackSerializer.Get<T>(_context);
-            serializer.Pack(buffer, thing);
+            MessagePackSerializer.Serialize(buffer, thing);
             return buffer.ToArray();
         }
     }
@@ -261,10 +255,11 @@ namespace FalconBmsUniversalServer
                 {
                     _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
                     _oldHash = newHash;
+                    // assume peer is back online
+                    _failedChunks = 0;
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, "Failed to send one chunk.");
                     _failedChunks++;
                     if (_failedChunks > 60)
                     {
@@ -274,7 +269,7 @@ namespace FalconBmsUniversalServer
                 }
             }
         }
-        
+
         private static byte ChannelFor(StreamedTextureRequest request)
         {
             switch (request.identifier)
@@ -323,18 +318,19 @@ namespace FalconBmsUniversalServer
     // lowercase property names, because message pack works automagic like this.
     namespace Messages
     {
-
         public interface IMessage
         {
             string type { get; }
         }
 
-        public struct Message: IMessage
+        [MessagePackObject(keyAsPropertyName: true)]
+        public struct Message : IMessage
         {
             public string type { get; set; }
         }
 
-        public struct OsbButtonMessage: IMessage
+        [MessagePackObject(keyAsPropertyName: true)]
+        public struct OsbButtonMessage : IMessage
         {
             public string type { get; set; }
             public string mfd { get; set; }
@@ -346,6 +342,7 @@ namespace FalconBmsUniversalServer
             }
         }
 
+        [MessagePackObject(keyAsPropertyName: true)]
         public struct IcpButtonMessage : IMessage
         {
             public string type { get; set; }
@@ -357,12 +354,13 @@ namespace FalconBmsUniversalServer
             }
         }
 
-        public struct StreamedTextureRequest: IMessage
+        [MessagePackObject(keyAsPropertyName: true)]
+        public struct StreamedTextureRequest : IMessage
         {
             public string type { get; set; }
             public string command { get; set; }
             public string identifier { get; set; }
-            
+
             public static bool IsType(string type)
             {
                 return type == "streamed-texture";
@@ -438,15 +436,17 @@ namespace FalconBmsUniversalServer
             private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
             {
                 var image = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
-                return ToJpeg(image, 93L);
+                return ToJpeg(image, 80L);
             }
+
             private static byte[] ToJpeg(Bitmap image, long quality)
             {
                 using (var encoderParameters = new EncoderParameters(1))
                 using (var encoderParameter = new EncoderParameter(Encoder.Quality, quality))
                 {
                     var buffer = new MemoryStream();
-                    var codecInfo = ImageCodecInfo.GetImageDecoders().First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
+                    var codecInfo = ImageCodecInfo.GetImageDecoders()
+                        .First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
                     encoderParameters.Param[0] = encoderParameter;
                     image.Save(buffer, codecInfo, encoderParameters);
                     return buffer.ToArray();
