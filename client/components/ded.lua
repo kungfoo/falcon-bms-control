@@ -2,7 +2,7 @@ local StreamedTexture = require("util.streamed-texture")
 local Ded = Class {
   -- max size of this component
   width = 460,
-  height = 200
+  height = 200,
 }
 
 function Ded:init(id, x, y)
