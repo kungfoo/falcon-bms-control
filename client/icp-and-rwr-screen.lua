@@ -59,7 +59,7 @@ end
 
 function Screen:adjustLayoutIfNeeded(w, h)
   -- currently nothing to display besides these two
-  self.flup = Flup.split {direction = "y", ratio = 0.2, components = {top = ded, bottom = icp}}
+  self.flup = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}}
 end
 
 function Screen:handleReceive(event)

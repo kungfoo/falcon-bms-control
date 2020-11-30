@@ -1,32 +1,49 @@
 local StreamedTexture = require("util.streamed-texture")
 local Ded = Class {}
 
-function Ded:init(id, x, y, width, height)
+function Ded:init(id, x, y)
   self.id = id
   self.image = nil -- drawable image
   self.imageData = nil -- pure image data received from server
-  self.position = {x = x or 0, y = y or 0}
-  self.dim = {width = width or 400, height = height or 130}
+  self.transform = love.math.newTransform():translate(x or 0, y or 0)
 end
 
 function Ded:update(dt)
 end
 
 function Ded:draw()
+  love.graphics.push()
+  love.graphics.applyTransform(self.transform)
+
   if self.imageData then
     love.graphics.setColor(Colors.white)
     if not self.image then
       -- only load image if it is a new frame.
       self.image = love.graphics.newImage(self.imageData)
     end
-    local dw = self.dim.width / self.image:getWidth()
-    local dh = self.dim.height / self.image:getHeight()
-    local scale = math.min(dw, dh)
-    love.graphics.draw(self.image, self.position.x, self.position.y, 0, scale, scale)
+    love.graphics.draw(self.image, 0, 0, 0, 1, 1)
   else
     love.graphics.setColor(Colors.white)
-    love.graphics.rectangle("line", self.position.x, self.position.y, self.dim.width, self.dim.height, 0)
-    love.graphics.print("DED data...", self.position.x + 10, self.position.y + self.dim.height / 2 - 10)
+    love.graphics.rectangle("line", 0, 0, 460, 200, 0)
+    love.graphics.print("DED data...", 0 + 10, 0 + 200 / 2 - 10)
+  end
+
+  love.graphics.pop()
+end
+
+function Ded:updateGeometry(x, y, w, h)
+  local scale = self:determineScale(w, h)
+  self.transform = love.math.newTransform()
+  self.transform:translate(x, y):scale(scale)
+end
+
+function Ded:determineScale(w, h)
+  if w >= 460 and h >= 200 then
+    -- do not scale up
+    return 1.0
+  else
+    local a, b = w / 460, h / 200
+    return math.min(a, b)
   end
 end
 
