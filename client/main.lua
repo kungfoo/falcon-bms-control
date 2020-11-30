@@ -88,7 +88,7 @@ function broadcasting:leave()
 end
 
 function broadcasting:draw()
-  love.setColor(Colors.white)
+  love.graphics.setColor(Colors.white)
   love.graphics.setFont(font)
   love.graphics.print("DISCOVERING SERVER" .. shine.dots[shine.position], 30, 30)
 end
