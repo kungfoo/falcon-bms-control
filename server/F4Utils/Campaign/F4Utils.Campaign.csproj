@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D386EC91-6D89-421F-87BC-4849E0232722}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>F4Utils.Campaign</RootNamespace>
+    <AssemblyName>F4Utils.Campaign</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Costura, Version=4.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\Costura.Fody.4.0.0\lib\net40\Costura.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>$(SolutionDir)\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AcdFile.cs" />
+    <Compile Include="AirTaskingManager.cs" />
+    <Compile Include="AirUnit.cs" />
+    <Compile Include="ATMAirbase.cs" />
+    <Compile Include="Battalion.cs" />
+    <Compile Include="Brigade.cs" />
+    <Compile Include="CampaignBase.cs" />
+    <Compile Include="CampaignManager.cs" />
+    <Compile Include="ClassTable.cs" />
+    <Compile Include="CmpFile.cs" />
+    <Compile Include="DdpFile.cs" />
+    <Compile Include="F4Structs\AirActionTypeEnum.cs" />
+    <Compile Include="F4Structs\AirTacticTypeEnum.cs" />
+    <Compile Include="F4Structs\AltLethality.cs" />
+    <Compile Include="F4Structs\Bbox_Types.cs" />
+    <Compile Include="F4Structs\CampEvent.cs" />
+    <Compile Include="F4Structs\CampLibConstants.cs" />
+    <Compile Include="F4Structs\CampObjectiveLinkDataType.cs" />
+    <Compile Include="F4Structs\Classtable_Classes.cs" />
+    <Compile Include="F4Structs\Classtable_Domains.cs" />
+    <Compile Include="F4Structs\Classtable_Types.cs" />
+    <Compile Include="F4Structs\color.cs" />
+    <Compile Include="F4Structs\ConditionPreset.cs" />
+    <Compile Include="F4Structs\CountryListEnum.cs" />
+    <Compile Include="F4Structs\DamageDataType.cs" />
+    <Compile Include="F4Structs\Data_Types.cs" />
+    <Compile Include="F4Structs\DirtyDataClassType.cs" />
+    <Compile Include="F4Structs\Dirtyness.cs" />
+    <Compile Include="F4Structs\Dirty_Battalion.cs" />
+    <Compile Include="F4Structs\Dirty_Campaign_Base.cs" />
+    <Compile Include="F4Structs\Dirty_Class.cs" />
+    <Compile Include="F4Structs\Dirty_Falcon_Entity.cs" />
+    <Compile Include="F4Structs\Dirty_Flight.cs" />
+    <Compile Include="F4Structs\Dirty_Ground_Unit.cs" />
+    <Compile Include="F4Structs\Dirty_Objective.cs" />
+    <Compile Include="F4Structs\Dirty_Package.cs" />
+    <Compile Include="F4Structs\Dirty_Sim_Base.cs" />
+    <Compile Include="F4Structs\Dirty_Squadron.cs" />
+    <Compile Include="F4Structs\Dirty_Team.cs" />
+    <Compile Include="F4Structs\Dirty_Unit.cs" />
+    <Compile Include="F4Structs\EventNode.cs" />
+    <Compile Include="F4Structs\Falcon4EntityClassType.cs" />
+    <Compile Include="F4Structs\FeatureClassDataType.cs" />
+    <Compile Include="F4Structs\FeatureEntry.cs" />
+    <Compile Include="F4Structs\FmapWeatherCell.cs" />
+    <Compile Include="F4Structs\GroundActionTypeEnum.cs" />
+    <Compile Include="F4Structs\MissionDataFlagEnum.cs" />
+    <Compile Include="F4Structs\MissionEscortTypeEnum.cs" />
+    <Compile Include="F4Structs\MissionProfileEnum.cs" />
+    <Compile Include="F4Structs\MissionContext.cs" />
+    <Compile Include="F4Structs\MissionRequestFlagEnum.cs" />
+    <Compile Include="F4Structs\MissionRollEnum.cs" />
+    <Compile Include="F4Structs\MissionTargetTypeEnum.cs" />
+    <Compile Include="F4Structs\MissionTypeEnum.cs" />
+    <Compile Include="F4Structs\Press.cs" />
+    <Compile Include="F4Structs\ROEAllowedEnum.cs" />
+    <Compile Include="F4Structs\ROEEngagementQueryTypeEnum.cs" />
+    <Compile Include="F4Structs\IRSTDataType.cs" />
+    <Compile Include="F4Structs\LoadoutArray.cs" />
+    <Compile Include="F4Structs\LoadoutStruct.cs" />
+    <Compile Include="F4Structs\MissionRequest.cs" />
+    <Compile Include="F4Structs\Mode_Types.cs" />
+    <Compile Include="F4Structs\MoveType.cs" />
+    <Compile Include="F4Structs\ObjClassDataType.cs" />
+    <Compile Include="F4Structs\ObjectiveDelta.cs" />
+    <Compile Include="F4Structs\OldVeh_types.cs" />
+    <Compile Include="F4Structs\PackedVUID.cs" />
+    <Compile Include="F4Structs\PersistantObject.cs" />
+    <Compile Include="F4Structs\PilotInfoClass.cs" />
+    <Compile Include="F4Structs\PrimaryObjective.cs" />
+    <Compile Include="F4Structs\PtConstants.cs" />
+    <Compile Include="F4Structs\PtDataType.cs" />
+    <Compile Include="F4Structs\PtHeaderDataType.cs" />
+    <Compile Include="F4Structs\RadarDataType.cs" />
+    <Compile Include="F4Structs\Radar_types.cs" />
+    <Compile Include="F4Structs\RocketClassDataType.cs" />
+    <Compile Include="F4Structs\RwrDataType.cs" />
+    <Compile Include="F4Structs\Rwr_Symbols.cs" />
+    <Compile Include="F4Structs\SimACDefType.cs" />
+    <Compile Include="F4Structs\SimWeaponDataType.cs" />
+    <Compile Include="F4Structs\SimWeap_types.cs" />
+    <Compile Include="F4Structs\SpecialTOTTypeEnum.cs" />
+    <Compile Include="F4Structs\Specific_Types.cs" />
+    <Compile Include="F4Structs\SquadInfo.cs" />
+    <Compile Include="F4Structs\SquadronStoresDataType.cs" />
+    <Compile Include="F4Structs\Sub_Types.cs" />
+    <Compile Include="F4Structs\table_of_equipment_manufacturers.cs" />
+    <Compile Include="F4Structs\TacticData.cs" />
+    <Compile Include="F4Structs\TankerConditionalModeEnum.cs" />
+    <Compile Include="F4Structs\TargetAreaProfileEnum.cs" />
+    <Compile Include="F4Structs\TargetDescriptionType.cs" />
+    <Compile Include="F4Structs\TargetThreatReturnFlagEnum.cs" />
+    <Compile Include="F4Structs\TeamAirActionType.cs" />
+    <Compile Include="F4Structs\TeamBasicInfo.cs" />
+    <Compile Include="F4Structs\TeamConstants.cs" />
+    <Compile Include="F4Structs\TeamDataEnum.cs" />
+    <Compile Include="F4Structs\TeamFlagsEnum.cs" />
+    <Compile Include="F4Structs\TeamGndActionType.cs" />
+    <Compile Include="F4Structs\TeamStatus.cs" />
+    <Compile Include="F4Structs\Temp.cs" />
+    <Compile Include="F4Structs\UnitClassDataType.cs" />
+    <Compile Include="F4Structs\UnitHistoryType.cs" />
+    <Compile Include="F4Structs\vector.cs" />
+    <Compile Include="F4Structs\VehicleClassDataType.cs" />
+    <Compile Include="F4Structs\Veh_types.cs" />
+    <Compile Include="F4Structs\VisualDataType.cs" />
+    <Compile Include="F4Structs\Vis_Types.cs" />
+    <Compile Include="F4Structs\VuClassHierarchy.cs" />
+    <Compile Include="F4Structs\VuConsts.cs" />
+    <Compile Include="F4Structs\VuEntityType.cs" />
+    <Compile Include="F4Structs\VuFlagBits.cs" />
+    <Compile Include="F4Structs\VuVisTypes.cs" />
+    <Compile Include="F4Structs\VU_ID.cs" />
+    <Compile Include="F4Structs\WeaponClassDataType.cs" />
+    <Compile Include="F4Structs\WeaponFlags.cs" />
+    <Compile Include="F4Structs\WeaponGuidanceTypes.cs" />
+    <Compile Include="F4Structs\WeaponListDataType.cs" />
+    <Compile Include="F4Structs\WeaponOverwriteFlags.cs" />
+    <Compile Include="F4Structs\WeaponsConstants.cs" />
+    <Compile Include="F4Structs\WeatherCell.cs" />
+    <Compile Include="F4Structs\WeatherConstants.cs" />
+    <Compile Include="F4Structs\WeatherEnums.cs" />
+    <Compile Include="F4Structs\WeatherShifts.cs" />
+    <Compile Include="F4Structs\Wind.cs" />
+    <Compile Include="F4Structs\WthTurbu.cs" />
+    <Compile Include="FcdFile.cs" />
+    <Compile Include="FedFile.cs" />
+    <Compile Include="IcdFile.cs" />
+    <Compile Include="OcdFile.cs" />
+    <Compile Include="PdFile.cs" />
+    <Compile Include="PdxFile.cs" />
+    <Compile Include="PhdFile.cs" />
+    <Compile Include="RcdFile.cs" />
+    <Compile Include="RktFile.cs" />
+    <Compile Include="RwdFile.cs" />
+    <Compile Include="Save\FmapFile.cs" />
+    <Compile Include="Save\FrcFile.cs" />
+    <Compile Include="Save\HisFile.cs" />
+    <Compile Include="Save\PakFile.cs" />
+    <Compile Include="Save\PriFile.cs" />
+    <Compile Include="Save\PriFiles.cs" />
+    <Compile Include="Save\TtFile.cs" />
+    <Compile Include="Save\TwxFile.cs" />
+    <Compile Include="SsdFile.cs" />
+    <Compile Include="SwdFile.cs" />
+    <Compile Include="UcdFile.cs" />
+    <Compile Include="EvtFile.cs" />
+    <Compile Include="F4CampaignFileBundleReader.cs" />
+    <Compile Include="Flight.cs" />
+    <Compile Include="GroundTaskingManager.cs" />
+    <Compile Include="GroundUnit.cs" />
+    <Compile Include="NavalTaskingManager.cs" />
+    <Compile Include="ObdFile.cs" />
+    <Compile Include="Objective.cs" />
+    <Compile Include="ObjFile.cs" />
+    <Compile Include="Package.cs" />
+    <Compile Include="Pilot.cs" />
+    <Compile Include="PltFile.cs" />
+    <Compile Include="PolFile.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PstFile.cs" />
+    <Compile Include="Squadron.cs" />
+    <Compile Include="TaskForce.cs" />
+    <Compile Include="TeaFile.cs" />
+    <Compile Include="Team.cs" />
+    <Compile Include="UniFile.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="VcdFile.cs" />
+    <Compile Include="VsdFile.cs" />
+    <Compile Include="Waypoint.cs" />
+    <Compile Include="WcdFile.cs" />
+    <Compile Include="WldFile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Drawing\Common.Drawing.csproj">
+      <Project>{5649a340-1475-4116-b5a1-cd21a99387f5}</Project>
+      <Name>Common.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lzss\LzssManaged\LzssManaged.csproj">
+      <Project>{04f20e15-844a-4d30-9ec4-e8fd61a043a9}</Project>
+      <Name>LzssManaged</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets'))" />
+    <Error Condition="!Exists('$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props'))" />
+  </Target>
+  <Import Project="$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets" Condition="'$(Configuration)' == 'Release' and Exists('$(SolutionDir)\packages\Fody.5.1.1\build\Fody.targets')" />
+  <Import Project="$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props" Condition="'$(Configuration)' == 'Release' and Exists('$(SolutionDir)\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

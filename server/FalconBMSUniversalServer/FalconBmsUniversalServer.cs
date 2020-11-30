@@ -1,6 +1,5 @@
 ﻿using ENet.Managed;
 using F4TexSharedMem;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Collections.Generic;
@@ -9,21 +8,26 @@ using System.Net.Sockets;
 using System;
 using System.Data.HashFunction;
 using System.Data.HashFunction.xxHash;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
-using System.Security;
+
 using System.Threading;
 using System.Threading.Tasks;
 using FalconBmsUniversalServer.Messages;
 using FalconBmsUniversalServer.SharedTextureMemory;
+using NLog;
+
 
 namespace FalconBmsUniversalServer
 {
-    class FalconBmsUniversalServer
+    internal class FalconBmsUniversalServer
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconBmsUniversalServer");
         private bool _running = true;
-        private readonly Dictionary<StreamKey, CancellationTokenSource> runningStreams = new Dictionary<StreamKey, CancellationTokenSource>();
+        private readonly Dictionary<StreamKey, CancellationTokenSource> _runningStreams = new Dictionary<StreamKey, CancellationTokenSource>();
+        private readonly IcpButtonHandler _icpButtonHandler;
+        private readonly OsbButtonHandler _osbButtonHandler;
 
         private readonly SerializationContext _context = new SerializationContext
         {
@@ -31,6 +35,13 @@ namespace FalconBmsUniversalServer
         };
 
         private readonly SharedTextureMemoryExtractor _extractor = new SharedTextureMemoryExtractor(new Reader());
+
+        private FalconBmsUniversalServer()
+        {
+            var sender  = new CallbackSender();
+            _icpButtonHandler = new IcpButtonHandler(sender);
+            _osbButtonHandler = new OsbButtonHandler(sender);
+        }
 
         private static void Main()
         {
@@ -100,9 +111,9 @@ namespace FalconBmsUniversalServer
             if (sender is ENetPeer peer)
             {
                 Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
-                foreach (var key in runningStreams.Keys.Where(key => key.Peer == peer))
+                foreach (var key in _runningStreams.Keys.Where(key => key.Peer == peer))
                 {
-                    runningStreams.TryGetValue(key, out var cancellationTokenSource);
+                    _runningStreams.TryGetValue(key, out var cancellationTokenSource);
                     cancellationTokenSource?.Cancel();
                 }
             }
@@ -115,7 +126,10 @@ namespace FalconBmsUniversalServer
             switch (message.type)
             {
                 case string type when OsbButtonMessage.IsType(type):
-                    HandleOsbButtonMessage( Unpack<OsbButtonMessage>(e));
+                    Task.Run(async () => await _osbButtonHandler.Handle(Unpack<OsbButtonMessage>(e)));
+                    break;
+                case string type when IcpButtonMessage.IsType(type): 
+                    Task.Run(async () => await _icpButtonHandler.Handle(Unpack<IcpButtonMessage>(e)));
                     break;
                 case string type when StreamedTextureRequest.IsType(type):
                     HandleStreamedTextureRequest(Unpack<StreamedTextureRequest>(e), peer);
@@ -124,11 +138,6 @@ namespace FalconBmsUniversalServer
                     Logger.Error("Received unhandled message type {0}", message.type);
                     break;
             }
-        }
-
-        private static void HandleOsbButtonMessage(OsbButtonMessage osbButtonMessage)
-        {
-            Logger.Debug("MFD OSB message received: {0}:{1}:{2}", osbButtonMessage.type, osbButtonMessage.mfd, osbButtonMessage.osb);
         }
 
         private void HandleStreamedTextureRequest(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
@@ -147,25 +156,48 @@ namespace FalconBmsUniversalServer
             }
         }
 
+        private readonly Mutex _mutex = new Mutex();
+
         private void StartStreamingTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
         {
-            Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
-            var cancellationToken = new CancellationTokenSource();
-            var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken);
-            var thread = new Thread(streamer.Run);
-            thread.Start();
-            
-            var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
-            runningStreams.Add(streamKey, cancellationToken);
+            try
+            {
+                _mutex.WaitOne();
+                Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
+                var cancellationToken = new CancellationTokenSource();
+                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken);
+                // TODO: should probably use a thread pool here and just submit some work instead of starting and stopping threads.
+                var thread = new Thread(streamer.Run);
+
+                var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
+                if (!_runningStreams.ContainsKey(streamKey))
+                {
+                    _runningStreams.Add(streamKey, cancellationToken);
+                }
+
+                thread.Start();
+            }
+            finally
+            {
+                _mutex.ReleaseMutex();   
+            }
         }
         
         private void StopStreamingTexture(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
         {
-            Logger.Debug("Stopping to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
-            var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
-            if (!runningStreams.TryGetValue(streamKey, out var cancellationTokenSource)) return;
-            cancellationTokenSource.Cancel();
-            runningStreams.Remove(streamKey);
+            try
+            {
+                _mutex.WaitOne();
+                Logger.Debug("Stopping to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
+                var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
+                if (!_runningStreams.TryGetValue(streamKey, out var cancellationTokenSource)) return;
+                cancellationTokenSource.Cancel();
+                _runningStreams.Remove(streamKey);
+            }
+            finally
+            {
+                _mutex.ReleaseMutex();
+            }
         }
 
         private T Unpack<T>(byte[] buffer)
@@ -192,12 +224,13 @@ namespace FalconBmsUniversalServer
     internal class StreamedTextureThread
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("StreamedTextureThread");
-        private readonly IxxHash hasher = xxHashFactory.Instance.Create();
+        private readonly IxxHash _hasher = xxHashFactory.Instance.Create();
         private readonly StreamedTextureRequest _request;
         private readonly ENetPeer _peer;
         private readonly SharedTextureMemoryExtractor _extractor;
         private readonly CancellationTokenSource _cancellationToken;
         private IHashValue _oldHash = null;
+        private int failedChunks = 0;
 
         public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer,
             SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken)
@@ -222,11 +255,24 @@ namespace FalconBmsUniversalServer
             if (!_extractor.Offers(_request.identifier) || !_extractor.IsDataAvailable) return;
             var encoded = _extractor.GetEncoded(_request.identifier);
             var channel = ChannelFor(_request);
-            var newHash = hasher.ComputeHash(encoded);
+            var newHash = _hasher.ComputeHash(encoded);
             if (!newHash.Equals(_oldHash))
             {
-                _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
-                _oldHash = newHash;
+                try
+                {
+                    _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+                    _oldHash = newHash;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Failed to send one chunk.");
+                    failedChunks++;
+                    if (failedChunks > 60)
+                    {
+                        // probably this peer has died.
+                        _cancellationToken.Cancel();
+                    }
+                }
             }
         }
         
@@ -301,6 +347,17 @@ namespace FalconBmsUniversalServer
             }
         }
 
+        public struct IcpButtonMessage : IMessage
+        {
+            public string type { get; set; }
+            public string button { get; set; }
+
+            public static bool IsType(string type)
+            {
+                return type.StartsWith("icp");
+            }
+        }
+
         public struct StreamedTextureRequest: IMessage
         {
             public string type { get; set; }
@@ -311,14 +368,6 @@ namespace FalconBmsUniversalServer
             {
                 return type == "streamed-texture";
             }
-        }
-
-        public struct StreamedTextureReply : IMessage
-        {
-            public string type { get; set; }
-            public string kind { get; set; }
-            public string identifier { get; set; }
-            public byte[] payload { get; set; }
         }
     }
 
@@ -389,10 +438,20 @@ namespace FalconBmsUniversalServer
 
             private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
             {
-                System.Drawing.Bitmap image = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
-                MemoryStream buffer = new MemoryStream();
-                image.Save(buffer, ImageFormat.Jpeg);
-                return buffer.ToArray();
+                var image = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
+                return ToJpeg(image, 93L);
+            }
+            private static byte[] ToJpeg(Bitmap image, long quality)
+            {
+                using (EncoderParameters encoderParameters = new EncoderParameters(1))
+                using (EncoderParameter encoderParameter = new EncoderParameter(Encoder.Quality, quality))
+                {
+                    var buffer = new MemoryStream();
+                    var codecInfo = ImageCodecInfo.GetImageDecoders().First(codec => codec.FormatID == ImageFormat.Jpeg.Guid);
+                    encoderParameters.Param[0] = encoderParameter;
+                    image.Save(buffer, codecInfo, encoderParameters);
+                    return buffer.ToArray();
+                }
             }
         }
     }

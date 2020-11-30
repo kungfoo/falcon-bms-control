@@ -35,20 +35,24 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="ENet.Managed, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\ENet.Managed.3.0.2\lib\net45\ENet.Managed.dll</HintPath>
     </Reference>
-    <Reference Include="F4TexSharedMem">
-      <HintPath>..\F4TexSharedMem\bin\x64\Release\F4TexSharedMem.dll</HintPath>
-    </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="MsgPack, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a2625990d5dc0167, processorArchitecture=MSIL">
       <HintPath>packages\MsgPack.Cli.1.0.1\lib\net46\MsgPack.dll</HintPath>
     </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c">
+      <HintPath>packages\NLog.4.7.5\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.HashFunction.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=80c9288e394c1322">
@@ -74,6 +78,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -81,7 +86,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CallbackSender.cs" />
     <Compile Include="FalconBmsUniversalServer.cs" />
+    <Compile Include="FalconKeyCallback.cs" />
+    <Compile Include="FalconKeyFile.cs" />
+    <Compile Include="IcpButtonHandler.cs" />
+    <Compile Include="KeyboardEmulator.cs" />
+    <Compile Include="KeyboardThread.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="OsbButtonHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +105,16 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\F4SharedMem\F4SharedMem.csproj">
+      <Project>{517d1b4d-e8c7-4331-bbe7-300fd6b78441}</Project>
+      <Name>F4SharedMem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\F4TexSharedMem\F4TexSharedMem.csproj">
+      <Project>{e930ba7b-7474-49d7-b7cf-25106c450190}</Project>
+      <Name>F4TexSharedMem</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

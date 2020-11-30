@@ -1,14 +1,10 @@
 local inspect = require("lib.inspect")
 
 local IcpButton = Class {
-  smallFont = love.graphics.newFont("fonts/DINRegular.ttf", 18, "normal"),
-  largeFont = love.graphics.newFont("fonts/DINRegular.ttf", 24, "normal"),
+  smallFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 18, "normal"),
+  largeFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 24, "normal"),
   size = 60,
-  isPressed = false,
-  sounds = {
-    pressed = love.audio.newSource("sounds/A/button-pressed.ogg", "static"),
-    released = love.audio.newSource("sounds/A/button-released.ogg", "static"),
-  },
+  sounds = Sounds.button,
 }
 
 function IcpButton:init(icp, id, options, x, y, w, h)
@@ -18,6 +14,7 @@ function IcpButton:init(icp, id, options, x, y, w, h)
   self.y = y
   self.w = w
   self.h = h
+  self.isPressed = false
   self.options = options
   self.options.type = options.type or "square"
 end
@@ -29,16 +26,16 @@ end
 
 function IcpButton:drawSquare()
   if self.isPressed then
-    love.graphics.setColor(0.3, 0.6, 0.3)
+    love.graphics.setColor(Colors.green)
   else
-    love.graphics.setColor(0.3, 0.3, 0.3)
+    love.graphics.setColor(Colors.grey)
   end
   love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, 5, 5)
-  love.graphics.setColor(.8, 1, 1)
+  love.graphics.setColor(Colors.cyan)
   love.graphics.rectangle("line", self.x, self.y, self.w, self.h, 5, 5)
 
   -- labelling
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.setColor(Colors.white)
   if self.options.number then
     love.graphics.setFont(self.largeFont)
     local x = self:hcentered(self.largeFont, self.options.number, self.x, self.size)
@@ -57,18 +54,18 @@ end
 
 function IcpButton:drawRound()
   if self.isPressed then
-    love.graphics.setColor(0.3, 0.6, 0.3)
+    love.graphics.setColor(Colors.green)
   else
-    love.graphics.setColor(0.3, 0.3, 0.3)
+    love.graphics.setColor(Colors.grey)
   end
   local center = {x = self.x + self.size / 2, y = self.y + self.size / 2}
   local radius = self.size / 2
   love.graphics.circle("fill", center.x, center.y, radius)
-  love.graphics.setColor(.8, 1, 1)
+  love.graphics.setColor(Colors.cyan)
   love.graphics.circle("line", center.x, center.y, radius)
 
   -- labelling
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.setColor(Colors.white)
   if self.options.number then
     love.graphics.setFont(self.largeFont)
     local x = self:hcentered(self.largeFont, self.options.number, self.x, self.size)

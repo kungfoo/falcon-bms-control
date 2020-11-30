@@ -14,122 +14,105 @@
 	TODO: consider coroutine friendliness
 
 	depends on oo.lua supplying class()
-]]
-
-local state_machine = class()
+]] local state_machine = class()
 
 function state_machine:new(states, start)
-	local ret = self:init({
-		states = states or {},
-		current_state = ""
-	})
+  local ret = self:init({states = states or {}, current_state = ""})
 
-	if start then
-		ret:set_state(start)
-	end
+  if start then ret:set_state(start) end
 
-	return ret
+  return ret
 end
 
 -------------------------------------------------------------------------------
---internal helpers
+-- internal helpers
 
 function state_machine:_get_state()
-	return self.states[self.current_state]
+  return self.states[self.current_state]
 end
 
---make an internal call, with up to 4 arguments
+-- make an internal call, with up to 4 arguments
 function state_machine:_call(name, a, b, c, d)
-	local state = self:_get_state()
-	if state and type(state[name]) == "function" then
-		return state[name](self, state, a, b, c, d)
-	end
-	return nil
+  local state = self:_get_state()
+  if state and type(state[name]) == "function" then return state[name](self, state, a, b, c, d) end
+  return nil
 end
 
 -------------------------------------------------------------------------------
---various checks
+-- various checks
 
 function state_machine:in_state(name)
-	return self.current_state == name
+  return self.current_state == name
 end
 
 function state_machine:has_state(name)
-	return self.states[name] ~= nil
+  return self.states[name] ~= nil
 end
 
 -------------------------------------------------------------------------------
---state adding/removing
+-- state adding/removing
 
---add a state
+-- add a state
 function state_machine:add_state(name, data)
-	if self.has_state(name) then
-		error("error: added duplicate state "..name)
-	else
-		self.states[name] = data
-		if self:in_state(name) then
-			self:_call("enter")
-		end
-	end
+  if self.has_state(name) then
+    error("error: added duplicate state " .. name)
+  else
+    self.states[name] = data
+    if self:in_state(name) then self:_call("enter") end
+  end
 
-	return self
+  return self
 end
 
---remove a state
+-- remove a state
 function state_machine:remove_state(name)
-	if not self.has_state(name) then
-		error("error: removed missed state "..name)
-	else
-		if self:in_state(name) then
-			self:_call("exit")
-		end
-		self.states[name] = nil
-	end
+  if not self.has_state(name) then
+    error("error: removed missed state " .. name)
+  else
+    if self:in_state(name) then self:_call("exit") end
+    self.states[name] = nil
+  end
 
-	return self
+  return self
 end
 
---hard-replace a state table
---if do_transitions is truthy and we're replacing the current state,
---exit is called on the old state and enter is called on the new state
+-- hard-replace a state table
+-- if do_transitions is truthy and we're replacing the current state,
+-- exit is called on the old state and enter is called on the new state
 function state_machine:replace_state(name, data, do_transitions)
-	local current = self:in_state(name)
-	if do_transitions and current then
-		self:_call("exit")
-	end
-	self.states[name] = data
-	if do_transitions and current then
-		self:_call("enter")
-	end
+  local current = self:in_state(name)
+  if do_transitions and current then self:_call("exit") end
+  self.states[name] = data
+  if do_transitions and current then self:_call("enter") end
 
-	return self
+  return self
 end
 
---ensure a state doesn't exist
+-- ensure a state doesn't exist
 function state_machine:clear_state(name)
-	return self:replace_state(name, nil, true)
+  return self:replace_state(name, nil, true)
 end
 
 -------------------------------------------------------------------------------
---transitions and updates
+-- transitions and updates
 
 function state_machine:set_state(state, reset)
-	if self.current_state ~= state or reset then
-		self:_call("exit")
-		self.current_state = state
-		self:_call("enter")
-	end
-	return self
+  if self.current_state ~= state or reset then
+    self:_call("exit")
+    self.current_state = state
+    self:_call("enter")
+  end
+  return self
 end
 
---perform an update
---pass in an optional delta time which is passed as an arg to the state functions
+-- perform an update
+-- pass in an optional delta time which is passed as an arg to the state functions
 function state_machine:update(dt)
-	return self:_call("update", dt)
+  return self:_call("update", dt)
 end
 
 function state_machine:draw()
-	self:_call("draw")
+  self:_call("draw")
 end
 
 return state_machine

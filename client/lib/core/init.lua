@@ -6,11 +6,9 @@
 
 	if not, several of the modules work as "normal" modules and return a table
 	for local-friendly use
-]]
-
-local path = ...
+]] local path = ...
 local function relative_file(p)
-	return table.concat({path, p}, ".")
+  return table.concat({path, p}, ".")
 end
 
 require(relative_file("oo"))

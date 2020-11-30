@@ -54,14 +54,16 @@ namespace F4SharedMem.Headers
 
         ATF_Not_Engaged = 0x10000000,
 
+        // Caution panel
+        Inlet_Icing = 0x20000000,
+
         // Free bits in LightBits3		
-        //0x20000000,
         //0x40000000,
         //0x80000000,
 
         // Used with the MAL/IND light code to light up "everything"
         // please update this if you add/change bits!
-        AllLampBits3On = 0x1147EFFF,
+        AllLampBits3On = 0x3147EFFF,
         AllLampBits3OnExceptCarapace = AllLampBits3On ^ SysTest
     };
 

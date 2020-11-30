@@ -3,6 +3,12 @@ Class = require("lib.hump.class")
 Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
+Flup = require("lib.flup")
+
+Colors = require("lib.colors")
+Sounds = require("lib.sounds")
+msgpack = require("lib.msgpack")
+inspect = require("lib.inspect")
 
 require("lib.interpolate")
 require("lib.core.table")
@@ -11,16 +17,15 @@ require("lib.core.math")
 -- libraries
 local socket = require("socket")
 local enet = require("enet")
-local msgpack = require("lib.msgpack")
 local tick = require("lib.tick")
 
 -- connecting states
 local broadcasting = {port = 9020}
-local connecting = {port = 9022}
+local connecting = {port = 9022, channels = 255}
 
 -- connected screen states
-local mfds = require("mfds")
-local icp = require("icp")
+local mfd_screen = require("mfd-screen")
+local icp_and_rwr = require("icp-and-rwr-screen")
 
 -- data
 local connection = {ip = nil, server = nil, host = nil, peer = nil}
@@ -30,9 +35,9 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
 local Switcher = require("components.switcher")
-local switcher = Switcher(20, 50, {mfds, icp})
+local switcher = Switcher({mfd_screen, icp_and_rwr})
 
-local font = love.graphics.newFont("fonts/slkscr.ttf", 20, "normal")
+local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
 function love.load()
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
@@ -83,13 +88,15 @@ function broadcasting:leave()
 end
 
 function broadcasting:draw()
+  love.setColor(Colors.white)
+  love.graphics.setFont(font)
   love.graphics.print("DISCOVERING SERVER" .. shine.dots[shine.position], 30, 30)
 end
 
 function connecting:enter(previous, serverIp)
   connection.ip = serverIp or connection.ip
   connection.host = enet.host_create()
-  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, 255)
+  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, connecting.channels)
 end
 
 function connecting:handleReceive(event)
@@ -112,12 +119,12 @@ function love.update(dt)
   while success and event do
     if event.type == "disconnect" then
       print("Disconnected.")
-      State.switch(connecting)
+      State.switch(broadcasting)
     elseif event.type == "connect" then
       print("Connected ...")
       connection.peer = event.peer
       -- switch to first screen
-      switcher:switch()
+      switcher:switch(icp_and_rwr)
     elseif event.type == "receive" then
       State.current():handleReceive(event)
     end
@@ -126,7 +133,7 @@ function love.update(dt)
 end
 
 function love.draw()
-  if debug.enabled then
+  if false then
     love.graphics.setFont(font)
     local fps = love.timer.getFPS()
     local mem = collectgarbage("count")
@@ -138,8 +145,8 @@ function love.draw()
                    debug.stats.time_update, debug.stats.time_draw, fps, mem / 1024,
                    love.graphics.getStats().texturememory / 1024 / 1024, ping)
 
-    love.graphics.setColor(255, 255, 255)
-    love.graphics.printf(text, 10, love.graphics.getHeight() - 20, love.graphics.getWidth(), "left")
+    love.graphics.setColor(Colors.white)
+    love.graphics.printf(text, 10, love.graphics.getHeight() - 26, love.graphics.getWidth(), "left")
   end
 end
 
