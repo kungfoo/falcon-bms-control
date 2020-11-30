@@ -2,7 +2,7 @@ local layout = require("lib.suit.layout").new()
 local IcpButton = require("components.icp-button")
 local RockerButton = require("components.rocker")
 
-local Icp = Class {padding = 25}
+local Icp = Class {padding = 25, width = 460, height = 490}
 
 function Icp:init(id, x, y)
   self.id = id
@@ -93,12 +93,12 @@ end
 
 function Icp:determineScale(w, h)
   -- turns out this is nicely square as well
-  if w >= 460 and h >= 460 then
+  if w >= Icp.width and h >= Icp.height then
     -- do not scale up
     return 1.0
   else
-    local d = math.min(w, h)
-    return d / 460
+    local a, b = w / Icp.width, h / Icp.height
+    return math.min(a, b)
   end
 end
 

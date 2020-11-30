@@ -35,7 +35,7 @@ local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 -- switcher component is present on all screens
 local Switcher = require("components.switcher")
-local switcher = Switcher(20, 30, {mfd_screen, icp_and_rwr})
+local switcher = Switcher({mfd_screen, icp_and_rwr})
 
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
@@ -131,7 +131,7 @@ function love.update(dt)
 end
 
 function love.draw()
-  if debug.enabled then
+  if false then
     love.graphics.setFont(font)
     local fps = love.timer.getFPS()
     local mem = collectgarbage("count")

@@ -1,5 +1,9 @@
 local StreamedTexture = require("util.streamed-texture")
-local Ded = Class {}
+local Ded = Class {
+  -- max size of this component
+  width = 460,
+  height = 200
+}
 
 function Ded:init(id, x, y)
   self.id = id
@@ -24,8 +28,8 @@ function Ded:draw()
     love.graphics.draw(self.image, 0, 0, 0, 1, 1)
   else
     love.graphics.setColor(Colors.white)
-    love.graphics.rectangle("line", 0, 0, 460, 200, 0)
-    love.graphics.print("DED data...", 0 + 10, 0 + 200 / 2 - 10)
+    love.graphics.rectangle("line", 0, 0, Ded.width, Ded.height, 0)
+    love.graphics.print("DED data...", 0 + 10, 0 + Ded.height / 2 - 10)
   end
 
   love.graphics.pop()
@@ -38,11 +42,11 @@ function Ded:updateGeometry(x, y, w, h)
 end
 
 function Ded:determineScale(w, h)
-  if w >= 460 and h >= 200 then
+  if w >= Ded.width and h >= Ded.height then
     -- do not scale up
     return 1.0
   else
-    local a, b = w / 460, h / 200
+    local a, b = w / Ded.width, h / Ded.height
     return math.min(a, b)
   end
 end

@@ -1,10 +1,10 @@
 local Switcher = Class {width = 150, height = 60, radius = 5, sounds = Sounds.button}
 
-function Switcher:init(leftMargin, bottomMargin, states)
-  self.margins = {leftMargin = leftMargin, bottomMargin = bottomMargin}
+function Switcher:init(states)
   self.states = states
   self.currentState = nil
   self.index = 0
+  self.transform = love.math.newTransform()
 end
 
 function Switcher:switch(state)
@@ -20,27 +20,46 @@ function Switcher:switch(state)
   self.index = math.wrap(self.index + 1, 0, #self.states)
 end
 
+function Switcher:update(dt)
+end
+
 function Switcher:draw()
+  love.graphics.push()
+  love.graphics.applyTransform(self.transform)
+
   if self.isPressed then
     love.graphics.setColor(Colors.green)
   else
     love.graphics.setColor(Colors.white)
   end
-  love.graphics.rectangle("line", self.x, self.y, self.width, self.height, self.radius)
+  love.graphics.rectangle("line", 0, 0, self.width, self.height, self.radius)
 
   love.graphics.setColor(Colors.green)
 
   local highlight = {
     width = (self.width / #self.states) - 20,
     height = self.height - 20,
-    x = (self.x + 10) + (self.index * (self.width / #self.states)),
-    y = self.y + 10,
+    x = (10) + (self.index * (self.width / #self.states)),
+    y = 10,
   }
   love.graphics.rectangle("fill", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
+  love.graphics.pop()
 end
 
-function Switcher:update(dt)
-  self.x, self.y = self.margins.leftMargin, love.graphics.getHeight() - self.margins.bottomMargin - self.height
+function Switcher:updateGeometry(x, y, w, h)
+  local scale = self:determineScale(w, h)
+  self.transform = love.math.newTransform()
+  self.transform:translate(x, y):scale(scale)
+end
+
+function Switcher:determineScale(w, h)
+  if w >= Switcher.width and h >= Switcher.height then
+    -- do not scale up
+    return 1.0
+  else
+    local a, b = w / Switcher.width, h / Switcher.height
+    return math.min(a, b)
+  end
 end
 
 function Switcher:pressed()
@@ -55,7 +74,8 @@ function Switcher:released()
 end
 
 function Switcher:mousepressed(x, y, button, isTouch, presses)
-  local hit = x >= self.x and x <= self.x + self.width and y >= self.y and y <= self.y + self.height
+  local dx, dy = self.transform:inverseTransformPoint(x, y)
+  local hit = dx >= 0 and dx <= self.width and dy >= 0 and dy <= self.height
   if hit then self:pressed() end
 end
 

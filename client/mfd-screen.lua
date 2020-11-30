@@ -22,6 +22,7 @@ local Screen = Class {
     end,
   },
   dimensions = {w = 0, h = 0},
+  padding = 10
 }
 
 function Screen:init()
@@ -44,7 +45,7 @@ function Screen:update(dt)
   local w, h = love.graphics.getDimensions()
   if self.dimensions.w ~= w or self.dimensions.h ~= h then
     self:adjustLayoutIfNeeded(w, h)
-    self.flup:fill(0, 0, w, h - 60)
+    self.flup:fill(self.padding, self.padding, w-self.padding*2, h-self.padding*2)
     self.dimensions.w = w
     self.dimensions.h = h
   end
@@ -57,9 +58,23 @@ end
 
 function Screen:adjustLayoutIfNeeded(w, h)
   if (w >= h) then
-    self.flup = Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}}
+    self.flup = Flup.split {
+      direction = "y",
+      ratio = 0.95,
+      components = {
+        top =  Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}},
+        bottom = self.components["switcher"]
+      }
+    }
   else
-    self.flup = Flup.split {direction = "y", components = {top = leftMfd, bottom = rightMfd}}
+    self.flup = Flup.split {
+      direction = "y",
+      ratio = 0.95,
+      components = {
+        top =  Flup.split {direction = "y", components = {top = leftMfd, bottom = rightMfd}},
+        bottom = self.components["switcher"]
+      }
+    }
   end
 end
 
