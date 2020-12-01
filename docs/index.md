@@ -2,7 +2,7 @@
 
 Falcon BMS Control lets you control Falcon BMS from any touch enabled device.
 
-There will be releases of the app to both iOS app store and Play Store in the near future.
+There will be releases of the app to both iOS app store and Play Store in the near future. The client and server code will be open-source.
 
 ## Windows server application
 
