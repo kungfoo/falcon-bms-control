@@ -16,6 +16,18 @@ If automatic discovery does not work for you on your network, please file an iss
 
 Windows Firewal will ask you to allow the server application to communicate on the network when you first run it. Not allowing it to do that will render the clients unable to discover the server and unusable.
 
+## Goals
+
+- be cross platform
+- require zero configuration (maybe allow for some)
+- responsive controls
+- work well on touch devices
+- make most of the screen space available
+
+## Non-Goals
+
+- photorealistic graphics
+
 ## Privacy Policy
 
 This app collects _none_ of your data. No data whatsoever is collected.
