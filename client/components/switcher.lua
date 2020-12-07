@@ -1,4 +1,4 @@
-local Switcher = Class {width = 150, height = 60, radius = 5, sounds = Sounds.button}
+local Switcher = Class {width = 150, height = 60, radius = 5, sounds = Sounds.button, id = "switcher"}
 
 function Switcher:init(states)
   self.states = states

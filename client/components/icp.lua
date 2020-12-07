@@ -7,11 +7,11 @@ local Icp = Class {padding = 25, width = 460, height = 490}
 function Icp:init(id, x, y)
   self.id = id
   self.transform = love.math.newTransform():translate(x or 0, y or 0)
-  self.buttons = {}
   self:createButtons(id)
 end
 
 function Icp:createButtons(id)
+  self.buttons = {}
   layout:reset(0, 0, self.padding - 5, self.padding)
   table.insert(self.buttons, IcpButton(id, "COM1", {label = "COM", number = 1, type = "round"},
                                        layout:col(IcpButton.size, IcpButton.size)))

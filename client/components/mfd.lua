@@ -7,7 +7,6 @@ local Mfd = Class {}
 
 function Mfd:init(identifier, x, y)
   self.id = identifier
-  self.buttons = {}
   self.transform = love.math.newTransform():translate(x or 0, y or 0)
   self:createButtons(identifier)
 end
