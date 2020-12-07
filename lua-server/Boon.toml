@@ -1,0 +1,40 @@
+[project]
+authors = "Silvio Heuberger"
+description = "A test server for Falcon BMS Control"
+email = "kung.foo@gmx.net"
+package_name = "falcon-bms-control-test-server"
+title = "Falcon BMS Control Test Server"
+url = "https://kungfoo.github.com/falcon-bms-control"
+uti = "ch.mollusca.falcon.bms.control.testserver"
+version = "v0.1a"
+
+[build]
+output_directory = "release"
+
+# List of patterns to exclude when building. Each item is a regular
+# expression, which when matched, will exclude the matched file or
+# directory from the build.
+ignore_list = [
+    # Git
+    "^.git.*",
+
+    # Binary files
+    ".zip$",
+    ".tar.gz$",
+    ".love$",
+    ".exe$",
+
+    # Boon-specific files and directories
+    "Boon.toml",
+    "release",
+]
+
+# List of targets to build for
+# Possible values: "love", "windows", "macos", "all"
+targets = ["all"]
+
+# If this is set to true, then the default ignore list will not be
+# merged with the project specific ignore list. This allows the
+# ignore list to be completely overwritten.
+exclude_default_ignore_list = false
+
