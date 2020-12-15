@@ -2,7 +2,21 @@
 
 Falcon BMS Control lets you control Falcon BMS from any touch enabled device.
 
-There will be releases of the app to both iOS app store and Play Store in the near future. The client and server code will be open-source.
+Releases for both iOS and android are available for free. The client and server code will be open-source once it is polished and documented.
+
+## iOS app
+
+Find the iOS release of the app here:
+
+[Falcon BMS Control for iOS](https://apps.apple.com/tt/app/falcon-bms-control/id1542670299)
+
+
+## Android app
+
+The android app is in open testing, available on the play store:
+
+[Falcon BMS Control for Android](https://play.google.com/store/apps/details?id=ch.mollusca.falconbmscontrol)
+
 
 ## Windows server application
 
@@ -20,6 +34,7 @@ Windows Firewal will ask you to allow the server application to communicate on t
 
 - be cross platform
 - require zero configuration (maybe allow for some)
+- auto discovery of server from multiple clients
 - responsive controls
 - work well on touch devices
 - make most of the screen space available
@@ -27,6 +42,7 @@ Windows Firewal will ask you to allow the server application to communicate on t
 ## Client Non-Goals
 
 - photorealistic graphics
+- replace more advanced and configurable tools like [Helios](https://github.com/HeliosVirtualCockpit/Helios)
 
 ## Privacy Policy
 
