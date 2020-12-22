@@ -1,5 +1,6 @@
 local Icp = require("components.icp")
 local Ded = require("components.ded")
+local Slider = require("components.slider")
 
 local StreamedTexture = require("util.streamed-texture")
 
@@ -7,9 +8,12 @@ local components = {}
 
 local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
+local slider = Slider(20, 15, 60, function(v)
+  print(v)
+end, {knob = 'circle'})
 
 local Screen = Class {
-  components = {icp, ded},
+  components = {icp, ded, slider},
   stats = {},
   channels = {
     -- general purpose reliable channel
@@ -69,8 +73,8 @@ function Screen:adjustLayoutIfNeeded(w, h)
         ratio = 0.6,
         components = {
           left = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
-          right = nil
-        }
+          right = slider,
+        },
       },
       bottom = self.components["switcher"],
     },
