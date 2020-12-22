@@ -64,7 +64,14 @@ function Screen:adjustLayoutIfNeeded(w, h)
     direction = "y",
     ratio = 0.95,
     components = {
-      top = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
+      top = Flup.split {
+        direction = "x",
+        ratio = 0.6,
+        components = {
+          left = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
+          right = nil
+        }
+      },
       bottom = self.components["switcher"],
     },
   }
