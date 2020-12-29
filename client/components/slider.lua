@@ -14,10 +14,6 @@ function Component:init(value, min, max, setter, style)
   self.knob = p.knob or 'rectangle'
 
   self.grabbed = false
-  self.ox = 0
-  self.oy = 0
-
-  print(inspect(self))
 end
 
 function Component:draw()
@@ -31,12 +27,13 @@ function Component:draw()
       love.graphics.rectangle('line', 0, 0, self.width, self.bounds.h)
     end
   elseif self.track == 'line' then
-    love.graphics.setLineWidth(4)
+    love.graphics.setLineWidth(3)
     if self.orientation == 'horizontal' then
       love.graphics.line(0, self.width / 2, self.bounds.w, self.width / 2)
     elseif self.orientation == 'vertical' then
-      love.graphics.line(self.bounds.w / 2, 0, self.bounds.w / 2, self.bounds.h)
+      love.graphics.line(self.width / 2, 0, self.width / 2, self.bounds.h)
     end
+    love.graphics.setLineWidth(1)
   end
 
   local knobX = 0
@@ -104,39 +101,17 @@ function Component:dragged(x, y)
     knobY = self.bounds.h * self.value
   end
 
-  local ox = x - knobX
-  local oy = y - knobY
+  local dx = x - knobX
+  local dy = y - knobY
 
-  local dx = ox - self.ox
-  local dy = oy - self.oy
   self.grabbed = true
   if self.orientation == 'horizontal' then
     self.value = self.value + dx / self.bounds.w
   elseif self.orientation == 'vertical' then
-    self.value = self.value - dy / self.bounds.h
+    self.value = self.value + dy / self.bounds.h
   end
 
   self.value = math.max(0, math.min(1, self.value))
-
-  -- if pressed then
-  --     if self.grabbed then
-  --         
-  --     elseif (x > knobX - self.width/2 and x < knobX + self.width/2 and y > knobY - self.width/2 and y < knobY + self.width/2) and not self.wasDown then
-  --         self.ox = ox
-  --         self.oy = oy
-  --         self.grabbed = true
-  --     end
-  -- else
-  --     self.grabbed = false
-  -- end
-
-  -- 
-
-  -- if self.setter ~= nil then
-  --     self.setter(self.min + self.value * (self.max - self.min))
-  -- end
-
-  -- self.wasDown = down
 end
 
 return Component

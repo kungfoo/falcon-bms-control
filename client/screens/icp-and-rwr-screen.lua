@@ -10,7 +10,7 @@ local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
 local slider = Slider(20, 15, 60, function(v)
   print(v)
-end, {knob = 'circle'})
+end, {orientation = 'horizontal', knob = 'circle', track = 'line'})
 
 local Screen = Class {
   components = {icp, ded, slider},
