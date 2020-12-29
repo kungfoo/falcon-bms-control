@@ -1,6 +1,6 @@
 local Component = Class {padding = 10, slider_height = 20}
 
-function Component:init(value, min, max, setter, style)
+function Component:init(value, min, max, setter, style, options)
   self.transform = love.math.newTransform():translate(x or 0, y or 0)
   self.value = (value - min) / (max - min)
   self.min = min
@@ -12,6 +12,9 @@ function Component:init(value, min, max, setter, style)
   self.orientation = p.orientation or 'horizontal'
   self.track = p.track or 'rectangle'
   self.knob = p.knob or 'rectangle'
+
+  local o = options or {}
+  self.values = o.values or nil
 
   self.grabbed = false
 end
@@ -85,9 +88,15 @@ function Component:slider_hit(x, y)
 end
 
 function Component:mousereleased(x, y, button, touch, presses)
-  local dx, dy = self.transform:inverseTransformPoint(x, y)
   if self.grabbed then
-    if self.setter ~= nil then self.setter(self.min + self.value * (self.max - self.min)) end
+    if self.setter ~= nil then
+      local value = self.min + self.value * (self.max - self.min)
+      if self.values then
+        -- snap to closest value
+        
+      end
+      self.setter(value)
+    end
     self.grabbed = false
   end
 end

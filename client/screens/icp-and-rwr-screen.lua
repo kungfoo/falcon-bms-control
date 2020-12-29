@@ -8,9 +8,9 @@ local components = {}
 
 local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
-local slider = Slider(20, 15, 60, function(v)
+local slider = Slider(30, 15, 60, function(v)
   print(v)
-end, {orientation = 'horizontal', knob = 'circle', track = 'line'})
+end, {orientation = 'horizontal', knob = 'circle', track = 'line'}, { values = {15, 30, 60} })
 
 local Screen = Class {
   components = {icp, ded, slider},
