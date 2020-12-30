@@ -93,7 +93,7 @@ function Component:mousereleased(x, y, button, touch, presses)
       local value = self.min + self.value * (self.max - self.min)
       if self.values then
         -- snap to closest value
-        local dist = math.pow(2,32)
+        local dist = math.pow(2, 32)
         local index = 0
         for i, v in ipairs(self.values) do
           if math.abs(value - v) < dist then

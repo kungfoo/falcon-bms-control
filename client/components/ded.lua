@@ -3,6 +3,7 @@ local Ded = Class {
   -- max size of this component
   width = 460,
   height = 200,
+  font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
 }
 
 function Ded:init(id, x, y)
@@ -29,6 +30,7 @@ function Ded:draw()
   else
     love.graphics.setColor(Colors.white)
     love.graphics.rectangle("line", 0, 0, Ded.width, Ded.height, 0)
+    love.graphics.setFont(self.font)
     love.graphics.print("DED data...", 0 + 10, 0 + Ded.height / 2 - 10)
   end
 

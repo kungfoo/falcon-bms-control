@@ -1,6 +1,7 @@
 local Icp = require("components.icp")
 local Ded = require("components.ded")
 local Slider = require("components.slider")
+local Label = require("components.label")
 
 local StreamedTexture = require("util.streamed-texture")
 
@@ -8,12 +9,14 @@ local components = {}
 
 local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
-local slider = Slider(30, 15, 60, function(v)
-  print(v)
-end, {label = "Refresh rate: $value/s"}, { values = {15, 30, 60} })
+
+local refresh_rate_label = Label("Refresh rate: 30/s")
+local refresh_rate_slider = Slider(30, 15, 60, function(value)
+  refresh_rate_label.value = "Refresh rate: " .. value .. "/s"
+end, {}, {values = {15, 30, 60}})
 
 local Screen = Class {
-  components = {icp, ded, slider},
+  components = {icp, ded, refresh_rate_slider, refresh_rate_label},
   stats = {},
   channels = {
     -- general purpose reliable channel
@@ -73,7 +76,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
         ratio = 0.6,
         components = {
           left = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
-          right = slider,
+          right = Flup.split {direction = "x", components = {left = refresh_rate_label, right = refresh_rate_slider}},
         },
       },
       bottom = self.components["switcher"],
