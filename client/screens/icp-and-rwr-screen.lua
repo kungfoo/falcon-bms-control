@@ -3,7 +3,7 @@ local Ded = require("components.ded")
 local Slider = require("components.slider")
 local Label = require("components.label")
 
-local StreamedTexture = require("util.streamed-texture")
+local StreamedTexture = require("lib.streamed-texture")
 
 local components = {}
 

@@ -1,4 +1,6 @@
-local Switcher = Class {width = 150, height = 60, radius = 5, sounds = Sounds.button, id = "switcher"}
+local Button = require("lib.button")
+
+local Switcher = Class {width = 150, height = 60, radius = 5, button = Button(), id = "switcher"}
 
 function Switcher:init(states)
   self.states = states
@@ -64,12 +66,12 @@ end
 
 function Switcher:pressed()
   self.isPressed = true
-  self.sounds.pressed:play()
+  Button.pressed()
 end
 
 function Switcher:released()
   self.isPressed = false
-  self.sounds.released:play()
+  Button.released()
   self:switch()
 end
 

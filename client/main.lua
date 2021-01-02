@@ -7,7 +7,6 @@ Flup = require("lib.flup")
 Settings = require("lib.settings")
 
 Colors = require("lib.colors")
-Sounds = require("lib.sounds")
 msgpack = require("lib.msgpack")
 inspect = require("lib.inspect")
 

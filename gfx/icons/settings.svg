@@ -11,7 +11,10 @@
    version="1.1"
    id="svg92"
    sodipodi:docname="settings.svg"
-   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   inkscape:export-filename="D:\Users\kungfoo\repositories\falcon-bms-universal-mfd\gfx\icons\settings.png"
+   inkscape:export-xdpi="983.03998"
+   inkscape:export-ydpi="983.03998">
   <metadata
      id="metadata98">
     <rdf:RDF>
@@ -34,19 +37,20 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="4094"
-     inkscape:window-height="2098"
+     inkscape:window-width="2945"
+     inkscape:window-height="1539"
      id="namedview94"
      showgrid="false"
      inkscape:zoom="9.435"
-     inkscape:cx="-89.848348"
+     inkscape:cx="-22.151563"
      inkscape:cy="54.622588"
-     inkscape:window-x="0"
-     inkscape:window-y="20"
+     inkscape:window-x="520"
+     inkscape:window-y="205"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg92" />
+     inkscape:current-layer="svg92"
+     inkscape:document-rotation="0" />
   <path
      d="M 5.952381,0 C 2.6666667,0 0,2.6666668 0,5.952381 V 44.047619 C 0,47.333333 2.6666667,50 5.952381,50 H 44.047619 C 47.333333,50 50,47.333333 50,44.047619 V 5.952381 C 50,2.6666668 47.333333,0 44.047619,0 Z m 17.1782,7.1428572 h 3.548176 l 1.034692,5.6198848 c 1.309524,0.285714 2.42913,0.844959 3.548177,1.499721 l 4.857236,-3.178479 2.536737,2.522787 -3.178479,4.880487 c 0.654762,1.119048 1.214286,2.250279 1.488095,3.559803 l 5.701266,1.120722 h 0.190662 v 3.571429 l -5.701264,1.118396 c -0.285716,1.309524 -0.847285,2.440755 -1.502047,3.559803 l 3.178479,4.880487 -2.522787,2.522787 -4.857236,-3.178479 c -1.119048,0.654762 -2.25028,1.214007 -3.559802,1.499721 l -1.118398,5.715216 H 23.225912 L 22.107514,37.141927 C 20.79799,36.856213 19.66676,36.296968 18.547712,35.642206 l -4.857236,3.178479 -2.522787,-2.522787 3.178479,-4.880487 C 13.691406,30.298363 13.129837,29.167132 12.844121,27.857608 L 7.1428571,26.739212 v -3.571429 l 5.6082599,-1.025391 c 0.285714,-1.309524 0.844958,-2.440755 1.49972,-3.559803 l -3.178479,-4.880487 2.522787,-2.522787 4.857236,3.178479 c 1.130952,-0.654762 2.250279,-1.214007 3.559802,-1.499721 z M 25,19.047619 c -3.27381,0 -5.952381,2.678572 -5.952381,5.952381 0,3.27381 2.678571,5.952381 5.952381,5.952381 3.27381,0 5.952381,-2.678571 5.952381,-5.952381 0,-3.273809 -2.678571,-5.952381 -5.952381,-5.952381 z"
      id="path90"
-     style="fill:#aad400;fill-opacity:1;stroke-width:1.19048" />
+     style="fill:#fffffe;fill-opacity:1;stroke-width:1.19048" />
 </svg>
