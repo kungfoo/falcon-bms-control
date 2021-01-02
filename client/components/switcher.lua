@@ -18,7 +18,7 @@ function Switcher:switch(state)
     self.currentState = table.shift(self.states)
     table.push(self.states, self.currentState)
   end
-  State.switch(self.currentState, self)
+  State.switch(self.currentState)
   self.index = math.wrap(self.index + 1, 0, #self.states)
 end
 

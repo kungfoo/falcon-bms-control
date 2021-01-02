@@ -1,4 +1,3 @@
-local inspect = require("lib.inspect")
 local Button = require("lib.button")
 
 local IcpButton = Class {

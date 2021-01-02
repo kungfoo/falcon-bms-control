@@ -6,7 +6,6 @@ local rightMfd = Mfd("f16/right-mfd")
 
 local Screen = Class {
   stats = {},
-  components = {leftMfd, rightMfd},
   channels = {
     -- general purpose reliable channel
     [0] = function(event)
@@ -26,10 +25,10 @@ local Screen = Class {
 }
 
 function Screen:init()
+  self.components = {leftMfd, rightMfd, Footer}
 end
 
-function Screen:enter(previous, switcher)
-  self.components["switcher"] = switcher
+function Screen:enter(previous)
   leftMfd:start()
   rightMfd:start()
 end
@@ -50,7 +49,7 @@ function Screen:update(dt)
     self.dimensions.h = h
   end
 
-  for _, component in pairs(self.components) do component:update(dt) end
+  for _, component in ipairs(self.components) do component:update(dt) end
 
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
@@ -63,7 +62,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
       ratio = 0.95,
       components = {
         top = Flup.split {direction = "x", components = {left = leftMfd, right = rightMfd}},
-        bottom = self.components["switcher"],
+        bottom = Footer,
       },
     }
   else
@@ -72,7 +71,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
       ratio = 0.95,
       components = {
         top = Flup.split {direction = "y", components = {top = leftMfd, bottom = rightMfd}},
-        bottom = self.components["switcher"],
+        bottom = Footer,
       },
     }
   end
@@ -94,11 +93,11 @@ function Screen:draw()
 end
 
 function Screen:mousepressed(x, y, button, isTouch, presses)
-  for _, component in pairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
 end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
-  for _, component in pairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
 end
 
 return Screen

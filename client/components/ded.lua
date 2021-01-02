@@ -1,4 +1,5 @@
 local StreamedTexture = require("lib.streamed-texture")
+
 local Ded = Class {
   -- max size of this component
   width = 460,
