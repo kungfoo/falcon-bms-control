@@ -2,9 +2,10 @@ local Component = Class {}
 
 local Button = require("lib.button")
 
-function Component:init(icon, options)
+function Component:init(icon, options, callback)
     local o = options or {}
     self.align = o.align or "left"
+    self.callback = callback or function() end
     self.image = love.graphics.newImage(love.image.newImageData(icon), {mipmaps = true})
     self.transform = love.math.newTransform()
     self.pressed = false
@@ -54,8 +55,11 @@ function Component:mousepressed(x, y, button, touch, presses)
 end
 
 function Component:mousereleased(x, y, button, touch, presses)
-    Button.released()
-    self.pressed = false
+    if self.pressed then
+        Button.released()
+        self.pressed = false
+        self.callback()
+    end
 end
 
 return Component

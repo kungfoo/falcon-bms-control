@@ -8,6 +8,7 @@ local refresh_rate_slider = Slider(30, 15, 60, function(value)
 end, {}, {values = {15, 30, 60}})
 
 function Screen:init()
+  self.settings_label = Label("Settings")
 end
 
 function Screen:enter(previous)
@@ -17,6 +18,10 @@ function Screen:leave()
 end
 
 function Screen:update(dt)
+end
+
+function Screen:draw()
+  self.settings_label:draw()
 end
 
 return Screen

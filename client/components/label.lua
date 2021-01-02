@@ -4,6 +4,7 @@ function Component:init(value, options)
   local p = options or {}
   self.value = value
   self.font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", p.size or 20, "normal")
+  self.transform = love.math.newTransform()
 end
 
 function Component:draw()

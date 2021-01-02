@@ -4,8 +4,9 @@ local ImageButton = require("components.image-button")
 
 function Footer:init(switcher, settings_screen)
     self.switcher = switcher
-    self.settings_button = ImageButton("icons/settings.png", {align = "right"})
-    self.settings_screen = settings_screen
+    self.settings_button = ImageButton("icons/settings.png", {align = "right"}, function()
+        State.switch(settings_screen)
+    end)
     self.transform = love.math.newTransform()
 
     self.flup = Flup.split {
@@ -23,7 +24,7 @@ end
 function Footer:draw()
     love.graphics.push()
     love.graphics.applyTransform(self.transform)
-   
+
     self.switcher:draw()
     self.settings_button:draw()
 
