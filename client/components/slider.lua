@@ -22,6 +22,7 @@ end
 function Component:draw()
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
+  love.graphics.setColor(Colors.white)
 
   if self.track == 'rectangle' then
     if self.orientation == 'horizontal' then

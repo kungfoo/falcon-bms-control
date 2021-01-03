@@ -1,7 +1,7 @@
 local Screen = Class {padding = 10, dimensions = {w = 0, h = 0}}
 local Slider = require("components.slider")
 local Label = require("components.label")
-
+local ImageButton = require("components.image-button")
 
 -- adjusts max RTT texture update frequency, may be beneficial for slow devices
 local function describe_refresh_rate(value)
@@ -58,11 +58,15 @@ end, {}, {values = {0, 1}})
 local settings_label = Label("Settings", {size = 30})
 
 function Screen:init()
+  self.close_button = ImageButton("icons/close.png", {align = "right"}, function()
+    State.switch(self.previous_screen)
+  end)
   self.labels = {settings_label, refresh_rate_label, quality_label, vibrate_label}
-  self.components = {refresh_rate_slider, quality_slider, vibrate_slider}
+  self.components = {refresh_rate_slider, quality_slider, vibrate_slider, self.close_button}
 end
 
 function Screen:enter(previous)
+  self.previous_screen = previous
 end
 
 function Screen:leave()
@@ -82,7 +86,7 @@ function Screen:update(dt)
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
-  self.flup = Flup.split {
+  local settings_flup = Flup.split {
     direction = "y",
     components = {
       top = Flup.split {
@@ -123,6 +127,15 @@ function Screen:adjustLayoutIfNeeded(w, h)
           }
         }
       }
+    }
+  }
+
+  self.flup = Flup.split {
+    direction = "y",
+    ratio = 0.95,
+    components = {
+      top = settings_flup,
+      bottom = self.close_button,
     }
   }
 end
