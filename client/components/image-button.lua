@@ -22,7 +22,6 @@ end
 function Component:updateGeometry(x, y, w, h)
     local scale = self:determineScale(w, h)
     self.transform = love.math.newTransform()
-    print(self.align)
     if self.align == "left" then
         self.transform:translate(x, y):scale(scale)
     end
