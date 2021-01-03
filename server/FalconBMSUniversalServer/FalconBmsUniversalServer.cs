@@ -232,6 +232,7 @@ namespace FalconBmsUniversalServer
             _peer = peer;
             _extractor = extractor;
             _cancellationToken = cancellationToken;
+            Logger.Debug("{}: Refresh rate is: {}", _request.identifier, _request.refresh_rate);
         }
 
         public void Run()
@@ -239,14 +240,17 @@ namespace FalconBmsUniversalServer
             while (!_cancellationToken.IsCancellationRequested)
             {
                 SendOneChunk();
-                Thread.Sleep(33);
+                var refreshRate = _request.refresh_rate != 0 ? _request.refresh_rate : 30;
+                var toSleep = ((int) (1f / refreshRate) * 1000);
+                Thread.Sleep(toSleep);
             }
         }
 
         private void SendOneChunk()
         {
             if (!_extractor.Offers(_request.identifier) || !_extractor.IsDataAvailable) return;
-            var encoded = _extractor.GetEncoded(_request.identifier);
+            var quality = _request.quality != 0 ? _request.quality : 80L;
+            var encoded = _extractor.GetEncoded(_request.identifier, quality);
             var channel = ChannelFor(_request);
             var newHash = _hasher.ComputeHash(encoded);
             if (!newHash.Equals(_oldHash))
@@ -310,7 +314,7 @@ namespace FalconBmsUniversalServer
 
         bool IsDataAvailable { get; }
 
-        byte[] GetEncoded(string identifier);
+        byte[] GetEncoded(string identifier, long quality);
     }
 
     // ReSharper disable InconsistentNaming
@@ -360,6 +364,10 @@ namespace FalconBmsUniversalServer
             public string type { get; set; }
             public string command { get; set; }
             public string identifier { get; set; }
+
+            public long quality { get; set; }
+
+            public int refresh_rate { get; set; }
 
             public static bool IsType(string type)
             {
@@ -428,15 +436,15 @@ namespace FalconBmsUniversalServer
                 return _offered.ContainsKey(identifier);
             }
 
-            public byte[] GetEncoded(string identifier)
+            public byte[] GetEncoded(string identifier, long quality)
             {
-                return ReadSharedTextureMemory(_offered[identifier]);
+                return ReadSharedTextureMemory(_offered[identifier], quality);
             }
 
-            private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition)
+            private byte[] ReadSharedTextureMemory(SharedTextureMemory sharedTextureMemoryPosition, long quality)
             {
                 var image = _reader.GetImage(sharedTextureMemoryPosition.ToRect());
-                return ToJpeg(image, 80L);
+                return ToJpeg(image, quality);
             }
 
             private static byte[] ToJpeg(Bitmap image, long quality)

@@ -64,7 +64,7 @@ function Ded:start()
 end
 
 function Ded:stop()
-  StreamedTexture.stop()
+  StreamedTexture.stop(self.id)
 end
 
 function Ded:mousepressed(x, y, button, isTouch, presses)
