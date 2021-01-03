@@ -152,4 +152,8 @@ function Screen:mousereleased(x, y, button, isTouch, presses)
   for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
 end
 
+function Screen:handleReceive(event)
+  -- intentionally left blank
+end
+
 return Screen
