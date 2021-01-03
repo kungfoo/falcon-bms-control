@@ -232,7 +232,7 @@ namespace FalconBmsUniversalServer
             _peer = peer;
             _extractor = extractor;
             _cancellationToken = cancellationToken;
-            Logger.Debug("{}: Refresh rate is: {}", _request.identifier, _request.refresh_rate);
+            Logger.Debug("{}: Refresh rate is: {}, Quality is: {}", _request.identifier, _request.refresh_rate, _request.quality);
         }
 
         public void Run()
@@ -241,7 +241,7 @@ namespace FalconBmsUniversalServer
             {
                 SendOneChunk();
                 var refreshRate = _request.refresh_rate != 0 ? _request.refresh_rate : 30;
-                var toSleep = ((int) (1f / refreshRate) * 1000);
+                var toSleep = (int)((1f / refreshRate) * 1000);
                 Thread.Sleep(toSleep);
             }
         }
