@@ -1,4 +1,6 @@
-local MfdButton = Class {size = 46, lineOffset = 8, sounds = Sounds.button}
+local Button = require("lib.button")
+
+local MfdButton = Class {size = 46, lineOffset = 8}
 
 function MfdButton:init(mfd, id, x, y, w, h)
   self.mfd = mfd
@@ -27,14 +29,14 @@ function MfdButton:hit(x, y)
 end
 
 function MfdButton:pressed()
-  self.sounds.pressed:play()
+  Button.pressed()
   self.isPressed = true
   local message = {type = "osb-pressed", mfd = self.mfd, osb = self.id}
   Signal.emit("send-to-server", message)
 end
 
 function MfdButton:released()
-  self.sounds.released:play()
+  Button.released()
   self.isPressed = false
   local message = {type = "osb-released", mfd = self.mfd, osb = self.id}
   Signal.emit("send-to-server", message)

@@ -1,15 +1,10 @@
 local Icp = require("components.icp")
 local Ded = require("components.ded")
 
-local StreamedTexture = require("util.streamed-texture")
-
-local components = {}
-
 local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
 
 local Screen = Class {
-  components = {icp, ded},
   stats = {},
   channels = {
     -- general purpose reliable channel
@@ -22,7 +17,7 @@ local Screen = Class {
       ded:consume(event.data)
     end,
     [4] = function(event)
-      components["f16/rwr"]:consume(event.data)
+      -- components["f16/rwr"]:consume(event.data)
     end,
   },
   dimensions = {w = 0, h = 0},
@@ -30,10 +25,10 @@ local Screen = Class {
 }
 
 function Screen:init()
+  self.components = {icp, ded, Footer}
 end
 
-function Screen:enter(previous, switcher)
-  self.components["switcher"] = switcher
+function Screen:enter(previous)
   ded:start()
 end
 
@@ -64,8 +59,15 @@ function Screen:adjustLayoutIfNeeded(w, h)
     direction = "y",
     ratio = 0.95,
     components = {
-      top = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
-      bottom = self.components["switcher"],
+      top = Flup.split {
+        direction = "x",
+        ratio = 0.6,
+        components = {
+          left = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
+          right = nil,
+        },
+      },
+      bottom = Footer,
     },
   }
 end
@@ -78,18 +80,18 @@ end
 function Screen:draw()
   local t1 = love.timer.getTime()
 
-  for _, component in pairs(self.components) do component:draw() end
+  for _, component in ipairs(self.components) do component:draw() end
 
   local t2 = love.timer.getTime()
   self.stats.time_draw = (t2 - t1) * 1000
 end
 
 function Screen:mousepressed(x, y, button, isTouch, presses)
-  for _, component in pairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
 end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
-  for _, component in pairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
 end
 
 return Screen

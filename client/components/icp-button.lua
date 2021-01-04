@@ -1,10 +1,9 @@
-local inspect = require("lib.inspect")
+local Button = require("lib.button")
 
 local IcpButton = Class {
   smallFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 18, "normal"),
   largeFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 24, "normal"),
   size = 60,
-  sounds = Sounds.button,
 }
 
 function IcpButton:init(icp, id, options, x, y, w, h)
@@ -99,14 +98,14 @@ function IcpButton:vcentered(font, y, height)
 end
 
 function IcpButton:pressed()
-  self.sounds.pressed:play()
+  Button.pressed()
   self.isPressed = true
   local message = {type = "icp-pressed", icp = self.icp, button = self.id}
   Signal.emit("send-to-server", message)
 end
 
 function IcpButton:released()
-  self.sounds.released:play()
+  Button.released()
   self.isPressed = false
   local message = {type = "icp-released", icp = self.icp, button = self.id}
   Signal.emit("send-to-server", message)

@@ -1,8 +1,10 @@
-local StreamedTexture = require("util.streamed-texture")
+local StreamedTexture = require("lib.streamed-texture")
+
 local Ded = Class {
   -- max size of this component
   width = 460,
   height = 200,
+  font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
 }
 
 function Ded:init(id, x, y)
@@ -29,6 +31,7 @@ function Ded:draw()
   else
     love.graphics.setColor(Colors.white)
     love.graphics.rectangle("line", 0, 0, Ded.width, Ded.height, 0)
+    love.graphics.setFont(self.font)
     love.graphics.print("DED data...", 0 + 10, 0 + Ded.height / 2 - 10)
   end
 
@@ -61,7 +64,7 @@ function Ded:start()
 end
 
 function Ded:stop()
-  StreamedTexture.stop()
+  StreamedTexture.stop(self.id)
 end
 
 function Ded:mousepressed(x, y, button, isTouch, presses)

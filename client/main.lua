@@ -4,9 +4,9 @@ Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
 Flup = require("lib.flup")
+Settings = require("lib.settings")
 
 Colors = require("lib.colors")
-Sounds = require("lib.sounds")
 msgpack = require("lib.msgpack")
 inspect = require("lib.inspect")
 
@@ -24,8 +24,9 @@ local broadcasting = {port = 9020}
 local connecting = {port = 9022, channels = 255}
 
 -- connected screen states
-local mfd_screen = require("mfd-screen")
-local icp_and_rwr = require("icp-and-rwr-screen")
+local mfd_screen = require("screens.mfd-screen")
+local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
+local settings_screen = require("screens.settings")
 
 -- data
 local connection = {ip = nil, server = nil, host = nil, peer = nil}
@@ -33,9 +34,12 @@ local shine = {dots = {".", "..", "..."}, position = 1}
 
 local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
--- switcher component is present on all screens
 local Switcher = require("components.switcher")
-local switcher = Switcher({mfd_screen, icp_and_rwr})
+local switcher = Switcher({mfd_screen, icp_and_rwr_screen})
+
+-- footer component is present on all screens
+local footer = require("components.footer")
+Footer = footer(switcher, settings_screen)
 
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
@@ -124,7 +128,7 @@ function love.update(dt)
       print("Connected ...")
       connection.peer = event.peer
       -- switch to first screen
-      switcher:switch(icp_and_rwr)
+      switcher:switch(icp_and_rwr_screen)
     elseif event.type == "receive" then
       State.current():handleReceive(event)
     end

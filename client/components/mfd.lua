@@ -1,4 +1,5 @@
-local StreamedTexture = require("util.streamed-texture")
+local StreamedTexture = require("lib.streamed-texture")
+
 local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
