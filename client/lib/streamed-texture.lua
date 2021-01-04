@@ -6,7 +6,7 @@ function StreamedTexture.start(identifier)
     identifier = identifier,
     command = "start",
     refresh_rate = Settings.refresh_rate,
-    quality = Settings.quality
+    quality = Settings.quality,
   })
 end
 

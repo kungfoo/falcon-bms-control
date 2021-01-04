@@ -64,7 +64,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
         ratio = 0.6,
         components = {
           left = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
-          right = nil
+          right = nil,
         },
       },
       bottom = Footer,

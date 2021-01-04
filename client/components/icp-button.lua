@@ -3,7 +3,7 @@ local Button = require("lib.button")
 local IcpButton = Class {
   smallFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 18, "normal"),
   largeFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 24, "normal"),
-  size = 60
+  size = 60,
 }
 
 function IcpButton:init(icp, id, options, x, y, w, h)

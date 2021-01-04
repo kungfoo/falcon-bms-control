@@ -5,7 +5,7 @@ local ImageButton = require("components.image-button")
 
 -- adjusts max RTT texture update frequency, may be beneficial for slow devices
 local function describe_refresh_rate(value)
-  return "Displays refresh rate: ".. value .. "/s"
+  return "Displays refresh rate: " .. value .. "/s"
 end
 
 local refresh_rate_label = Label(describe_refresh_rate(Settings.refresh_rate))
@@ -26,14 +26,16 @@ local quality_slider = Slider(Settings.quality, 50, 90, function(value)
 end)
 
 local function describe_vibration(value)
-  if value == true then
-    return "Vibration: ON"
-  end
+  if value == true then return "Vibration: ON" end
   return "Vibration: OFF"
 end
 
 local function from_bool(value)
-  if value then return 1 else return 0  end
+  if value then
+    return 1
+  else
+    return 0
+  end
 end
 
 local function to_bool(value)
@@ -50,7 +52,7 @@ local function to_bool(value)
 end
 
 local vibrate_label = Label(describe_vibration(Settings.vibrate))
-local vibrate_slider = Slider(from_bool(Settings.vibrate), 0, 1, function (value)
+local vibrate_slider = Slider(from_bool(Settings.vibrate), 0, 1, function(value)
   Settings.vibrate = to_bool(value)
   vibrate_label.value = describe_vibration(Settings.vibrate)
 end, {}, {values = {0, 1}})
@@ -80,9 +82,7 @@ function Screen:update(dt)
     self.dimensions.w = w
     self.dimensions.h = h
   end
-  for _, component in ipairs(self.components) do
-    component:update(dt)
-  end
+  for _, component in ipairs(self.components) do component:update(dt) end
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
@@ -92,52 +92,21 @@ function Screen:adjustLayoutIfNeeded(w, h)
       top = Flup.split {
         direction = "y",
         components = {
-          top = Flup.split {
-            direction = "x",
-            components = {
-              left = settings_label,
-              right = nil
-            }
-          },
-          bottom = Flup.split {
-            direction = "x",
-            components = {
-              left = refresh_rate_label,
-              right = refresh_rate_slider
-            }
-          }
-        }
+          top = Flup.split {direction = "x", components = {left = settings_label, right = nil}},
+          bottom = Flup.split {direction = "x", components = {left = refresh_rate_label, right = refresh_rate_slider}},
+        },
       },
       bottom = Flup.split {
         direction = "y",
         components = {
-          top = Flup.split {
-            direction = "x",
-            components = {
-              left = quality_label,
-              right = quality_slider
-            }
-          },
-          bottom = Flup.split {
-            direction = "x",
-            components = {
-              left = vibrate_label,
-              right = vibrate_slider
-            }
-          }
-        }
-      }
-    }
+          top = Flup.split {direction = "x", components = {left = quality_label, right = quality_slider}},
+          bottom = Flup.split {direction = "x", components = {left = vibrate_label, right = vibrate_slider}},
+        },
+      },
+    },
   }
 
-  self.flup = Flup.split {
-    direction = "y",
-    ratio = 0.95,
-    components = {
-      top = settings_flup,
-      bottom = self.close_button,
-    }
-  }
+  self.flup = Flup.split {direction = "y", ratio = 0.95, components = {top = settings_flup, bottom = self.close_button}}
 end
 
 function Screen:draw()

@@ -1,6 +1,6 @@
 local Button = require("lib.button")
 
-local MfdButton = Class {size = 46, lineOffset = 8 }
+local MfdButton = Class {size = 46, lineOffset = 8}
 
 function MfdButton:init(mfd, id, x, y, w, h)
   self.mfd = mfd
