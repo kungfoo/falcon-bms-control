@@ -58,12 +58,13 @@ function Screen:adjustLayoutIfNeeded(w, h)
   self.flup = Flup.split {
     direction = "y",
     ratio = 0.95,
+    margin = 10,
     components = {
       top = Flup.split {
         direction = "x",
-        ratio = 0.6,
+        ratio = 0.8,
         components = {
-          left = Flup.split {direction = "y", ratio = 0.3, components = {top = ded, bottom = icp}},
+          left = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = ded, bottom = icp}},
           right = nil,
         },
       },
