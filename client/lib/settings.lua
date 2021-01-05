@@ -7,7 +7,12 @@ local file_name = "settings.msgpack"
 function Settings:init()
   local file_data, size = love.filesystem.read(file_name)
   local from_file = {}
-  if file_data then from_file = msgpack.unpack(file_data) end
+  if file_data then
+    success, from_file = pcall(function()
+      return msgpack.unpack(file_data)
+    end)
+    if not success then print("Failed to load settings, falling back to defaults because of " .. from_file) end
+  end
   self.proxy = {}
   self.proxy.refresh_rate = from_file.refresh_rate or defaults.refresh_rate
   self.proxy.quality = from_file.quality or defaults.quality
