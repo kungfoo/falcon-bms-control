@@ -4,7 +4,7 @@ Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
 Flup = require("lib.flup")
-Settings = require("lib.settings")
+Settings = require("lib.settings")()
 
 Colors = require("lib.colors")
 msgpack = require("lib.msgpack")

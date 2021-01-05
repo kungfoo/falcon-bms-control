@@ -8,9 +8,9 @@ local function describe_refresh_rate(value)
   return "Displays refresh rate: " .. value .. "/s"
 end
 
-local refresh_rate_label = Label(describe_refresh_rate(Settings.refresh_rate))
-local refresh_rate_slider = Slider(Settings.refresh_rate, 15, 60, function(value)
-  Settings.refresh_rate = value
+local refresh_rate_label = Label(describe_refresh_rate(Settings:refreshRate()))
+local refresh_rate_slider = Slider(Settings:refreshRate(), 15, 60, function(value)
+  Settings:setRefreshRate(value)
   refresh_rate_label.value = describe_refresh_rate(value)
 end, {}, {values = {15, 30, 60}})
 
@@ -19,10 +19,10 @@ local function describe_quality(value)
   return "Compression quality: " .. value
 end
 
-local quality_label = Label(describe_quality(Settings.quality))
-local quality_slider = Slider(Settings.quality, 50, 90, function(value)
-  Settings.quality = math.floor(value)
-  quality_label.value = describe_quality(Settings.quality)
+local quality_label = Label(describe_quality(Settings:quality()))
+local quality_slider = Slider(Settings:quality(), 50, 90, function(value)
+  Settings:setQuality(math.floor(value))
+  quality_label.value = describe_quality(Settings:quality())
 end)
 
 local function describe_vibration(value)
@@ -51,10 +51,10 @@ local function to_bool(value)
   end
 end
 
-local vibrate_label = Label(describe_vibration(Settings.vibrate))
-local vibrate_slider = Slider(from_bool(Settings.vibrate), 0, 1, function(value)
-  Settings.vibrate = to_bool(value)
-  vibrate_label.value = describe_vibration(Settings.vibrate)
+local vibrate_label = Label(describe_vibration(Settings:vibrate()))
+local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(value)
+  Settings:setVibrate(to_bool(value))
+  vibrate_label.value = describe_vibration(Settings:vibrate())
 end, {}, {values = {0, 1}})
 
 local settings_label = Label("Settings", {size = 30})
