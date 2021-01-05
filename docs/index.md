@@ -4,6 +4,12 @@ Falcon BMS Control lets you control Falcon BMS from any touch enabled device.
 
 Releases for both iOS and android are available for free. The client and server code will be open-source once it is polished and documented.
 
+## TL;DR: How to use it?
+
+- Install the app on your device
+- Enable RTT exports in `${falcon bms install}/user/config/falcon_bms.cfg`: set `g_bExportRTTTextures 1`
+- Allow the server application in Windows Firewall
+
 ## iOS app
 
 Find the iOS release of the app here:
@@ -29,6 +35,12 @@ If automatic discovery does not work for you on your network, please file an iss
 ### Windows Firewall
 
 Windows Firewal will ask you to allow the server application to communicate on the network when you first run it. Not allowing it to do that will render the clients unable to discover the server and unusable.
+
+## FAQ
+
+### I get a windows language switch popup on some keypresses?
+
+On some systems with multiple input languages, the shortcut for language input switching conflicts with the default BMS key binds. The easiest solution is probably to unbind the shortcut in Windows language preferences.
 
 ## Client Goals
 
