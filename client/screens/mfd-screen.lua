@@ -62,7 +62,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
       ratio = 0.95,
       margin = 10,
       components = {
-        top = Flup.split {direction = "x", margin = 10, components = {left = leftMfd, right = rightMfd}},
+        top = Flup.split {direction = "x", margin = 20, components = {left = leftMfd, right = rightMfd}},
         bottom = Footer,
       },
     }
@@ -72,7 +72,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
       ratio = 0.95,
       margin = 10,
       components = {
-        top = Flup.split {direction = "y", margin = 10, components = {top = leftMfd, bottom = rightMfd}},
+        top = Flup.split {direction = "y", margin = 20, components = {top = leftMfd, bottom = rightMfd}},
         bottom = Footer,
       },
     }
