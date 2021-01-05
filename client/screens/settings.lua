@@ -106,7 +106,12 @@ function Screen:adjustLayoutIfNeeded(w, h)
     },
   }
 
-  self.flup = Flup.split {direction = "y", ratio = 0.95, components = {top = settings_flup, bottom = self.close_button}}
+  self.flup = Flup.split {
+    direction = "y",
+    ratio = 0.95,
+    margin = 10,
+    components = {top = settings_flup, bottom = self.close_button},
+  }
 end
 
 function Screen:draw()
