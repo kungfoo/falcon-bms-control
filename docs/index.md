@@ -40,6 +40,20 @@ If automatic discovery does not work for you on your network, please file an iss
 
 Windows Firewal will ask you to allow the server application to communicate on the network when you first run it. Not allowing it to do that will render the clients unable to discover the server and unusable.
 
+## Client settings
+
+All client settings are effective immediately and persised across runs of the application.
+
+- Displays refresh rate: lower for slow devices and networks
+  - 15fps
+  - 30fps: default
+  - 60fps
+  
+- Displays compression quality: lower for slow networks
+  - Range from 50 to 90
+  
+- Vibration: Provide haptic feedback on button pushes on devices that have the hardware for it.
+
 ## FAQ
 
 ### I get a windows language switch popup on some keypresses?
@@ -48,9 +62,9 @@ On some systems with multiple input languages, the shortcut for language input s
 
 ### I have a very slow android device, can I run it?
 
-You will probably want to set the display refresh rate to 15fps on a very slow devices, but the rest of the app should work fine.
+You will probably want to set the display refresh rate to 15fps on a very slow devices, but the rest of the app should work fine. The changes are effective immediately.
 
-### I am on a very slow Wifi
+### I am on a very slow wifi, can I save bandwidth?
 
 You can turn down the compression quality of the exported displays to save _significant_ amounts of bandwidth. The default is 80, try setting it to ~60 for a first try. The changes are effective immediately.
 
