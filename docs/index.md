@@ -28,7 +28,7 @@ The android app is in open testing, available on the play store:
 
 The client applications for both iOS and android will try to discover and connect to the `falcon-bms-control` server running on the same network automatically.
 
-Download the server application from here: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/tag/) and run the application alongside Falcon BMS.
+Download the server application from here: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/) and run the application alongside Falcon BMS.
 
 If automatic discovery does not work for you on your network, please file an issue at: [Issues](https://github.com/kungfoo/falcon-bms-control/issues)
 
