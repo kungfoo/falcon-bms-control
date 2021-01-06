@@ -7,6 +7,7 @@ Releases for both iOS and android are available for free. The client and server 
 ## TL;DR: How to use it?
 
 - Install the app on your device
+- Install the windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/)
 - Enable RTT exports in `${falcon bms install}/user/config/falcon_bms.cfg`: set `g_bExportRTTTextures 1`
 - Allow the server application in Windows Firewall
 
@@ -23,6 +24,9 @@ The android app is in open testing, available on the play store:
 
 [Falcon BMS Control for Android](https://play.google.com/store/apps/details?id=ch.mollusca.falconbmscontrol)
 
+## Windows client application
+
+A windows client is currently in testing and will be available soon...
 
 ## Windows server application
 
@@ -41,6 +45,14 @@ Windows Firewal will ask you to allow the server application to communicate on t
 ### I get a windows language switch popup on some keypresses?
 
 On some systems with multiple input languages, the shortcut for language input switching conflicts with the default BMS key binds. The easiest solution is probably to unbind the shortcut in Windows language preferences.
+
+### I have a very slow android device, can I run it?
+
+You will probably want to set the display refresh rate to 15fps on a very slow devices, but the rest of the app should work fine.
+
+### I am on a very slow Wifi
+
+You can turn down the compression quality of the exported displays to save _significant_ amounts of bandwidth. The default is 80, try setting it to ~60 for a first try. The changes are effective immediately.
 
 ## Client Goals
 
