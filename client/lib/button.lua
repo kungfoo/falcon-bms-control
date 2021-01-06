@@ -6,7 +6,7 @@ local Button = Class {
 }
 
 function Button.pressed()
-  if Settings.vibrate then love.system.vibrate(0.2) end
+  if Settings:vibrate() then love.system.vibrate(0.1) end
   Button.sounds.pressed:play()
 end
 
