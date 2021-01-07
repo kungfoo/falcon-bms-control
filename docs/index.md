@@ -11,6 +11,10 @@ Releases for both iOS and android are available for free. The client and server 
 - Enable RTT exports in `${falcon bms install}/user/config/falcon_bms.cfg`: set `g_bExportRTTTextures 1`
 - Allow the server application in Windows Firewall
 
+## Known Limitations
+
+- Currently the server app does not support binds to DX buttons in the keyfile, such as hardware MFD frames.
+
 ## iOS app
 
 Find the iOS release of the app here:
