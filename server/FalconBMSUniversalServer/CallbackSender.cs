@@ -13,9 +13,9 @@ namespace FalconBmsUniversalServer
     {
         private static readonly Logger Logger = LogManager.GetLogger("CallbackSender");
         private static readonly string FALCON_BMS_PROCESS_NAME = "Falcon BMS";
-        
+
         private FalconKeyFile _keyFile;
-        
+
         private FalconKeyFile OpenKeyFile()
         {
             if (_keyFile != null)
@@ -46,7 +46,14 @@ namespace FalconBmsUniversalServer
                 _keyFile = OpenKeyFile();
                 if (_keyFile == null) return;
                 Logger.Debug("Down {}", _keyFile[callback]);
-                _keyFile[callback].Down();
+                if (_keyFile.HasCallback(callback))
+                {
+                    _keyFile[callback].Down();
+                }
+                else
+                {
+                    Logger.Error("No callback for {} present in keyfile {}, some functionality will not work!", callback, kf.FileName);
+                }
             }));
         }
 
@@ -57,7 +64,14 @@ namespace FalconBmsUniversalServer
                 _keyFile = OpenKeyFile();
                 if (_keyFile == null) return;
                 Logger.Debug("Released {}", _keyFile[callback]);
-                _keyFile[callback].Up();
+                if (_keyFile.HasCallback(callback))
+                {
+                    _keyFile[callback].Up();
+                }
+                else
+                {
+                    Logger.Error("No callback for {} present in keyfile {}, some functionality will not work!", callback, kf.FileName);
+                }
             }));
         }
 
@@ -82,7 +96,7 @@ namespace FalconBmsUniversalServer
                 Logger.Error("Could not find process named {0}", FALCON_BMS_PROCESS_NAME);
             }
         }
-        
+
         [DllImport("User32.dll")]
         private static extern int SetForegroundWindow(IntPtr point);
     }
