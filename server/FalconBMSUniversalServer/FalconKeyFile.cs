@@ -23,22 +23,18 @@
     public class FalconKeyFile
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("FalconKeyFile");
-        private readonly string _fileName;
         private bool _parsed = false;
         private readonly Dictionary<string, FalconKeyCallback> _callbacks = new Dictionary<string, FalconKeyCallback>();
         private List<FalconKeyCallback> _callbackList;
 
         public FalconKeyFile(string keyFile)
         {
-            _fileName = keyFile;
+            FileName = keyFile;
         }
 
         #region Properties
 
-        public string FileName
-        {
-            get { return _fileName; }
-        }
+        public string FileName { get; }
 
         #endregion
 
@@ -149,7 +145,7 @@
             {
                 if (!_parsed)
                 {
-                    ParseKeys(_fileName);
+                    ParseKeys(FileName);
                 }
 
                 return _callbackList;
@@ -160,7 +156,7 @@
         {
             if (!_parsed)
             {
-                ParseKeys(_fileName);
+                ParseKeys(FileName);
             } 
             
             return _callbacks.ContainsKey(callbackName);
@@ -172,7 +168,7 @@
             {
                 if (!_parsed)
                 {
-                    ParseKeys(_fileName);
+                    ParseKeys(FileName);
                 }
 
                 return _callbacks.ContainsKey(callbackName) ? _callbacks[callbackName] : null;
