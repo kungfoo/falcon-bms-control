@@ -14,6 +14,7 @@ Releases for both iOS and android are available for free. The client and server 
 ## Known Limitations
 
 - Currently the server app does not support binds to DX buttons in the keyfile, such as hardware MFD frames.
+- Works best with `BMS Full.key`, since that one has all the key binds for all the functions.
 
 ## iOS app
 
