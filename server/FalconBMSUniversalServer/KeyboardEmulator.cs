@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace FalconBMSUniversalServer
 {
@@ -23,8 +24,10 @@ namespace FalconBMSUniversalServer
     {
         private static readonly IntPtr KeyboardLayout;
         private static readonly KeyboardThread KeyboardThread;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("KeyboardEmulator");
 
-        private static readonly Dictionary<string, ushort> Keycodes = new Dictionary<string, ushort>{
+        private static readonly Dictionary<string, ushort> Keycodes = new Dictionary<string, ushort>
+        {
             {"BACKSPACE", 0x08},
             {"TAB", 0x09},
             {"CLEAR", 0x0C},
@@ -95,16 +98,48 @@ namespace FalconBMSUniversalServer
             {"F24", 0x87},
             {"NUMLOCK", 0x90},
             {"SCROLLLOCK", 0x91},
-            {"ENTER", 0x0D},     
+            {"ENTER", 0x0D},
             // high byte set is numpad
-            {"NUMENTER", 0x10D },
-            {"NUMPADENTER", 0x10D }
+            {"NUMENTER", 0x10D},
+            {"NUMPADENTER", 0x10D}
         };
 
         static KeyboardEmulator()
         {
             KeyboardThread = new KeyboardThread(30);
-            KeyboardLayout = NativeMethods.GetKeyboardLayout(0);
+            // BMS actually binds to keycodes, not key names, so using qwerty is actually correct. Fallback present, in case anything goes wrong.
+            KeyboardLayout = FindQwertyLayout() ?? NativeMethods.GetKeyboardLayout(0);
+        }
+
+
+        private static IntPtr? FindQwertyLayout()
+        {
+            Int32 allocSize = NativeMethods.GetKeyboardLayoutList(0, null);
+
+            // array of int ptrs, which are not actually pointers but machine word-sized integer handles 
+            // containing padded int32 values that we don't have to deallocate
+            IntPtr[] hkls = new IntPtr[allocSize];
+
+            // native method to fill array with static handles
+            Int32 count = NativeMethods.GetKeyboardLayoutList(hkls.Length, hkls);
+            if (count != allocSize)
+            {
+                // broken native method wrapper? don't use the values
+                return null;
+            }
+
+            foreach (IntPtr hkl in hkls)
+            {
+                Logger.Debug(
+                    $"KeyboardEmulator: keyboard layout 0x{((UInt32) hkl):X8} detected (not necessarily active)");
+                if ((((UInt32) hkl) & 0xffff0000) == 0x04090000)
+                {
+                    Logger.Debug("Found qwerty layout for keycode conversion.");
+                    return hkl;
+                }
+            }
+
+            return null;
         }
 
 
@@ -125,6 +160,7 @@ namespace FalconBMSUniversalServer
                         {
                             eventList.Add(CreateInput(Keycodes[keycode], keyDown));
                         }
+
                         index = endIndex;
                     }
                     else
@@ -134,7 +170,7 @@ namespace FalconBMSUniversalServer
                 }
                 else
                 {
-                    eventList.Add(CreateInput((ushort)NativeMethods.VkKeyScanEx(character, KeyboardLayout), keyDown));
+                    eventList.Add(CreateInput((ushort) NativeMethods.VkKeyScanEx(character, KeyboardLayout), keyDown));
                 }
             }
 
@@ -151,8 +187,9 @@ namespace FalconBMSUniversalServer
             ushort ourCode = virtualKeyCode;
             if (ourCode > 0xff)
             {
-                virtualKeyCode = (ushort)(virtualKeyCode & 0x00ff);
+                virtualKeyCode = (ushort) (virtualKeyCode & 0x00ff);
             }
+
             NativeMethods.Input input = new NativeMethods.Input();
             input.Type = NativeMethods.InputKeyboard;
             input.inputs.ki.wVk = virtualKeyCode;
@@ -177,16 +214,16 @@ namespace FalconBMSUniversalServer
             uint scanCode = NativeMethods.MapVirtualKeyEx(virtualKeyCode, 0, KeyboardLayout);
             if (virtualKeyCode == 0x13)
             {
-                scanCode = 0x04C5;                  // extended scancode for Pause
+                scanCode = 0x04C5; // extended scancode for Pause
             }
 
             if (keyDown)
             {
-                input.inputs.ki.wScan = (ushort)(scanCode & 0xFF);
+                input.inputs.ki.wScan = (ushort) (scanCode & 0xFF);
             }
             else
             {
-                input.inputs.ki.wScan = (ushort)scanCode;
+                input.inputs.ki.wScan = (ushort) scanCode;
                 input.inputs.ki.dwFlags |= NativeMethods.KeyUp;
             }
 
@@ -194,14 +231,14 @@ namespace FalconBMSUniversalServer
         }
 
         public static void KeyDown(string keys)
-        {            
+        {
             string[] keyList = Regex.Split(keys, @"\s+");
             foreach (string keyCombo in keyList)
             {
                 KeyboardThread.AddEvents(CreateEvents(keys, true, false));
             }
         }
-        
+
         public static void KeyUp(string keys)
         {
             string[] keyList = Regex.Split(keys, @"\s+");
@@ -210,7 +247,7 @@ namespace FalconBMSUniversalServer
                 KeyboardThread.AddEvents(CreateEvents(keys, false, false));
             }
         }
-        
+
         public static void KeyPress(string keys)
         {
             List<NativeMethods.Input> events = new List<NativeMethods.Input>();
