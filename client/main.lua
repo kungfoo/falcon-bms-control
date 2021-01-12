@@ -27,8 +27,6 @@ local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
 local settings_screen = require("screens.settings-screen")
 local connecting_screen = require("screens.connecting-screen")
 
-local shine = {dots = {".", "..", "..."}, position = 1}
-
 local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
 
 local Switcher = require("components.switcher")
@@ -49,10 +47,6 @@ function love.load()
 
   Signal.register("send-to-server", function(message)
     Connection.server:send(msgpack.pack(message))
-  end)
-
-  Timer.every(0.5, function()
-    shine.position = ((shine.position + 1) % #shine.dots) + 1
   end)
 end
 
