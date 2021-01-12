@@ -1,6 +1,6 @@
 local msgpack = require("lib.msgpack")
 
-local defaults = {refresh_rate = 30, quality = 80, vibrate = false}
+local defaults = {refresh_rate = 30, quality = 80, vibrate = false, ip = nil}
 local Settings = Class {}
 local file_name = "settings.msgpack"
 
@@ -17,6 +17,7 @@ function Settings:init()
   self.proxy.refresh_rate = from_file.refresh_rate or defaults.refresh_rate
   self.proxy.quality = from_file.quality or defaults.quality
   self.proxy.vibrate = from_file.vibrate or defaults.vibrate
+  self.proxy.ip = from_file.ip or defaults.ip
 end
 
 function Settings:changed()
@@ -45,6 +46,11 @@ function Settings:setVibrate(value)
   self:changed()
 end
 
+function Settings:setIp(value)
+  self.proxy.ip = value
+  self:changed()
+end
+
 function Settings:refreshRate()
   return self.proxy.refresh_rate
 end
@@ -55,6 +61,10 @@ end
 
 function Settings:vibrate()
   return self.proxy.vibrate
+end
+
+function Settings:ip()
+  return self.proxy.ip
 end
 
 return Settings

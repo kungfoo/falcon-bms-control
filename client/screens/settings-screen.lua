@@ -61,7 +61,7 @@ local settings_label = Label("Settings", {size = 30})
 
 function Screen:init()
   self.close_button = ImageButton("icons/close.png", {align = "right"}, function()
-    State.switch(self.previous_screen)
+    State.switch(self.previous_screen, self)
   end)
   self.labels = {settings_label, refresh_rate_label, quality_label, vibrate_label}
   self.components = {refresh_rate_slider, quality_slider, vibrate_slider, self.close_button}
@@ -83,6 +83,10 @@ function Screen:update(dt)
     self.dimensions.h = h
   end
   for _, component in ipairs(self.components) do component:update(dt) end
+end
+
+function Screen:handleReceive(event)
+  -- intentionally left blank
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
@@ -124,10 +128,6 @@ end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
   for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
-end
-
-function Screen:handleReceive(event)
-  -- intentionally left blank
 end
 
 return Screen
