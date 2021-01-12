@@ -1,9 +1,15 @@
+-- a bunch of functions
+require("lib.interpolate")
+require("lib.core.table")
+require("lib.core.math")
+
 -- globals that are used all over the place.
 Class = require("lib.hump.class")
 Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
 Flup = require("lib.flup")
+
 -- initialize settings straight away.
 local settings = require("lib.settings")
 Settings = settings()
@@ -12,9 +18,7 @@ Colors = require("lib.colors")
 msgpack = require("lib.msgpack")
 inspect = require("lib.inspect")
 
-require("lib.interpolate")
-require("lib.core.table")
-require("lib.core.math")
+Connection = {ip = nil, server = nil, host = nil, peer = nil}
 
 -- libraries
 local socket = require("socket")
@@ -30,8 +34,6 @@ local mfd_screen = require("screens.mfd-screen")
 local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
 local settings_screen = require("screens.settings")
 
--- data
-local connection = {ip = nil, server = nil, host = nil, peer = nil}
 local shine = {dots = {".", "..", "..."}, position = 1}
 
 local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
@@ -55,7 +57,7 @@ function love.load()
   State.switch(broadcasting)
 
   Signal.register("send-to-server", function(message)
-    connection.server:send(msgpack.pack(message))
+    Connection.server:send(msgpack.pack(message))
   end)
 
   Timer.every(0.5, function()
@@ -100,9 +102,9 @@ function broadcasting:draw()
 end
 
 function connecting:enter(previous, serverIp)
-  connection.ip = serverIp or connection.ip
-  connection.host = enet.host_create()
-  connection.server = connection.host:connect(connection.ip .. ":" .. connecting.port, connecting.channels)
+  Connection.ip = serverIp or connection.ip
+  Connection.host = enet.host_create()
+  Connection.server = Connection.host:connect(Connection.ip .. ":" .. connecting.port, connecting.channels)
 end
 
 function connecting:handleReceive(event)
@@ -112,8 +114,8 @@ function connecting:draw()
   love.graphics.print("CONNECTING" .. shine.dots[shine.position], 30, 30)
 end
 
-function connection:service()
-  return connection.host:service()
+function Connection:service()
+  return Connection.host:service()
 end
 
 function love.update(dt)
@@ -121,39 +123,24 @@ function love.update(dt)
   Timer.update(dt)
 
   -- service enet host.
-  local success, event = pcall(connection.service)
+  local success, event = pcall(Connection.service)
   while success and event do
     if event.type == "disconnect" then
       print("Disconnected.")
       State.switch(broadcasting)
     elseif event.type == "connect" then
       print("Connected ...")
-      connection.peer = event.peer
+      Connection.peer = event.peer
       -- switch to first screen
       switcher:switch(icp_and_rwr_screen)
     elseif event.type == "receive" then
       State.current():handleReceive(event)
     end
-    success, event = pcall(connection.service)
+    success, event = pcall(Connection.service)
   end
 end
 
 function love.draw()
-  if false then
-    love.graphics.setFont(font)
-    local fps = love.timer.getFPS()
-    local mem = collectgarbage("count")
-
-    local ping = 0
-    if connection.server then ping = connection.server:round_trip_time() end
-
-    local text = ("upd: %2.2fMS, drw: %2.2fMS, fps: %d, mem: %2.2fMB, tex_mem: %2.2fMB, ping: %dMS"):format(
-                   debug.stats.time_update, debug.stats.time_draw, fps, mem / 1024,
-                   love.graphics.getStats().texturememory / 1024 / 1024, ping)
-
-    love.graphics.setColor(Colors.white)
-    love.graphics.printf(text, 10, love.graphics.getHeight() - 26, love.graphics.getWidth(), "left")
-  end
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -162,8 +149,8 @@ end
 
 function love.quit()
   print("Quitting client...")
-  if connection.peer then
-    connection.peer:disconnect()
-    connection.host:flush()
+  if Connection.peer then
+    Connection.peer:disconnect()
+    Connection.host:flush()
   end
 end
