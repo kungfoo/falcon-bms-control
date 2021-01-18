@@ -2,6 +2,7 @@ local Screen = Class {padding = 10, dimensions = {w = 0, h = 0}}
 local Slider = require("components.slider")
 local Label = require("components.label")
 local ImageButton = require("components.image-button")
+local Input = require("components.input")
 
 -- adjusts max RTT texture update frequency, may be beneficial for slow devices
 local function describe_refresh_rate(value)
@@ -57,13 +58,16 @@ local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(valu
   vibrate_label.value = describe_vibration(Settings:vibrate())
 end, {}, {values = {0, 1}})
 
+local server_ip_label = Label("Server IP (disables discovery)")
+local server_ip_input = Input()
+
 local settings_label = Label("Settings", {size = 30})
 
 function Screen:init()
   self.close_button = ImageButton("icons/close.png", {align = "right"}, function()
     State.switch(self.previous_screen, self)
   end)
-  self.labels = {settings_label, refresh_rate_label, quality_label, vibrate_label}
+  self.labels = {settings_label, refresh_rate_label, quality_label, vibrate_label, server_ip_label}
   self.components = {refresh_rate_slider, quality_slider, vibrate_slider, self.close_button}
 end
 
@@ -128,6 +132,18 @@ end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
   for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
+end
+
+function Screen:textedited(text, start, length)
+  print("textedited()", text, start, length)
+end
+
+function Screen:textinput(t)
+  print(t)
+end
+
+function Screen:keypressed(key)
+  print("keypressed()", key)
 end
 
 return Screen
