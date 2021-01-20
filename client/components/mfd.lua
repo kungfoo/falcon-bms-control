@@ -50,7 +50,7 @@ function Mfd:draw()
   love.graphics.applyTransform(self.transform)
 
   love.graphics.setColor(Colors.dark_grey)
-  love.graphics.rectangle("fill", 0, 0, self.max_size, self.max_size, 20, 20)
+  love.graphics.rectangle("fill", 0, 0, self.max_size, self.max_size, 10, 10)
 
   for _, button in ipairs(self.buttons) do button:draw() end
   if self.imageData then

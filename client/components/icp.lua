@@ -79,6 +79,9 @@ function Icp:draw()
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
 
+  love.graphics.setColor(Colors.dark_grey)
+  love.graphics.rectangle("fill", 0, 0, self.width, self.height, 10, 10)
+  
   for _, button in ipairs(self.buttons) do button:draw() end
 
   love.graphics.pop()

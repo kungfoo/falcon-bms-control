@@ -21,6 +21,9 @@ function Ded:draw()
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
 
+  love.graphics.setColor(Colors.dark_grey)
+  love.graphics.rectangle("fill", 0, 0, self.width, self.height, 10, 10)
+
   if self.imageData then
     love.graphics.setColor(Colors.white)
     if not self.image then
@@ -30,7 +33,6 @@ function Ded:draw()
     love.graphics.draw(self.image, 0, 0, 0, 1, 1)
   else
     love.graphics.setColor(Colors.white)
-    love.graphics.rectangle("line", 0, 0, Ded.width, Ded.height, 0)
     love.graphics.setFont(self.font)
     love.graphics.print("DED data...", 0 + 10, 0 + Ded.height / 2 - 10)
   end
