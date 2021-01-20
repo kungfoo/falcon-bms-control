@@ -3,13 +3,13 @@ local utf8 = require 'utf8'
 local Component = Class {}
 
 function Component:init(options, callback)
-    self.callback = callback or function()
-      -- intentionally left blank
-    end
+  self.callback = callback or function()
+    -- intentionally left blank
+  end
 end
 
 function Component:draw()
-  
+
 end
 
 function Component:updateGeometry(x, y, w, h)

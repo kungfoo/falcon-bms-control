@@ -63,7 +63,7 @@ function love.update(dt)
   while success and event do
     if event.type == "disconnect" then
       print("Disconnected.")
-      State.switch(connecting_screen)
+      State.switch(connecting_screen, settings_screen)
     elseif event.type == "connect" then
       print("Connected ...")
       Connection.peer = event.peer

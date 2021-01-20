@@ -4,7 +4,9 @@ local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
 
-local Mfd = Class {}
+local Mfd = Class {
+  max_size = 502
+}
 
 function Mfd:init(identifier, x, y)
   self.id = identifier
@@ -47,8 +49,8 @@ function Mfd:draw()
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
 
-  -- love.graphics.setColor(Colors.green)
-  -- love.graphics.rectangle("line", 0, 0, 500, 500, 0, 0)
+  love.graphics.setColor(Colors.dark_grey)
+  love.graphics.rectangle("fill", 0, 0, self.max_size, self.max_size, 20, 20)
 
   for _, button in ipairs(self.buttons) do button:draw() end
   if self.imageData then
@@ -57,24 +59,18 @@ function Mfd:draw()
       -- only load image if it is a new frame.
       self.image = love.graphics.newImage(self.imageData)
     end
-    -- TODO: scale image according to component width and height, not a fixed scale.
     local texture_scale = 410 / self.image:getWidth()
     love.graphics.draw(self.image, MfdButton.size, MfdButton.size, 0, texture_scale, texture_scale)
   else
-    -- TODO: draw no data string here.
+    love.graphics.setColor(Colors.black)
+    love.graphics.rectangle("fill", MfdButton.size, MfdButton.size, 410, 410, 5, 5)
   end
 
   love.graphics.pop()
 end
 
 function Mfd:determineScale(w, h)
-  if w >= 500 and h >= 500 then
-    -- do not scale up
-    return 1.0
-  else
-    local d = math.min(w, h)
-    return d / 500
-  end
+  return math.min(w, h) / self.max_size
 end
 
 function Mfd:update(dt)
