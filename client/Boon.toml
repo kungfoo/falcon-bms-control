@@ -28,7 +28,7 @@ url = "https://kungfoo.github.io/falcon-bms-control/"
 
 # The Uniform Type Identifier for your game. This is required for the
 # macOS build of the game.
-uti = "ch.mollusca.falcon.bms/control"
+uti = "ch.mollusca.falcon.bms.control"
 
 # An arbitrary version for the current iteration of the game. Can use
 # any desired version format. This will be used to differentiate the
