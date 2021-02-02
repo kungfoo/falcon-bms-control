@@ -32,10 +32,12 @@ end
 
 function Screen:enter(previous)
   ded:start()
+  rwr:start()
 end
 
 function Screen:leave()
   ded:stop()
+  rwr:stop()
 end
 
 function Screen:update(dt)
