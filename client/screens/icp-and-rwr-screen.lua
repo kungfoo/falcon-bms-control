@@ -19,7 +19,7 @@ local Screen = Class {
       ded:consume(event.data)
     end,
     [4] = function(event)
-      rwr:consume(event)
+      rwr:consume(event.data)
     end,
   },
   dimensions = {w = 0, h = 0},
@@ -66,10 +66,10 @@ function Screen:adjustLayoutIfNeeded(w, h)
     components = {
       top = Flup.split {
         direction = "x",
-        ratio = 0.7,
+        ratio = 0.3,
         components = {
-          left = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = ded, bottom = icp}},
-          right = Flup.split {direction = "y", margin = 10, components = {top = rwr, bottom = nil}},
+          right = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = ded, bottom = icp}},
+          left = Flup.split {direction = "y", margin = 10, components = {top = rwr, bottom = nil}},
         },
       },
       bottom = Footer,
