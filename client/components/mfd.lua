@@ -4,9 +4,7 @@ local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
 
-local Mfd = Class {
-  max_size = 502
-}
+local Mfd = Class {max_size = 502}
 
 function Mfd:init(identifier, x, y)
   self.id = identifier

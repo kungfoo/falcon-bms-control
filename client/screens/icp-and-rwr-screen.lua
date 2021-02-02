@@ -1,8 +1,10 @@
 local Icp = require("components.icp")
 local Ded = require("components.ded")
+local Rwr = require("components.rwr")
 
 local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
+local rwr = Rwr("f16/rwr")
 
 local Screen = Class {
   stats = {},
@@ -17,7 +19,7 @@ local Screen = Class {
       ded:consume(event.data)
     end,
     [4] = function(event)
-      -- components["f16/rwr"]:consume(event.data)
+      rwr:consume(event)
     end,
   },
   dimensions = {w = 0, h = 0},
@@ -25,7 +27,7 @@ local Screen = Class {
 }
 
 function Screen:init()
-  self.components = {icp, ded, Footer}
+  self.components = {icp, ded, rwr, Footer}
 end
 
 function Screen:enter(previous)
@@ -62,10 +64,10 @@ function Screen:adjustLayoutIfNeeded(w, h)
     components = {
       top = Flup.split {
         direction = "x",
-        ratio = 0.8,
+        ratio = 0.7,
         components = {
           left = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = ded, bottom = icp}},
-          right = nil,
+          right = Flup.split {direction = "y", margin = 10, components = {top = rwr, bottom = nil}},
         },
       },
       bottom = Footer,
