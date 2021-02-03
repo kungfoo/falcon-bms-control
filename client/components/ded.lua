@@ -20,7 +20,8 @@ function Ded:update(dt)
 end
 
 local function stencil()
-  love.graphics.rectangle("fill", Ded.padding, Ded.padding, Ded.width, Ded.height, Ded.corner_radius/2, Ded.corner_radius/2)
+  love.graphics.rectangle("fill", Ded.padding, Ded.padding, Ded.width, Ded.height, Ded.corner_radius / 2,
+                          Ded.corner_radius / 2)
 end
 
 function Ded:draw()
@@ -28,7 +29,8 @@ function Ded:draw()
   love.graphics.applyTransform(self.transform)
 
   love.graphics.setColor(Colors.dark_grey)
-  love.graphics.rectangle("fill", 0, 0, self.width+self.padding*2, self.height+self.padding*2, self.corner_radius, self.corner_radius)
+  love.graphics.rectangle("fill", 0, 0, self.width + self.padding * 2, self.height + self.padding * 2,
+                          self.corner_radius, self.corner_radius)
 
   love.graphics.stencil(stencil, "replace", 1)
   love.graphics.setStencilTest("gequal", 1)
@@ -46,7 +48,7 @@ function Ded:draw()
 
     love.graphics.setColor(Colors.white)
     love.graphics.setFont(self.font)
-    love.graphics.print("DED data...", self.padding*3, Ded.height / 2)
+    love.graphics.print("DED data...", self.padding * 3, Ded.height / 2)
   end
 
   love.graphics.setStencilTest()
@@ -60,7 +62,7 @@ function Ded:updateGeometry(x, y, w, h)
 end
 
 function Ded:determineScale(w, h)
-  local dw, dh = Ded.width + 2* Ded.padding, Ded.height + 2 * Ded.padding
+  local dw, dh = Ded.width + 2 * Ded.padding, Ded.height + 2 * Ded.padding
   if w >= dw and h >= dh then
     -- do not scale up
     return 1.0
