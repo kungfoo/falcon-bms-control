@@ -2,8 +2,10 @@ local StreamedTexture = require("lib.streamed-texture")
 
 local Ded = Class {
   -- max size of this component
-  width = 460,
-  height = 200,
+  padding = 20,
+  width = 400,
+  height = 150,
+  corner_radius = 10,
   font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
 }
 
@@ -17,12 +19,19 @@ end
 function Ded:update(dt)
 end
 
+local function stencil()
+  love.graphics.rectangle("fill", Ded.padding, Ded.padding, Ded.width, Ded.height, Ded.corner_radius/2, Ded.corner_radius/2)
+end
+
 function Ded:draw()
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
 
   love.graphics.setColor(Colors.dark_grey)
-  love.graphics.rectangle("fill", 0, 0, self.width, self.height, 10, 10)
+  love.graphics.rectangle("fill", 0, 0, self.width+self.padding*2, self.height+self.padding*2, self.corner_radius, self.corner_radius)
+
+  love.graphics.stencil(stencil, "replace", 1)
+  love.graphics.setStencilTest("gequal", 1)
 
   if self.imageData then
     love.graphics.setColor(Colors.white)
@@ -30,13 +39,17 @@ function Ded:draw()
       -- only load image if it is a new frame.
       self.image = love.graphics.newImage(self.imageData)
     end
-    love.graphics.draw(self.image, 0, 0, 0, 1, 1)
+    love.graphics.draw(self.image, self.padding, self.padding, 0, 1, 1)
   else
+    love.graphics.setColor(Colors.black)
+    love.graphics.rectangle("fill", self.padding, self.padding, self.width, self.height)
+
     love.graphics.setColor(Colors.white)
     love.graphics.setFont(self.font)
-    love.graphics.print("DED data...", 0 + 10, 0 + Ded.height / 2 - 10)
+    love.graphics.print("DED data...", self.padding*3, Ded.height / 2)
   end
 
+  love.graphics.setStencilTest()
   love.graphics.pop()
 end
 
@@ -47,11 +60,12 @@ function Ded:updateGeometry(x, y, w, h)
 end
 
 function Ded:determineScale(w, h)
-  if w >= Ded.width and h >= Ded.height then
+  local dw, dh = Ded.width + 2* Ded.padding, Ded.height + 2 * Ded.padding
+  if w >= dw and h >= dh then
     -- do not scale up
     return 1.0
   else
-    local a, b = w / Ded.width, h / Ded.height
+    local a, b = w / dw, h / dh
     return math.min(a, b)
   end
 end
