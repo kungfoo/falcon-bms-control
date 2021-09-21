@@ -20,6 +20,7 @@ function MfdButton:draw()
   end
   love.graphics.rectangle("fill", self.x, self.y, self.w, self.h, 5, 5)
   love.graphics.setColor(Colors.cyan)
+  love.graphics.setLineWidth(1)
   love.graphics.rectangle("line", self.x + self.lineOffset, self.y + self.lineOffset, self.w - self.lineOffset * 2,
                           self.h - self.lineOffset * 2, 3, 3)
 end

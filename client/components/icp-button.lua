@@ -19,6 +19,7 @@ function IcpButton:init(icp, id, options, x, y, w, h)
 end
 
 function IcpButton:draw()
+  love.graphics.setLineWidth(1)
   if self.options.type == "square" then self:drawSquare() end
   if self.options.type == "round" then self:drawRound() end
 end

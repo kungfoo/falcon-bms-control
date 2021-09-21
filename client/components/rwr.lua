@@ -49,6 +49,12 @@ function Rwr:draw()
     love.graphics.print("RWR data...", self.padding + 20, Rwr.height / 2)
   end
 
+  love.graphics.setColor(0.3, 0.6, 0.3, 0.3)
+  love.graphics.setLineWidth(3)
+  local cx, cy = (Rwr.width / 2) + Rwr.padding, (Rwr.height / 2) + Rwr.padding
+  love.graphics.circle("line", cx, cy, 125 / 2)
+  love.graphics.circle("line", cx, cy, 53 / 2)
+
   love.graphics.setStencilTest()
   love.graphics.pop()
 end
