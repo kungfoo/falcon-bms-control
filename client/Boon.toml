@@ -48,18 +48,6 @@ output_directory = "release"
 # expression, which when matched, will exclude the matched file or
 # directory from the build.
 ignore_list = [
-    # Git
-    "^.git.*",
-
-    # Binary files
-    ".zip$",
-    ".tar.gz$",
-    ".love$",
-    ".exe$",
-
-    # Boon-specific files and directories
-    "Boon.toml$",
-    "^release$"
 ]
 
 # List of targets to build for
@@ -69,5 +57,5 @@ targets = ["windows", "love"]
 # If this is set to true, then the default ignore list will not be
 # merged with the project specific ignore list. This allows the
 # ignore list to be completely overwritten.
-exclude_default_ignore_list = true
+exclude_default_ignore_list = false
 
