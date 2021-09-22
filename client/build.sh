@@ -1,4 +1,7 @@
 #!/bin/bash
-rm -rf build
-mkdir -p build
-zip -r build/game.love . -x build
+
+pushd ../boon || exit
+cargo build --release
+popd || exit
+
+../boon/target/release/boon build . --version 11.3

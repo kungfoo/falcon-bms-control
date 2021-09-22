@@ -33,7 +33,7 @@ uti = "ch.mollusca.falcon.bms.control"
 # An arbitrary version for the current iteration of the game. Can use
 # any desired version format. This will be used to differentiate the
 # resulting build files.
-version = "1.1.0"
+version = "1.1.1"
 
 #
 # Build settings
@@ -64,7 +64,7 @@ ignore_list = [
 
 # List of targets to build for
 # Possible values: "love", "windows", "macos", "all"
-targets = ["windows"]
+targets = ["windows", "love"]
 
 # If this is set to true, then the default ignore list will not be
 # merged with the project specific ignore list. This allows the
