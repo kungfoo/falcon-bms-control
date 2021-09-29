@@ -57,11 +57,12 @@ function Rwr:draw()
 
   -- draw overlay lines
   love.graphics.setCanvas({self.canvas, stencil=true})
+  love.graphics.clear()
   love.graphics.setLineWidth(1)
   love.graphics.stencil(smallStencil, "increment")
   love.graphics.setStencilTest("less", 2)
 
-  love.graphics.setColor(0.4, 0.5, 0.4, 0.6)
+  love.graphics.setColor(0.4, 0.5, 0.4, 1)
   local cx, cy = (Rwr.width / 2), (Rwr.height / 2)
   love.graphics.circle("line", cx, cy, 125 / 2)
   love.graphics.circle("line", cx, cy, 53 / 2)
@@ -73,10 +74,10 @@ function Rwr:draw()
   
   -- set back to screen drawing
   love.graphics.setCanvas()
-  love.graphics.draw(self.canvas)
+  love.graphics.pop()
+  love.graphics.draw(self.canvas, Rwr.padding, Rwr.padding)
 
   love.graphics.setStencilTest()
-  love.graphics.pop()
 end
 
 function Rwr:updateGeometry(x, y, w, h)
