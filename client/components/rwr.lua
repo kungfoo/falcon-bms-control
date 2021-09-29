@@ -14,6 +14,7 @@ function Rwr:init(id, x, y)
   self.image = nil -- drawable image
   self.imageData = nil -- pure image data received from server
   self.transform = love.math.newTransform():translate(x or 0, y or 0)
+  self.canvas = love.graphics.newCanvas(Rwr.width + Rwr.padding, Rwr.height + Rwr.padding)
 end
 
 function Rwr:update(dt)
@@ -21,6 +22,11 @@ end
 
 local function stencil()
   love.graphics.circle("fill", (Rwr.width / 2) + Rwr.padding, (Rwr.height / 2) + Rwr.padding, Rwr.width / 2)
+end
+
+local function smallStencil()
+  love.graphics.circle("fill", (Rwr.width / 2) + Rwr.padding, (Rwr.height / 2) + Rwr.padding, Rwr.width / 2)
+  love.graphics.circle("fill", (Rwr.width / 2), (Rwr.height / 2), 52/2)
 end
 
 function Rwr:draw()
@@ -46,14 +52,28 @@ function Rwr:draw()
     love.graphics.rectangle("fill", self.padding, self.padding, self.width, self.height)
     love.graphics.setColor(Colors.white)
     love.graphics.setFont(self.font)
-    love.graphics.print("RWR data...", self.padding + 20, Rwr.height / 2)
+    love.graphics.print("RWR data...", self.padding + 20, Rwr.height / 2 - 30)
   end
 
-  love.graphics.setColor(0.3, 0.6, 0.3, 0.3)
-  love.graphics.setLineWidth(3)
-  local cx, cy = (Rwr.width / 2) + Rwr.padding, (Rwr.height / 2) + Rwr.padding
+  -- draw overlay lines
+  love.graphics.setCanvas({self.canvas, stencil=true})
+  love.graphics.setLineWidth(1)
+  love.graphics.stencil(smallStencil, "increment")
+  love.graphics.setStencilTest("less", 2)
+
+  love.graphics.setColor(0.4, 0.5, 0.4, 0.6)
+  local cx, cy = (Rwr.width / 2), (Rwr.height / 2)
   love.graphics.circle("line", cx, cy, 125 / 2)
   love.graphics.circle("line", cx, cy, 53 / 2)
+
+  love.graphics.line(cx, 0, cx, Rwr.height)
+  love.graphics.line(0, cy, Rwr.width, cy)
+  love.graphics.setStencilTest()
+  love.graphics.circle("fill", cx, cy, 2)
+  
+  -- set back to screen drawing
+  love.graphics.setCanvas()
+  love.graphics.draw(self.canvas)
 
   love.graphics.setStencilTest()
   love.graphics.pop()
