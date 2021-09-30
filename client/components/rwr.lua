@@ -11,6 +11,7 @@ local Rwr = Class {
 
 function Rwr:init(id, x, y)
   self.id = id
+  self.scale = 1
   self.image = nil -- drawable image
   self.imageData = nil -- pure image data received from server
   self.transform = love.math.newTransform():translate(x or 0, y or 0)
@@ -26,7 +27,7 @@ end
 
 local function smallStencil()
   love.graphics.circle("fill", (Rwr.width / 2) + Rwr.padding, (Rwr.height / 2) + Rwr.padding, Rwr.width / 2)
-  love.graphics.circle("fill", (Rwr.width / 2), (Rwr.height / 2), 52/2)
+  love.graphics.circle("fill", (Rwr.width / 2), (Rwr.height / 2), 52 / 2)
 end
 
 function Rwr:draw()
@@ -56,7 +57,7 @@ function Rwr:draw()
   end
 
   -- draw overlay lines
-  love.graphics.setCanvas({self.canvas, stencil=true})
+  love.graphics.setCanvas({self.canvas, stencil = true})
   love.graphics.clear()
   love.graphics.setLineWidth(1)
   love.graphics.stencil(smallStencil, "increment")
@@ -71,17 +72,19 @@ function Rwr:draw()
   love.graphics.line(0, cy, Rwr.width, cy)
   love.graphics.setStencilTest()
   love.graphics.circle("fill", cx, cy, 2)
-  
+
   -- set back to screen drawing
   love.graphics.setCanvas()
   love.graphics.pop()
-  love.graphics.draw(self.canvas, Rwr.padding, Rwr.padding)
+  -- draw overlay canvas
+  love.graphics.draw(self.canvas, Rwr.padding * self.scale, Rwr.padding * self.scale)
 
   love.graphics.setStencilTest()
 end
 
 function Rwr:updateGeometry(x, y, w, h)
   local scale = self:determineScale(w, h)
+  self.scale = scale
   self.transform = love.math.newTransform()
   self.transform:translate(x, y):scale(scale)
 end

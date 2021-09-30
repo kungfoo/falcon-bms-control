@@ -60,8 +60,8 @@ end
 function Layout:pop()
   assert(#self._stack > 0, "Nothing to pop")
   local w, h = self._w, self._h
-  self._x, self._y, self._padx, self._pady, self._w, self._h, self._widths, self._heights =
-    unpack(self._stack[#self._stack])
+  self._x, self._y, self._padx, self._pady, self._w, self._h, self._widths, self._heights = unpack(
+                                                                                              self._stack[#self._stack])
   self._isFirstCell = false
   self._stack[#self._stack] = nil
 
