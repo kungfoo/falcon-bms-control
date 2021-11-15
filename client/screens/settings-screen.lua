@@ -68,7 +68,7 @@ function Screen:init()
     State.switch(self.previous_screen, self)
   end)
   self.labels = {settings_label, refresh_rate_label, quality_label, vibrate_label, server_ip_label}
-  self.components = {refresh_rate_slider, quality_slider, vibrate_slider, self.close_button}
+  self.components = {refresh_rate_slider, quality_slider, vibrate_slider, self.close_button, server_ip_input}
 end
 
 function Screen:enter(previous)
@@ -135,15 +135,27 @@ function Screen:mousereleased(x, y, button, isTouch, presses)
 end
 
 function Screen:textedited(text, start, length)
-  print("textedited()", text, start, length)
+  for _, component in ipairs(self.components) do
+    pcall(function()
+      component:textedited(text, start, length)
+    end)
+  end
 end
 
 function Screen:textinput(t)
-  print(t)
+  for _, component in ipairs(self.components) do
+    pcall(function()
+      component:textinput(t)
+    end)
+  end
 end
 
 function Screen:keypressed(key)
-  print("keypressed()", key)
+  for _, component in ipairs(self.components) do
+    pcall(function()
+      component:keypressed(key)
+    end)
+  end
 end
 
 return Screen
