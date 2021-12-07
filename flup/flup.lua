@@ -1,4 +1,8 @@
-local flup = {split = Class {}, fixed = Class {}, internal = {}}
+local flup = {split = Class {}, fixed = Class {}, grid = Class {
+  rows = {
+    columns = {}
+  }
+}, internal = {}}
 
 function flup.split:init(options)
   self.direction = options.direction or "x"
@@ -40,6 +44,56 @@ function flup.internal.updateGeometry(node, x, y, w, h)
       end
     end
   else
+    -- must be a component then, let's tell it its size
+    if node.updateGeometry then node:updateGeometry(x, y, w, h) end
+  end
+end
+
+function flup.grid:init(options)
+  self.rows = options.rows or {}
+  self.margin = options.margin or 0
+end
+
+function flup.grid:fill(x, y, w, h)
+  flup.internal.updateGridGeometry(self, x, y, w, h)
+end
+
+function flup.grid:draw()
+  for i, row in pairs(self.rows) do
+    for j, column in pairs(row.columns) do
+      column:draw()
+    end
+  end
+end
+
+function flup.internal.updateGridGeometry(node, x, y, w, h)
+  if node.rows then
+    -- assume flup.grid or compatible
+    local num_rows = #node.rows
+    local height_per_row = h / num_rows
+
+    for i, row in pairs(node.rows) do
+      local y_start = height_per_row * (i-1)
+      local y_end = y_start + height_per_row - 1
+
+      local num_columns = #row.columns
+      local width_per_column = w / num_columns
+      for j, column in pairs(row.columns) do
+        local x_start = width_per_column * (j-1)
+        local x_end = x_start + width_per_column
+
+        -- must be another grid-like thing
+        if column.updateGridGeometry then
+          flup.internal.updateGridGeometry(column, x_start, y_start, width_per_column, height_per_row)
+        end
+        -- must be a component then
+        if column.updateGeometry then
+          column:updateGeometry(x_start, y_start, width_per_column, height_per_row)
+        end
+      end
+    end
+  else
+    -- must be a component then, let's tell it its size
     if node.updateGeometry then node:updateGeometry(x, y, w, h) end
   end
 end
