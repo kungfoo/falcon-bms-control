@@ -6,7 +6,6 @@ local Snip = require("../snip")
 
 local width, height = nil, nil
 
-
 -- example of using flup grip, a space-filling grid.
 -- components can be dynamically layouted to use the most space of whatever
 -- they are placed in and have weights/percentages defined. Think html table.
@@ -31,7 +30,17 @@ local grid = Flup.grid {
     },
     {
       columns = {
-        Snip("4.1")
+        Snip("4.1"),
+        Snip("4.2"),
+        Flup.grid {
+          rows = {
+            {
+              columns = {
+                Snip("4.3.1"), Snip("4.3.2"), Snip("4.3.3")
+              },
+            },
+          }
+        }
       }
     }
   }
