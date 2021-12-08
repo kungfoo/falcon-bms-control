@@ -22,8 +22,8 @@ function Screen:enter(previous, settings_screen)
   self.settings_screen = settings_screen
 
   if Settings:ip() then
-    print("Connecting to " .. ip .. ", stored in settings.")
-    Screen:connect(ip)
+    print("Connecting to " .. Settings:ip() .. ", stored in settings.")
+    Screen:connect(Settings:ip())
   else
     print("Starting server discovery...")
     broadcast.socket = socket.udp4()
@@ -35,7 +35,7 @@ function Screen:enter(previous, settings_screen)
 end
 
 function Screen:connect(ip)
-  connection_state_label.value = "Connecting..."
+  connection_state_label.value = "Connecting to " .. ip .. "..."
   Connection.ip = ip or Settings:ip()
   Connection.host = enet.host_create()
   Connection.server = Connection.host:connect(Connection.ip .. ":" .. connecting.port, connecting.channels)
@@ -58,10 +58,13 @@ function Screen:receiveAck()
 end
 
 function Screen:leave()
-  print("Stopping server discovery.")
-  Timer.cancel(broadcast.send)
-  Timer.cancel(broadcast.receive)
-  broadcast.socket:close()
+  -- are we even sending?
+  if broadcast.send then
+    print("Stopping server discovery.")
+    Timer.cancel(broadcast.send)
+    Timer.cancel(broadcast.receive)
+    broadcast.socket:close()
+  end
 end
 
 function Screen:update(dt)

@@ -26,6 +26,7 @@ function Settings:changed()
     refresh_rate = self.proxy.refresh_rate,
     quality = self.proxy.quality,
     vibrate = self.proxy.vibrate,
+    ip = self.proxy.ip,
   })
   local success, error = love.filesystem.write(file_name, bytes)
   if not success then print("Failed to write settings.") end

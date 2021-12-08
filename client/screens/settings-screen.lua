@@ -52,6 +52,13 @@ local function to_bool(value)
   end
 end
 
+local function ip_address_allowed_chars()
+  local allowed_chars = {}
+  for i = 0, 9 do allowed_chars[i] = "" .. i end
+  allowed_chars["."] = "."
+  return allowed_chars
+end
+
 local vibrate_label = Label(describe_vibration(Settings:vibrate()))
 local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(value)
   Settings:setVibrate(to_bool(value))
@@ -59,7 +66,9 @@ local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(valu
 end, {}, {values = {0, 1}})
 
 local server_ip_label = Label("Server IP (disables discovery)")
-local server_ip_input = Input()
+local server_ip_input = Input(Settings:ip(), {allowed_chars = ip_address_allowed_chars()}, function(ip)
+  Settings:setIp(ip)
+end)
 
 local settings_label = Label("Settings", {size = 30})
 
@@ -94,23 +103,13 @@ function Screen:handleReceive(event)
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
-  local settings_flup = Flup.split {
-    direction = "y",
-    components = {
-      top = Flup.split {
-        direction = "y",
-        components = {
-          top = Flup.split {direction = "x", components = {left = settings_label, right = nil}},
-          bottom = Flup.split {direction = "x", components = {left = refresh_rate_label, right = refresh_rate_slider}},
-        },
-      },
-      bottom = Flup.split {
-        direction = "y",
-        components = {
-          top = Flup.split {direction = "x", components = {left = quality_label, right = quality_slider}},
-          bottom = Flup.split {direction = "x", components = {left = vibrate_label, right = vibrate_slider}},
-        },
-      },
+  local settings_flup = Flup.grid {
+    rows = {
+      {columns = {settings_label, {}}},
+      {columns = {refresh_rate_label, refresh_rate_slider}},
+      {columns = {quality_label, quality_slider}},
+      {columns = {vibrate_label, vibrate_slider}},
+      {columns = {server_ip_label, server_ip_input}},
     },
   }
 

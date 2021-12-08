@@ -1,12 +1,4 @@
-local flup = {
-  split = Class {},
-  fixed = Class {},
-  grid = Class {
-    rows = {
-    }
-  },
-  internal = {}
-}
+local flup = {split = Class {}, fixed = Class {}, grid = Class {rows = {}}, internal = {}}
 
 function flup.split:init(options)
   self.direction = options.direction or "x"
@@ -20,6 +12,10 @@ function flup.split:draw()
 end
 
 function flup.split:fill(x, y, w, h)
+  flup.split:_updateGeometry(self, x, y, w, h)
+end
+
+function flup.split:updateGeometry(x, y, w, h)
   flup.split:_updateGeometry(self, x, y, w, h)
 end
 
@@ -62,12 +58,12 @@ function flup.grid:fill(x, y, w, h)
   flup.grid:_updateGeometry(self, x, y, w, h)
 end
 
+function flup.grid:updateGeometry(x, y, w, h)
+  flup.grid:_updateGeometry(self, x, y, w, h)
+end
+
 function flup.grid:draw()
-  for i, row in pairs(self.rows) do
-    for j, column in pairs(row.columns) do
-      if column.draw then column:draw() end
-    end
-  end
+  for i, row in pairs(self.rows) do for j, column in pairs(row.columns) do if column.draw then column:draw() end end end
 end
 
 function flup.grid:_updateGeometry(node, x, y, w, h)
@@ -77,20 +73,18 @@ function flup.grid:_updateGeometry(node, x, y, w, h)
     local height_per_row = h / num_rows
 
     for i, row in pairs(node.rows) do
-      local y_start = y + height_per_row * (i-1)
+      local y_start = y + height_per_row * (i - 1)
 
       local num_columns = #row.columns
       local width_per_column = w / num_columns
       for j, column in pairs(row.columns) do
-        local x_start = x + width_per_column * (j-1)
+        local x_start = x + width_per_column * (j - 1)
 
         if column._updateGeometry then
           column:_updateGeometry(column, x_start, y_start, width_per_column, height_per_row)
         end
         -- must be a component then, let's tell it its size
-        if column.updateGeometry then
-          column:updateGeometry(x_start, y_start, width_per_column, height_per_row)
-        end
+        if column.updateGeometry then column:updateGeometry(x_start, y_start, width_per_column, height_per_row) end
       end
     end
   else
