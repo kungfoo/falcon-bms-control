@@ -26,6 +26,7 @@ function Screen:enter(previous, settings_screen)
     Screen:connect(Settings:ip())
   else
     print("Starting server discovery...")
+    connection_state_label.value = "Discovering server..."
     broadcast.socket = socket.udp4()
     broadcast.socket:settimeout(0)
     broadcast.socket:setoption("broadcast", true)

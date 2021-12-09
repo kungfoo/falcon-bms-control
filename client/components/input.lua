@@ -1,6 +1,6 @@
 local utf8 = require 'utf8'
 
-local Component = Class {has_focus = false, width = 500, height = 50, place_holder = "[automatic discovery]"}
+local Component = Class {has_focus = false, width = 500, height = 40, place_holder = "Enter some text..."}
 
 function Component:init(value, options, callback)
   self.callback = callback or function()
@@ -11,6 +11,7 @@ function Component:init(value, options, callback)
   for i, char in pairs(options.allowed_chars) do self.allowed_chars[char] = true end
   self.font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", options.size or 20, "normal")
   self.value = value or ""
+  self.place_holder = options.place_holder or self.place_holder
 end
 
 function Component:draw()
@@ -20,7 +21,7 @@ function Component:draw()
   if self.has_focus then
     love.graphics.setColor(Colors.green)
   else
-    love.graphics.setColor(Colors.grey)
+    love.graphics.setColor(Colors.white)
   end
   love.graphics.rectangle("line", 0, 0, self.w, self.height)
   if self.value == "" then
@@ -32,6 +33,10 @@ function Component:draw()
   end
 
   love.graphics.pop()
+end
+
+function Component:setValue(value)
+  self.value = value or ""
 end
 
 function Component:updateGeometry(x, y, w, h)
@@ -58,6 +63,8 @@ end
 
 function Component:focus(value)
   self.has_focus = value
+  local x, y = self.transform:transformPoint(0,0)
+  love.keyboard.setTextInput(value, x, y, self.width, self.height)
 end
 
 function Component:textedited(text, start, length)

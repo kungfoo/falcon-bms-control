@@ -66,7 +66,7 @@ local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(valu
 end, {}, {values = {0, 1}})
 
 local server_ip_label = Label("Server IP (disables discovery)")
-local server_ip_input = Input(Settings:ip(), {allowed_chars = ip_address_allowed_chars()}, function(ip)
+local server_ip_input = Input(Settings:ip(), {allowed_chars = ip_address_allowed_chars(), place_holder = "[automatic discovery]"}, function(ip)
   Settings:setIp(ip)
 end)
 
@@ -82,6 +82,7 @@ end
 
 function Screen:enter(previous)
   self.previous_screen = previous
+  server_ip_input:setValue(Settings:ip())
 end
 
 function Screen:leave()
@@ -106,10 +107,10 @@ function Screen:adjustLayoutIfNeeded(w, h)
   local settings_flup = Flup.grid {
     rows = {
       {columns = {settings_label, {}}},
+      {columns = {server_ip_label, server_ip_input}},
       {columns = {refresh_rate_label, refresh_rate_slider}},
       {columns = {quality_label, quality_slider}},
       {columns = {vibrate_label, vibrate_slider}},
-      {columns = {server_ip_label, server_ip_input}},
     },
   }
 
