@@ -52,23 +52,41 @@ local function to_bool(value)
   end
 end
 
-local function ip_address_allowed_chars()
+local function build_ip_address_allowed_chars()
   local allowed_chars = {}
-  for i = 0, 9 do allowed_chars[i] = "" .. i end
-  allowed_chars["."] = "."
+  for i = 0, 9 do allowed_chars["" .. i] = true end
+  allowed_chars["."] = true
   return allowed_chars
 end
+
+local ip_address_allowed_chars = build_ip_address_allowed_chars()
+
+local function ip_address_allows_input(value, key)
+  if ip_address_allowed_chars[key] then return true end
+  return false
+end
+
+local function valid_ip_address(value)
+  return string.match(value, "^%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?$") ~= nil
+end
+
+local function handle_ip_address_input(ip)
+  if valid_ip_address(ip) then Settings:setIp(ip) end
+  -- clear settings when field is empty
+  if ip == "" then Settings:setIp(nil) end
+end
+
+local server_ip_label = Label("Server IP (disables discovery)")
+local server_ip_input = Input(Settings:ip(),
+                              {allows_input = ip_address_allows_input,
+                              place_holder = "[automatic discovery]"},
+                              handle_ip_address_input)
 
 local vibrate_label = Label(describe_vibration(Settings:vibrate()))
 local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(value)
   Settings:setVibrate(to_bool(value))
   vibrate_label.value = describe_vibration(Settings:vibrate())
 end, {}, {values = {0, 1}})
-
-local server_ip_label = Label("Server IP (disables discovery)")
-local server_ip_input = Input(Settings:ip(), {allowed_chars = ip_address_allowed_chars(), place_holder = "[automatic discovery]"}, function(ip)
-  Settings:setIp(ip)
-end)
 
 local settings_label = Label("Settings", {size = 30})
 

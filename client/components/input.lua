@@ -6,10 +6,12 @@ function Component:init(value, options, callback)
   self.callback = callback or function()
     -- intentionally left blank
   end
-  self.transform = love.math.newTransform()
-  self.allowed_chars = {}
-  for i, char in pairs(options.allowed_chars) do self.allowed_chars[char] = true end
+  self.allows_input = options.allows_input or function(_, _)
+    return true
+  end
+
   self.font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", options.size or 20, "normal")
+  self.transform = love.math.newTransform()
   self.value = value or ""
   self.place_holder = options.place_holder or self.place_holder
 end
@@ -63,7 +65,7 @@ end
 
 function Component:focus(value)
   self.has_focus = value
-  local x, y = self.transform:transformPoint(0,0)
+  local x, y = self.transform:transformPoint(0, 0)
   love.keyboard.setTextInput(value, x, y, self.width, self.height)
 end
 
@@ -77,14 +79,12 @@ end
 
 function Component:keypressed(key)
   if self.has_focus then
-    if self.allowed_chars[key] ~= nil then self.value = self.value .. key end
+    if self.allows_input(self.value, key) then self.value = self.value .. key end
     if key == "backspace" and string.len(self.value) > 0 then
       self.value = string.sub(self.value, 0, string.len(self.value) - 1)
     end
 
-    if string.match(self.value, "%d+%.%d+%.%d+%.%d+") then self.callback(self.value) end
-
-    if string.len(self.value) == 0 then self.callback(nil) end
+    self.callback(self.value)
   end
 end
 
