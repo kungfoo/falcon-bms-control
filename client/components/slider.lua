@@ -68,9 +68,9 @@ function Component:updateGeometry(x, y, w, h)
   self.bounds.h = h
 end
 
-function Component:update(dt)
+function Component:update(dt, x, y)
   if self.grabbed then
-    local dx, dy = self.transform:inverseTransformPoint(love.mouse.getX(), love.mouse.getY())
+    local dx, dy = self.transform:inverseTransformPoint(x, y)
     self:dragged(dx, dy)
   end
 end
@@ -113,6 +113,7 @@ function Component:mousereleased(x, y, button, touch, presses)
 end
 
 function Component:dragged(x, y)
+  self.grabbed = true
   local knobX = 0
   local knobY = 0
   if self.orientation == 'horizontal' then
@@ -124,7 +125,6 @@ function Component:dragged(x, y)
   local dx = x - knobX
   local dy = y - knobY
 
-  self.grabbed = true
   if self.orientation == 'horizontal' then
     self.value = self.value + dx / self.bounds.w
   elseif self.orientation == 'vertical' then

@@ -1,10 +1,12 @@
 local Icp = require("components.icp")
 local Ded = require("components.ded")
 local Rwr = require("components.rwr")
+local LeftBrowSwitchPanel = require("components.leftbrowswitchpanel")
 
 local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
 local rwr = Rwr("f16/rwr")
+local leftSwitchPanel = LeftBrowSwitchPanel()
 
 local Screen = Class {
   stats = {},
@@ -27,7 +29,7 @@ local Screen = Class {
 }
 
 function Screen:init()
-  self.components = {icp, ded, rwr, Footer}
+  self.components = {icp, ded, rwr, leftSwitchPanel, Footer}
 end
 
 function Screen:enter(previous)
@@ -58,7 +60,6 @@ function Screen:update(dt)
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
-  -- currently nothing to display besides these two
   self.flup = Flup.split {
     direction = "y",
     ratio = 0.95,
@@ -66,10 +67,10 @@ function Screen:adjustLayoutIfNeeded(w, h)
     components = {
       top = Flup.split {
         direction = "x",
-        ratio = 0.3,
+        ratio = 0.4,
         components = {
           right = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = ded, bottom = icp}},
-          left = Flup.split {direction = "y", margin = 10, components = {top = rwr, bottom = nil}},
+          left = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = rwr, bottom = leftSwitchPanel}},
         },
       },
       bottom = Footer,

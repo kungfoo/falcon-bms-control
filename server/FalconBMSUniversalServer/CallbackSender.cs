@@ -75,6 +75,25 @@ namespace FalconBmsUniversalServer
             }));
         }
 
+        public Task SendCallback(string callback)
+        {
+            return Task.Run(() => InvokeCallbackForButton(callback, kf =>
+            {
+                _keyFile = OpenKeyFile();
+                if (_keyFile == null) return;
+                Logger.Debug("Released {}", _keyFile[callback]);
+                if (_keyFile.HasCallback(callback))
+                {
+                    _keyFile[callback].Down();
+                    _keyFile[callback].Up();
+                }
+                else
+                {
+                    Logger.Error("No callback for {} present in keyfile {}, some functionality will not work!", callback, kf.FileName);
+                }
+            }));
+        }
+
         private void InvokeCallbackForButton(string callback, Action<FalconKeyFile> action)
         {
             var p = Process.GetProcessesByName(FALCON_BMS_PROCESS_NAME).FirstOrDefault();

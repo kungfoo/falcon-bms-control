@@ -114,7 +114,8 @@ function Screen:update(dt)
     self.dimensions.w = w
     self.dimensions.h = h
   end
-  for _, component in ipairs(self.components) do component:update(dt) end
+  local dx, dy = love.mouse.getX(), love.mouse.getY()
+  for _, component in ipairs(self.components) do component:update(dt, dx, dy) end
 end
 
 function Screen:handleReceive(event)

@@ -51,6 +51,7 @@ end
 
 function flup.grid:init(options)
   self.rows = options.rows or {}
+  self.weights = options.weights or {}
   self.margin = options.margin or 0
 end
 
@@ -69,28 +70,56 @@ end
 function flup.grid:_updateGeometry(node, x, y, w, h)
   if node.rows then
     -- assume flup.grid or compatible
-    local num_rows = #node.rows
-    local height_per_row = h / num_rows
-
-    for i, row in pairs(node.rows) do
-      local y_start = y + height_per_row * (i - 1)
+    local row_heights = flup.grid:_calculate_row_heights(node, h)
+    local last_height = 0
+    for i, row in ipairs(node.rows) do
+      local y_start = y + last_height
 
       local num_columns = #row.columns
       local width_per_column = w / num_columns
-      for j, column in pairs(row.columns) do
+      for j, column in ipairs(row.columns) do
         local x_start = x + width_per_column * (j - 1)
 
         if column._updateGeometry then
-          column:_updateGeometry(column, x_start, y_start, width_per_column, height_per_row)
+          column:_updateGeometry(column, x_start, y_start, width_per_column, row_heights[i])
         end
         -- must be a component then, let's tell it its size
-        if column.updateGeometry then column:updateGeometry(x_start, y_start, width_per_column, height_per_row) end
+        if column.updateGeometry then column:updateGeometry(x_start, y_start, width_per_column, row_heights[i]) end
       end
+      last_height = last_height + row_heights[i]
     end
-  else
-    -- must be a component then, let's tell it its size
-    -- if node.updateGeometry then node:updateGeometry(x, y, w, h) end
   end
+end
+
+-- performs a left to right reduction of t using f, with o as the initial value
+-- reduce({1, 2, 3}, f, 0) -> f(f(f(0, 1), 2), 3)
+-- (but performed iteratively, so no stack smashing)
+function table.reduce(t, f, o)
+  for i, v in ipairs(t) do o = f(o, v) end
+  return o
+end
+
+-- return the numeric sum of all elements of t
+function table.sum(t)
+  return table.reduce(t, function(a, b)
+    return a + b
+  end, 0)
+end
+
+function flup.grid:_calculate_row_heights(node, h)
+  local heights = {}
+  -- distribute evenly
+  for i, _ in ipairs(node.rows) do
+    heights[i] = h / #node.rows
+  end
+
+  local sum = table.sum(node.weights)
+  if node.weights then
+    for i, weight in ipairs(node.weights) do
+      heights[i] = h * (weight / sum)
+    end
+  end
+  return heights
 end
 
 return flup

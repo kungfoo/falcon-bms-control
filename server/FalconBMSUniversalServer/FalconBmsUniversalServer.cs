@@ -29,6 +29,7 @@ namespace FalconBmsUniversalServer
 
         private readonly IcpButtonHandler _icpButtonHandler;
         private readonly OsbButtonHandler _osbButtonHandler;
+        private readonly ApPanelSwitchHandler _apPanelSwitchHandler;
 
         private readonly SharedTextureMemoryExtractor _extractor = new SharedTextureMemoryExtractor(new Reader());
 
@@ -37,6 +38,7 @@ namespace FalconBmsUniversalServer
             var sender = new CallbackSender();
             _icpButtonHandler = new IcpButtonHandler(sender);
             _osbButtonHandler = new OsbButtonHandler(sender);
+            _apPanelSwitchHandler = new ApPanelSwitchHandler(sender);
         }
 
         private static void Main()
@@ -126,6 +128,9 @@ namespace FalconBmsUniversalServer
                     break;
                 case string type when IcpButtonMessage.IsType(type):
                     Task.Run(async () => await _icpButtonHandler.Handle(Unpack<IcpButtonMessage>(e)));
+                    break;
+                case string type when CockpitSwitchMessage.IsType(type):
+                    Task.Run(async () => await _apPanelSwitchHandler.Handle(Unpack<CockpitSwitchMessage>(e)));
                     break;
                 case string type when StreamedTextureRequest.IsType(type):
                     HandleStreamedTextureRequest(Unpack<StreamedTextureRequest>(e), peer);
@@ -355,6 +360,18 @@ namespace FalconBmsUniversalServer
             public static bool IsType(string type)
             {
                 return type.StartsWith("icp");
+            }
+        }
+
+        [MessagePackObject(keyAsPropertyName: true)]
+        public struct CockpitSwitchMessage : IMessage
+        {
+            public string type { get; set; }
+            public string switch { get; set; }
+
+            public static bool IsType(string type)
+            {
+                return type.StartsWith("cockpit-switch");
             }
         }
 
