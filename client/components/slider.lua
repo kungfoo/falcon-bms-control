@@ -1,5 +1,7 @@
 local Component = Class {padding = 10, width = 30}
 
+local Button = require("lib.button")
+
 function Component:init(value, min, max, setter, style, options)
   self.transform = love.math.newTransform()
   self.value = (value - min) / (max - min)
@@ -77,7 +79,10 @@ end
 
 function Component:mousepressed(x, y, button, touch, presses)
   local dx, dy = self.transform:inverseTransformPoint(x, y)
-  if self:slider_hit(dx, dy) then self:dragged(dx, dy) end
+  if self:slider_hit(dx, dy) then
+    Button.pressed()
+    self:dragged(dx, dy)
+  end
 end
 
 function Component:slider_hit(x, y)
@@ -109,6 +114,7 @@ function Component:mousereleased(x, y, button, touch, presses)
       self.setter(value)
     end
     self.grabbed = false
+    Button.released()
   end
 end
 

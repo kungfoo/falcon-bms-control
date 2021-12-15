@@ -9,29 +9,29 @@ local masterArmLabel = Label("Master Arm")
 local rollApLabel = Label("Roll AP")
 local pitchApLabel = Label("Pitch AP")
 
-local function send_switch_state(state)
-  local message = {type = "cockpit-switch", switch = state}
+local function send_switch_identifier(identifier)
+  local message = {type = "cockpit-switch", identifier = identifier}
   Signal.emit("send-to-server", message)
 end
 
 local function handle_roll_ap(value)
-  local values = {[-1] = "roll-ap-up", [0] = "roll-ap-mid", [1] = "roll-ap-down"}
-  send_switch_state(values[value])
+  local ids = {[-1] = "roll-ap-up", [0] = "roll-ap-mid", [1] = "roll-ap-down"}
+  send_switch_identifier(ids[value])
 end
 
 local function handle_pitch_ap(value)
-  local values = {[-1] = "pitch-ap-up", [0] = "pitch-ap-mid", [1] = "pitch-ap-down"}
-  send_switch_state(values[value])
+  local ids = {[-1] = "pitch-ap-up", [0] = "pitch-ap-mid", [1] = "pitch-ap-down"}
+  send_switch_identifier(ids[value])
 end
 
 local function handle_master_arm(value)
-  local values = {[-1] = "master-arm-arm", [0] = "master-arm-safe", [1] = "master-arm-sim"}
-  send_switch_state(values[value])
+  local ids = {[-1] = "master-arm-arm", [0] = "master-arm-safe", [1] = "master-arm-sim"}
+  send_switch_identifier(ids[value])
 end
 
 local function handle_laser_arm(value)
-  local values = {[0] = "laser-arm-on", [1] = "laser-arm-off"}
-  send_switch_state(values[value])
+  local ids = {[0] = "laser-arm-on", [1] = "laser-arm-off"}
+  send_switch_identifier(ids[value])
 end
 
 local rollApSlider = Slider(0, -1, 1, handle_roll_ap, {orientation = "vertical"}, {values = {0, -1, 1}})
