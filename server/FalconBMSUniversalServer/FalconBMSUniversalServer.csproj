@@ -121,6 +121,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApPanelSwitchHandler.cs" />
     <Compile Include="CallbackSender.cs" />
     <Compile Include="FalconBmsUniversalServer.cs" />
     <Compile Include="FalconKeyCallback.cs" />

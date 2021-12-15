@@ -359,6 +359,18 @@ namespace FalconBmsUniversalServer
         }
 
         [MessagePackObject(keyAsPropertyName: true)]
+        public struct CockpitSwitchMessage : IMessage
+        {
+            public string type { get; set; }
+            public string identifier { get; set; }
+
+            public static bool IsType(string type)
+            {
+                return type.StartsWith("cockpit-switch");
+            }
+        }
+
+        [MessagePackObject(keyAsPropertyName: true)]
         public struct StreamedTextureRequest : IMessage
         {
             public string type { get; set; }
