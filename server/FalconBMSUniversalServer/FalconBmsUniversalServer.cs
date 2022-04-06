@@ -161,7 +161,9 @@ namespace FalconBmsUniversalServer
                 _mutex.WaitOne();
                 Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
                 var cancellationToken = new CancellationTokenSource();
-                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken);
+                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken, () => {
+                    StopStreamingTexture(streamedTextureRequest, peer);
+                });
                 // TODO: should probably use a thread pool here and just submit some work instead of starting and stopping threads.
                 var thread = new Thread(streamer.Run);
 
@@ -217,21 +219,24 @@ namespace FalconBmsUniversalServer
     internal class StreamedTextureThread
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("StreamedTextureThread");
+        private static readonly int MAX_FAILED_CHUNKS = 180;
         private readonly IxxHash _hasher = xxHashFactory.Instance.Create();
         private readonly StreamedTextureRequest _request;
         private readonly ENetPeer _peer;
         private readonly SharedTextureMemoryExtractor _extractor;
         private readonly CancellationTokenSource _cancellationToken;
+        private readonly Action _onTooManyFailedChunks;
         private IHashValue _oldHash = null;
         private int _failedChunks = 0;
 
         public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer,
-            SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken)
+            SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken, Action onTooManyFailedChunks)
         {
             _request = request;
             _peer = peer;
             _extractor = extractor;
             _cancellationToken = cancellationToken;
+            _onTooManyFailedChunks = onTooManyFailedChunks;
             Logger.Debug("{}: Refresh rate is: {}, Quality is: {}", _request.identifier, _request.refresh_rate, _request.quality);
         }
 
@@ -244,6 +249,7 @@ namespace FalconBmsUniversalServer
                 var toSleep = (int)((1f / refreshRate) * 1000);
                 Thread.Sleep(toSleep);
             }
+            Logger.Debug("Stopping to send: {}", _request.identifier);
         }
 
         private void SendOneChunk()
@@ -265,10 +271,11 @@ namespace FalconBmsUniversalServer
                 catch (Exception e)
                 {
                     _failedChunks++;
-                    if (_failedChunks > 60)
+                    if (_failedChunks > MAX_FAILED_CHUNKS)
                     {
+                        Logger.Error("Assuming peer {0} has died because {1} chunks failed while sending with '{2}'", _peer, MAX_FAILED_CHUNKS, e.Message);
                         // probably this peer has died.
-                        _cancellationToken.Cancel();
+                        _onTooManyFailedChunks();
                     }
                 }
             }
