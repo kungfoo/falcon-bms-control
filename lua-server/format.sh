@@ -1,4 +1,3 @@
 #!/bin/bash
 
-find . -name '*.lua' -exec lua-format -vi {} \;
-
+stylua --config-path ../config/stylua.toml .

@@ -50,7 +50,7 @@ Clients are built for iOS and android are using seperate repositories that are q
 
 - Any text editor, try `vscode`, `vim` or something fancier.
 - `love2d` installed using a package manager of sorts
-- `` installed using a package manager
+- `stylua` installed using a package manager or `cargo` to format lua code
 - (_Not required_) An android or windows touch device to test using touch features.
 
 
