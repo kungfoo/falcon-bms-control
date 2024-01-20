@@ -1,6 +1,6 @@
 # Fast Layout Updater
 
-This is a prototype layout manager/updater based on a BSP.
+This is a prototype layout manager/updater based on either a BSP or a grid.
 
 The only way to structure widgets right now it to define splits
 on one axis and define percentages along the axis of how to distribute

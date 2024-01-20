@@ -1,2 +1,3 @@
 client/build/*
+.DS_Store
 lua-server/build/*
