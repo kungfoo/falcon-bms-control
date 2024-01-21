@@ -1,4 +1,4 @@
-local flup = {split = Class {}, fixed = Class {}, grid = Class {rows = {}}, internal = {}}
+local flup = { split = Class({}), fixed = Class({}), grid = Class({ rows = {} }), internal = {} }
 
 function flup.split:init(options)
   self.direction = options.direction or "x"
@@ -8,7 +8,9 @@ function flup.split:init(options)
 end
 
 function flup.split:draw()
-  for _, c in pairs(self.components) do c:draw() end
+  for _, c in pairs(self.components) do
+    c:draw()
+  end
 end
 
 function flup.split:fill(x, y, w, h)
@@ -19,8 +21,7 @@ function flup.split:updateGeometry(x, y, w, h)
   flup.split:_updateGeometry(self, x, y, w, h)
 end
 
-function flup.fixed:init(options)
-end
+function flup.fixed:init(options) end
 
 function flup.split:_updateGeometry(node, x, y, w, h)
   if node.direction and node.ratio and node.components then
@@ -28,7 +29,9 @@ function flup.split:_updateGeometry(node, x, y, w, h)
     local margin = node.margin or 0
     if node.direction == "x" then
       local p = w * node.ratio
-      if node.components.left then flup.split:_updateGeometry(node.components.left, x, y, p - margin / 2, h) end
+      if node.components.left then
+        flup.split:_updateGeometry(node.components.left, x, y, p - margin / 2, h)
+      end
 
       if node.components.right then
         flup.split:_updateGeometry(node.components.right, x + p + 1 + margin / 2, y, w - p - margin / 2, h)
@@ -37,7 +40,9 @@ function flup.split:_updateGeometry(node, x, y, w, h)
 
     if node.direction == "y" then
       local p = h * node.ratio
-      if node.components.top then flup.split:_updateGeometry(node.components.top, x, y, w, p - margin / 2) end
+      if node.components.top then
+        flup.split:_updateGeometry(node.components.top, x, y, w, p - margin / 2)
+      end
 
       if node.components.bottom then
         flup.split:_updateGeometry(node.components.bottom, x, y + p + 1 + margin / 2, w, h - p - margin / 2)
@@ -45,7 +50,9 @@ function flup.split:_updateGeometry(node, x, y, w, h)
     end
   else
     -- must be a component then, let's tell it its size
-    if node.updateGeometry then node:updateGeometry(x, y, w, h) end
+    if node.updateGeometry then
+      node:updateGeometry(x, y, w, h)
+    end
   end
 end
 
@@ -63,7 +70,13 @@ function flup.grid:updateGeometry(x, y, w, h)
 end
 
 function flup.grid:draw()
-  for i, row in pairs(self.rows) do for j, column in pairs(row.columns) do if column.draw then column:draw() end end end
+  for i, row in pairs(self.rows) do
+    for j, column in pairs(row.columns) do
+      if column.draw then
+        column:draw()
+      end
+    end
+  end
 end
 
 function flup.grid:_updateGeometry(node, x, y, w, h)
@@ -84,7 +97,9 @@ function flup.grid:_updateGeometry(node, x, y, w, h)
           column:_updateGeometry(column, x_start, y_start, width_per_column, height_per_row)
         end
         -- must be a component then, let's tell it its size
-        if column.updateGeometry then column:updateGeometry(x_start, y_start, width_per_column, height_per_row) end
+        if column.updateGeometry then
+          column:updateGeometry(x_start, y_start, width_per_column, height_per_row)
+        end
       end
     end
   else
