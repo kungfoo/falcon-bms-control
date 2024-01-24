@@ -1,10 +1,10 @@
 local Button = require("lib.button")
 
-local IcpButton = Class {
+local IcpButton = Class({
   smallFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 18, "normal"),
   largeFont = love.graphics.newFont("fonts/b612/B612-Regular.ttf", 24, "normal"),
   size = 60,
-}
+})
 
 function IcpButton:init(icp, id, options, x, y, w, h)
   self.icp = icp
@@ -20,8 +20,12 @@ end
 
 function IcpButton:draw()
   love.graphics.setLineWidth(1)
-  if self.options.type == "square" then self:drawSquare() end
-  if self.options.type == "round" then self:drawRound() end
+  if self.options.type == "square" then
+    self:drawSquare()
+  end
+  if self.options.type == "round" then
+    self:drawRound()
+  end
 end
 
 function IcpButton:drawSquare()
@@ -47,7 +51,9 @@ function IcpButton:drawSquare()
     love.graphics.setFont(self.smallFont)
     local x = self:hcentered(self.smallFont, self.options.label, self.x, self.size)
     local y = self.y + 10
-    if not self.options.number then y = self:vcentered(self.smallFont, self.y, self.size) end
+    if not self.options.number then
+      y = self:vcentered(self.smallFont, self.y, self.size)
+    end
     love.graphics.printf(self.options.label, x, y, self.size)
   end
 end
@@ -58,7 +64,7 @@ function IcpButton:drawRound()
   else
     love.graphics.setColor(Colors.grey)
   end
-  local center = {x = self.x + self.size / 2, y = self.y + self.size / 2}
+  local center = { x = self.x + self.size / 2, y = self.y + self.size / 2 }
   local radius = self.size / 2
   love.graphics.circle("fill", center.x, center.y, radius)
   love.graphics.setColor(Colors.cyan)
@@ -101,14 +107,14 @@ end
 function IcpButton:pressed()
   Button.pressed()
   self.isPressed = true
-  local message = {type = "icp-pressed", icp = self.icp, button = self.id}
+  local message = { type = "icp-pressed", icp = self.icp, button = self.id }
   Signal.emit("send-to-server", message)
 end
 
 function IcpButton:released()
   Button.released()
   self.isPressed = false
-  local message = {type = "icp-released", icp = self.icp, button = self.id}
+  local message = { type = "icp-released", icp = self.icp, button = self.id }
   Signal.emit("send-to-server", message)
 end
 

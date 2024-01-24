@@ -4,7 +4,7 @@ local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
 
-local Mfd = Class {max_size = 502}
+local Mfd = Class({ max_size = 502 })
 
 function Mfd:init(identifier, x, y)
   self.id = identifier
@@ -17,27 +17,27 @@ function Mfd:createButtons(identifier)
 
   -- top row of buttons
   layout:push(105, 0):padding(61 - MfdButton.size, 0)
-  for _, osb in ipairs {"OSB_1", "OSB_2", "OSB_3", "OSB_4", "OSB_5"} do
+  for _, osb in ipairs({ "OSB_1", "OSB_2", "OSB_3", "OSB_4", "OSB_5" }) do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:col(MfdButton.size, MfdButton.size)))
   end
 
   -- right column
   layout:pop()
   layout:push(MfdButton.size + 410, 110):padding(0, 58 - MfdButton.size)
-  for _, osb in ipairs {"OSB_6", "OSB_7", "OSB_8", "OSB_9", "OSB_10"} do
+  for _, osb in ipairs({ "OSB_6", "OSB_7", "OSB_8", "OSB_9", "OSB_10" }) do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:row(MfdButton.size, MfdButton.size)))
   end
 
   -- left column
   layout:push(0, 110):padding(0, 58 - MfdButton.size)
-  for _, osb in ipairs {"OSB_20", "OSB_19", "OSB_18", "OSB_17", "OSB_16"} do
+  for _, osb in ipairs({ "OSB_20", "OSB_19", "OSB_18", "OSB_17", "OSB_16" }) do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:row(MfdButton.size, MfdButton.size)))
   end
 
   -- bottom row
   layout:pop()
   layout:push(105, 410 + MfdButton.size):padding(61 - MfdButton.size, 0)
-  for _, osb in ipairs {"OSB_15", "OSB_14", "OSB_13", "OSB_12", "OSB_11"} do
+  for _, osb in ipairs({ "OSB_15", "OSB_14", "OSB_13", "OSB_12", "OSB_11" }) do
     table.insert(self.buttons, MfdButton(identifier, osb, layout:col(MfdButton.size, MfdButton.size)))
   end
 end
@@ -50,7 +50,9 @@ function Mfd:draw()
   love.graphics.setColor(Colors.dark_grey)
   love.graphics.rectangle("fill", 0, 0, self.max_size, self.max_size, 10, 10)
 
-  for _, button in ipairs(self.buttons) do button:draw() end
+  for _, button in ipairs(self.buttons) do
+    button:draw()
+  end
   if self.imageData then
     love.graphics.setColor(Colors.white)
     if not self.image then
@@ -71,8 +73,7 @@ function Mfd:determineScale(w, h)
   return math.min(w, h) / self.max_size
 end
 
-function Mfd:update(dt)
-end
+function Mfd:update(dt) end
 
 function Mfd:updateGeometry(x, y, w, h)
   local scale = self:determineScale(w, h)

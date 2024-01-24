@@ -6,7 +6,7 @@ local ded = Ded("f16/ded")
 local icp = Icp("f16/icp")
 local rwr = Rwr("f16/rwr")
 
-local Screen = Class {
+local Screen = Class({
   stats = {},
   channels = {
     -- general purpose reliable channel
@@ -22,12 +22,12 @@ local Screen = Class {
       rwr:consume(event.data)
     end,
   },
-  dimensions = {w = 0, h = 0},
+  dimensions = { w = 0, h = 0 },
   padding = 10,
-}
+})
 
 function Screen:init()
-  self.components = {icp, ded, rwr, Footer}
+  self.components = { icp, ded, rwr, Footer }
 end
 
 function Screen:enter(previous)
@@ -51,7 +51,9 @@ function Screen:update(dt)
     self.dimensions.h = h
   end
 
-  for _, component in pairs(self.components) do component:update(dt) end
+  for _, component in pairs(self.components) do
+    component:update(dt)
+  end
 
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
@@ -59,44 +61,52 @@ end
 
 function Screen:adjustLayoutIfNeeded(w, h)
   -- currently nothing to display besides these two
-  self.flup = Flup.split {
+  self.flup = Flup.split({
     direction = "y",
     ratio = 0.95,
     margin = 10,
     components = {
-      top = Flup.split {
+      top = Flup.split({
         direction = "x",
         ratio = 0.3,
         components = {
-          right = Flup.split {direction = "y", ratio = 0.3, margin = 10, components = {top = ded, bottom = icp}},
-          left = Flup.split {direction = "y", margin = 10, components = {top = rwr, bottom = nil}},
+          right = Flup.split({ direction = "y", ratio = 0.3, margin = 10, components = { top = ded, bottom = icp } }),
+          left = Flup.split({ direction = "y", margin = 10, components = { top = rwr, bottom = nil } }),
         },
-      },
+      }),
       bottom = Footer,
     },
-  }
+  })
 end
 
 function Screen:handleReceive(event)
   local handler = self.channels[event.channel]
-  if handler then handler(event) end
+  if handler then
+    handler(event)
+  end
 end
 
 function Screen:draw()
   local t1 = love.timer.getTime()
 
-  for _, component in ipairs(self.components) do component:draw() end
+  for _, component in ipairs(self.components) do
+    component:draw()
+  end
 
   local t2 = love.timer.getTime()
   self.stats.time_draw = (t2 - t1) * 1000
 end
 
 function Screen:mousepressed(x, y, button, isTouch, presses)
-  for _, component in ipairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do
+    component:mousepressed(x, y, button, isTouch, presses)
+  end
 end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
-  for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do
+    component:mousereleased(x, y, button, isTouch, presses)
+  end
 end
 
 return Screen

@@ -1,13 +1,13 @@
 local StreamedTexture = require("lib.streamed-texture")
 
-local Ded = Class {
+local Ded = Class({
   -- max size of this component
   padding = 20,
   width = 400,
   height = 150,
   corner_radius = 10,
   font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
-}
+})
 
 function Ded:init(id, x, y)
   self.id = id
@@ -16,12 +16,10 @@ function Ded:init(id, x, y)
   self.transform = love.math.newTransform():translate(x or 0, y or 0)
 end
 
-function Ded:update(dt)
-end
+function Ded:update(dt) end
 
 local function stencil()
-  love.graphics.rectangle("fill", Ded.padding, Ded.padding, Ded.width, Ded.height, Ded.corner_radius / 2,
-                          Ded.corner_radius / 2)
+  love.graphics.rectangle("fill", Ded.padding, Ded.padding, Ded.width, Ded.height, Ded.corner_radius / 2, Ded.corner_radius / 2)
 end
 
 function Ded:draw()
@@ -29,8 +27,15 @@ function Ded:draw()
   love.graphics.applyTransform(self.transform)
 
   love.graphics.setColor(Colors.dark_grey)
-  love.graphics.rectangle("fill", 0, 0, self.width + self.padding * 2, self.height + self.padding * 2,
-                          self.corner_radius, self.corner_radius)
+  love.graphics.rectangle(
+    "fill",
+    0,
+    0,
+    self.width + self.padding * 2,
+    self.height + self.padding * 2,
+    self.corner_radius,
+    self.corner_radius
+  )
 
   love.graphics.stencil(stencil, "replace", 1)
   love.graphics.setStencilTest("gequal", 1)
@@ -89,7 +94,6 @@ function Ded:mousepressed(x, y, button, isTouch, presses)
   -- intentionally left blank
 end
 
-function Ded:mousereleased(x, y, button, isTouch, presses)
-end
+function Ded:mousereleased(x, y, button, isTouch, presses) end
 
 return Ded

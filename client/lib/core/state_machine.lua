@@ -14,12 +14,15 @@
 	TODO: consider coroutine friendliness
 
 	depends on oo.lua supplying class()
-]] local state_machine = class()
+]]
+local state_machine = class()
 
 function state_machine:new(states, start)
-  local ret = self:init({states = states or {}, current_state = ""})
+  local ret = self:init({ states = states or {}, current_state = "" })
 
-  if start then ret:set_state(start) end
+  if start then
+    ret:set_state(start)
+  end
 
   return ret
 end
@@ -34,7 +37,9 @@ end
 -- make an internal call, with up to 4 arguments
 function state_machine:_call(name, a, b, c, d)
   local state = self:_get_state()
-  if state and type(state[name]) == "function" then return state[name](self, state, a, b, c, d) end
+  if state and type(state[name]) == "function" then
+    return state[name](self, state, a, b, c, d)
+  end
   return nil
 end
 
@@ -58,7 +63,9 @@ function state_machine:add_state(name, data)
     error("error: added duplicate state " .. name)
   else
     self.states[name] = data
-    if self:in_state(name) then self:_call("enter") end
+    if self:in_state(name) then
+      self:_call("enter")
+    end
   end
 
   return self
@@ -69,7 +76,9 @@ function state_machine:remove_state(name)
   if not self.has_state(name) then
     error("error: removed missed state " .. name)
   else
-    if self:in_state(name) then self:_call("exit") end
+    if self:in_state(name) then
+      self:_call("exit")
+    end
     self.states[name] = nil
   end
 
@@ -81,9 +90,13 @@ end
 -- exit is called on the old state and enter is called on the new state
 function state_machine:replace_state(name, data, do_transitions)
   local current = self:in_state(name)
-  if do_transitions and current then self:_call("exit") end
+  if do_transitions and current then
+    self:_call("exit")
+  end
   self.states[name] = data
-  if do_transitions and current then self:_call("enter") end
+  if do_transitions and current then
+    self:_call("enter")
+  end
 
   return self
 end

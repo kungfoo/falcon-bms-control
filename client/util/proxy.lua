@@ -9,14 +9,15 @@ local function Proxy(f)
 end
 
 Font = Proxy(function(arg)
-  if tonumber(arg) then return love.graphics.newFont('fonts/slkscr.ttf', arg) end
+  if tonumber(arg) then
+    return love.graphics.newFont("fonts/slkscr.ttf", arg)
+  end
   return Proxy(function(size)
-    return love.graphics.newFont('fonts/' .. arg .. '.ttf', size)
+    return love.graphics.newFont("fonts/" .. arg .. ".ttf", size)
   end)
 end)
 
 Image = Proxy(function(image_file)
-  assert(type(image_file) == 'string', 'Loading images requires a string path')
-  return love.image.newImageData('resources/images/' .. image_file)
+  assert(type(image_file) == "string", "Loading images requires a string path")
+  return love.image.newImageData("resources/images/" .. image_file)
 end)
-

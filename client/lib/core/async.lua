@@ -7,27 +7,32 @@
 		getting a reference to the task for manipulation
 			attaching multiple callbacks
 			cancelling
-]] local async = class()
+]]
+local async = class()
 
 function async:new()
-  return self:init({tasks = {}})
+  return self:init({ tasks = {} })
 end
 
 -- add a task to the kernel
 function async:call(f, args, cb, error_cb)
-  table.insert(self.tasks, {coroutine.create(f), args, cb, error_cb})
+  table.insert(self.tasks, { coroutine.create(f), args, cb, error_cb })
 end
 
 -- update some task in the kernel
 function async:update()
   -- grab task definition
   local td = table.remove(self.tasks, 1)
-  if not td then return false end
+  if not td then
+    return false
+  end
   -- run a step
   local co, args, cb, error_cb = td[1], td[2], td[3], td[4]
   -- (reuse these 8 temps)
   local a, b, c, d, e, f, g, h
-  if args then a, b, c, d, e, f, g, h = unpack(args) end
+  if args then
+    a, b, c, d, e, f, g, h = unpack(args)
+  end
   local success, a, b, c, d, e, f, g, h = coroutine.resume(co, a, b, c, d, e, f, g, h)
   -- error?
   if not success then
@@ -52,7 +57,11 @@ end
 -- update tasks for some amount of time
 function async:update_for_time(t)
   local now = love.timer.getTime()
-  while love.timer.getTime() - now < t do if not self:update() then break end end
+  while love.timer.getTime() - now < t do
+    if not self:update() then
+      break
+    end
+  end
 end
 
 return async

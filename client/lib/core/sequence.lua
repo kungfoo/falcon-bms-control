@@ -6,12 +6,13 @@
 
 	in that case, you can still use the table methods that accept a table
 	first as method calls.
-]] local sequence = {}
+]]
+local sequence = {}
 
-sequence.mt = {__index = sequence}
+sequence.mt = { __index = sequence }
 
 -- proxy missing table fns to table
-sequence._mt = {__index = table}
+sequence._mt = { __index = table }
 setmetatable(sequence, sequence._mt)
 
 -- upgrade a table into a functional sequence

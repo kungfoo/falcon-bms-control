@@ -1,9 +1,12 @@
 --[[
 	functional programming facilities
-]] -- collect all keys of a table into a sequence
+]]
+-- collect all keys of a table into a sequence
 function table.keys(t)
   local r = {}
-  for k, v in pairs(t) do table.insert(r, k) end
+  for k, v in pairs(t) do
+    table.insert(r, k)
+  end
   return r
 end
 
@@ -11,7 +14,9 @@ end
 -- (shallow copy if it's already a sequence)
 function table.values(t)
   local r = sequence:new()
-  for k, v in pairs(t) do table.insert(r, v) end
+  for k, v in pairs(t) do
+    table.insert(r, v)
+  end
   return r
 end
 
@@ -20,7 +25,9 @@ end
 function table.foreach(t, f)
   for i, v in ipairs(t) do
     local r = f(v, i)
-    if r ~= nil then return r end
+    if r ~= nil then
+      return r
+    end
   end
 end
 
@@ -28,7 +35,9 @@ end
 -- reduce({1, 2, 3}, f, 0) -> f(f(f(0, 1), 2), 3)
 -- (but performed iteratively, so no stack smashing)
 function table.reduce(t, f, o)
-  for i, v in ipairs(t) do o = f(o, v) end
+  for i, v in ipairs(t) do
+    o = f(o, v)
+  end
   return o
 end
 
@@ -38,7 +47,9 @@ function table.map(t, f)
   local r = {}
   for i, v in ipairs(t) do
     local mapped = f(v, i)
-    if mapped ~= nil then table.insert(r, mapped) end
+    if mapped ~= nil then
+      table.insert(r, mapped)
+    end
   end
   return r
 end
@@ -46,7 +57,11 @@ end
 -- filters a sequence
 function table.filter(t, f)
   local r = {}
-  for i, v in ipairs(t) do if f(v, i) then table.insert(r, v) end end
+  for i, v in ipairs(t) do
+    if f(v, i) then
+      table.insert(r, v)
+    end
+  end
   return r
 end
 
@@ -75,7 +90,9 @@ function table.zip(t1, t2, f)
     local v1 = t1[i]
     local v2 = t2[i]
     local zipped = f(v1, v2, i)
-    if zipped ~= nil then table.insert(ret, zipped) end
+    if zipped ~= nil then
+      table.insert(ret, zipped)
+    end
   end
   return ret
 end
@@ -86,7 +103,9 @@ end
 function table.dedupe(t)
   local seen = {}
   return table.filter(t, function(v)
-    if seen[v] then return false end
+    if seen[v] then
+      return false
+    end
     seen[v] = true
     return true
   end)
@@ -114,32 +133,52 @@ end
 
 -- true if any element of the table matches f
 function table.any(t, f)
-  for i, v in ipairs(t) do if f(v) then return true end end
+  for i, v in ipairs(t) do
+    if f(v) then
+      return true
+    end
+  end
   return false
 end
 
 -- true if no element of the table matches f
 function table.none(t, f)
-  for i, v in ipairs(t) do if f(v) then return false end end
+  for i, v in ipairs(t) do
+    if f(v) then
+      return false
+    end
+  end
   return true
 end
 
 -- true if all elements of the table match f
 function table.all(t, f)
-  for i, v in ipairs(t) do if not f(v) then return false end end
+  for i, v in ipairs(t) do
+    if not f(v) then
+      return false
+    end
+  end
   return true
 end
 
 -- counts the elements of t that match f
 function table.count(t, f)
   local c = 0
-  for i, v in ipairs(t) do if f(v) then c = c + 1 end end
+  for i, v in ipairs(t) do
+    if f(v) then
+      c = c + 1
+    end
+  end
   return c
 end
 
 -- true if the table contains element e
 function table.contains(t, e)
-  for i, v in ipairs(t) do if v == e then return true end end
+  for i, v in ipairs(t) do
+    if v == e then
+      return true
+    end
+  end
   return false
 end
 
@@ -153,7 +192,9 @@ end
 -- return the numeric mean of all elements of t
 function table.mean(t)
   local len = #t
-  if len == 0 then return 0 end
+  if len == 0 then
+    return 0
+  end
   return table.sum(t) / len
 end
 
@@ -205,6 +246,10 @@ end
 
 -- return the first element of the table that results in a true filter
 function table.find_match(t, f)
-  for i, v in ipairs(t) do if f(v) then return v end end
+  for i, v in ipairs(t) do
+    if f(v) then
+      return v
+    end
+  end
   return nil
 end

@@ -1,27 +1,30 @@
-local Component = Class {}
+local Component = Class({})
 
 local Button = require("lib.button")
 
 function Component:init(icon, options, callback)
   local o = options or {}
   self.align = o.align or "left"
-  self.callback = callback or function()
-  end
-  self.image = love.graphics.newImage(love.image.newImageData(icon), {mipmaps = true})
+  self.callback = callback or function() end
+  self.image = love.graphics.newImage(love.image.newImageData(icon), { mipmaps = true })
   self.transform = love.math.newTransform()
   self.pressed = false
 end
 
 function Component:draw()
   love.graphics.setColor(Colors.grey)
-  if self.pressed then love.graphics.setColor(Colors.green) end
+  if self.pressed then
+    love.graphics.setColor(Colors.green)
+  end
   love.graphics.draw(self.image, self.transform)
 end
 
 function Component:updateGeometry(x, y, w, h)
   local scale = self:determineScale(w, h)
   self.transform = love.math.newTransform()
-  if self.align == "left" then self.transform:translate(x, y):scale(scale) end
+  if self.align == "left" then
+    self.transform:translate(x, y):scale(scale)
+  end
   if self.align == "right" then
     self.transform:translate(x + w - self.image:getWidth() * scale, y + h - self.image:getHeight() * scale):scale(scale)
   end
@@ -39,8 +42,7 @@ function Component:determineScale(w, h)
   end
 end
 
-function Component:update(dt)
-end
+function Component:update(dt) end
 
 function Component:mousepressed(x, y, button, touch, presses)
   local dx, dy = self.transform:inverseTransformPoint(x, y)

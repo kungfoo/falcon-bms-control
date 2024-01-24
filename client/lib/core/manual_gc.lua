@@ -23,7 +23,8 @@
 	the function steps the garbage collector only do a small step
 	each time. this prevents the start of collection from "spiking",
 	though it still causes some with particularly large sets
-]] return function(time_budget, safetynet_megabytes, disable_otherwise)
+]]
+return function(time_budget, safetynet_megabytes, disable_otherwise)
   local max_steps = 1000
   local steps = 0
   local start_time = love.timer.getTime()
@@ -32,7 +33,11 @@
     steps = steps + 1
   end
   -- safety net
-  if collectgarbage("count") / 1024 > safetynet_megabytes then collectgarbage("collect") end
+  if collectgarbage("count") / 1024 > safetynet_megabytes then
+    collectgarbage("collect")
+  end
   -- don't collect gc outside this margin
-  if disable_otherwise then collectgarbage("stop") end
+  if disable_otherwise then
+    collectgarbage("stop")
+  end
 end

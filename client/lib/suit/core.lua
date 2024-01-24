@@ -1,7 +1,7 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 local NONE = {}
-local BASE = (...):match('(.-)[^%.]+$')
-local default_theme = require(BASE .. 'theme')
+local BASE = (...):match("(.-)[^%.]+$")
+local default_theme = require(BASE .. "theme")
 
 local suit = {}
 suit.__index = suit
@@ -13,9 +13,9 @@ function suit.new(theme)
     mouse_x = 0,
     mouse_y = 0,
     mouse_button_down = false,
-    candidate_text = {text = "", start = 0, length = 0},
+    candidate_text = { text = "", start = 0, length = 0 },
 
-    draw_queue = {n = 0},
+    draw_queue = { n = 0 },
 
     Button = require(BASE .. "button"),
     ImageButton = require(BASE .. "imagebutton"),
@@ -30,7 +30,9 @@ end
 
 -- helper
 function suit.getOptionsAndSize(opt, ...)
-  if type(opt) == "table" then return opt, ... end
+  if type(opt) == "table" then
+    return opt, ...
+  end
   return {}, opt, ...
 end
 
@@ -98,7 +100,9 @@ end
 function suit:registerMouseHit(id, ul_x, ul_y, hit)
   if not self.hovered and hit(self.mouse_x - ul_x, self.mouse_y - ul_y) then
     self.hovered = id
-    if self.active == nil and self.mouse_button_down then self.active = id end
+    if self.active == nil and self.mouse_button_down then
+      self.active = id
+    end
   end
   return self:getStateName(id)
 end
@@ -119,7 +123,9 @@ end
 
 function suit:updateMouse(x, y, button_down)
   self.mouse_x, self.mouse_y = x, y
-  if button_down ~= nil then self.mouse_button_down = button_down end
+  if button_down ~= nil then
+    self.mouse_button_down = button_down
+  end
 end
 
 function suit:getMousePosition()
@@ -182,13 +188,12 @@ function suit:enterFrame()
   self.hit = nil
 end
 
-function suit:exitFrame()
-end
+function suit:exitFrame() end
 
 -- draw
 function suit:registerDraw(f, ...)
-  local args = {...}
-  local nargs = select('#', ...)
+  local args = { ... }
+  local nargs = select("#", ...)
   self.draw_queue.n = self.draw_queue.n + 1
   self.draw_queue[self.draw_queue.n] = function()
     f(unpack(args, 1, nargs))
@@ -197,8 +202,10 @@ end
 
 function suit:draw()
   self:exitFrame()
-  love.graphics.push('all')
-  for i = self.draw_queue.n, 1, -1 do self.draw_queue[i]() end
+  love.graphics.push("all")
+  for i = self.draw_queue.n, 1, -1 do
+    self.draw_queue[i]()
+  end
   love.graphics.pop()
   self.draw_queue.n = 0
   self:enterFrame()

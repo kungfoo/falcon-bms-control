@@ -9,7 +9,7 @@ Signal = require("lib.hump.signal")
 State = require("lib.hump.gamestate")
 Timer = require("lib.hump.timer")
 Flup = require("lib.flup")
-Connection = {ip = nil, server = nil, host = nil, peer = nil}
+Connection = { ip = nil, server = nil, host = nil, peer = nil }
 
 -- initialize settings straight away.
 local settings = require("lib.settings")
@@ -27,10 +27,10 @@ local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
 local settings_screen = require("screens.settings-screen")
 local connecting_screen = require("screens.connecting-screen")
 
-local debug = {enabled = true, stats = {time_update = 0, time_draw = 0}}
+local debug = { enabled = true, stats = { time_update = 0, time_draw = 0 } }
 
 local Switcher = require("components.switcher")
-local switcher = Switcher({mfd_screen, icp_and_rwr_screen})
+local switcher = Switcher({ mfd_screen, icp_and_rwr_screen })
 
 -- footer component is present on most screens
 local footer = require("components.footer")
@@ -76,11 +76,12 @@ function love.update(dt)
   end
 end
 
-function love.draw()
-end
+function love.draw() end
 
 function love.keypressed(key, scancode, isrepeat)
-  if key == "escape" then love.event.quit() end
+  if key == "escape" then
+    love.event.quit()
+  end
 end
 
 function love.quit()

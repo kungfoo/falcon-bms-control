@@ -1,6 +1,7 @@
 --[[
 	extra mathematical functions
-]] local bit = require("bit")
+]]
+local bit = require("bit")
 
 -- wrap v around range [lo, hi)
 function math.wrap(v, lo, hi)
@@ -39,8 +40,12 @@ end
 
 -- 0, 1, -1 sign of a scalar
 function math.sign(v)
-  if v < 0 then return -1 end
-  if v > 0 then return 1 end
+  if v < 0 then
+    return -1
+  end
+  if v > 0 then
+    return 1
+  end
   return 0
 end
 
@@ -1122,7 +1127,11 @@ local sparse_primes_1k = {
 }
 
 function math.first_above(v, t)
-  for _, p in ipairs(t) do if p > v then return p end end
+  for _, p in ipairs(t) do
+    if p > v then
+      return p
+    end
+  end
   return t[#t]
 end
 

@@ -22,8 +22,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-]] --
-local _PATH = (...):match('^(.*[%./])[^%.%/]+$') or ''
+]]
+--
+local _PATH = (...):match("^(.*[%./])[^%.%/]+$") or ""
 local cos, sin = math.cos, math.sin
 
 local camera = {}
@@ -44,7 +45,9 @@ function camera.smooth.linear(speed)
     -- normalize direction
     local d = math.sqrt(dx * dx + dy * dy)
     local dts = math.min((s or speed) * love.timer.getDelta(), d) -- prevent overshooting the goal
-    if d > 0 then dx, dy = dx / d, dy / d end
+    if d > 0 then
+      dx, dy = dx / d, dy / d
+    end
 
     return dx * dts, dy * dts
   end
@@ -63,7 +66,7 @@ local function new(x, y, zoom, rot, smoother)
   zoom = zoom or 1
   rot = rot or 0
   smoother = smoother or camera.smooth.none() -- for locking, see below
-  return setmetatable({x = x, y = y, scale = zoom, rot = rot, smoother = smoother}, camera)
+  return setmetatable({ x = x, y = y, scale = zoom, rot = rot, smoother = smoother }, camera)
 end
 
 function camera:lookAt(x, y)
@@ -105,7 +108,9 @@ function camera:attach(x, y, w, h, noclip)
   w, h = w or love.graphics.getWidth(), h or love.graphics.getHeight()
 
   self._sx, self._sy, self._sw, self._sh = love.graphics.getScissor()
-  if not noclip then love.graphics.setScissor(x, y, w, h) end
+  if not noclip then
+    love.graphics.setScissor(x, y, w, h)
+  end
 
   local cx, cy = x + w / 2, y + h / 2
   love.graphics.push()
@@ -208,7 +213,7 @@ function camera:lockWindow(x, y, x_min, x_max, y_min, y_max, smoother, ...)
 end
 
 -- the module
-return setmetatable({new = new, smooth = camera.smooth}, {
+return setmetatable({ new = new, smooth = camera.smooth }, {
   __call = function(_, ...)
     return new(...)
   end,

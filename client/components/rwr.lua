@@ -1,13 +1,13 @@
 local StreamedTexture = require("lib.streamed-texture")
 
-local Rwr = Class {
+local Rwr = Class({
   -- max size of this component
   padding = 10,
   width = 240,
   height = 240,
   corner_radius = 10,
   font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
-}
+})
 
 function Rwr:init(id, x, y)
   self.id = id
@@ -18,8 +18,7 @@ function Rwr:init(id, x, y)
   self.canvas = love.graphics.newCanvas(Rwr.width + Rwr.padding, Rwr.height + Rwr.padding)
 end
 
-function Rwr:update(dt)
-end
+function Rwr:update(dt) end
 
 local function stencil()
   love.graphics.circle("fill", (Rwr.width / 2) + Rwr.padding, (Rwr.height / 2) + Rwr.padding, Rwr.width / 2)
@@ -35,8 +34,15 @@ function Rwr:draw()
   love.graphics.applyTransform(self.transform)
 
   love.graphics.setColor(Colors.dark_grey)
-  love.graphics.rectangle("fill", 0, 0, self.width + self.padding * 2, self.height + self.padding * 2,
-                          self.corner_radius, self.corner_radius)
+  love.graphics.rectangle(
+    "fill",
+    0,
+    0,
+    self.width + self.padding * 2,
+    self.height + self.padding * 2,
+    self.corner_radius,
+    self.corner_radius
+  )
 
   love.graphics.stencil(stencil, "replace", 1)
   love.graphics.setStencilTest("gequal", 1)
@@ -57,7 +63,7 @@ function Rwr:draw()
   end
 
   -- draw overlay lines
-  love.graphics.setCanvas({self.canvas, stencil = true})
+  love.graphics.setCanvas({ self.canvas, stencil = true })
   love.graphics.clear()
   love.graphics.setLineWidth(1)
   love.graphics.stencil(smallStencil, "increment")
@@ -117,7 +123,6 @@ function Rwr:mousepressed(x, y, button, isTouch, presses)
   -- intentionally left blank
 end
 
-function Rwr:mousereleased(x, y, button, isTouch, presses)
-end
+function Rwr:mousereleased(x, y, button, isTouch, presses) end
 
 return Rwr

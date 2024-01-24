@@ -1,6 +1,7 @@
 --[[
 	extra table routines
-]] -- return the back element of a table
+]]
+-- return the back element of a table
 function table.back(t)
   return t[#t]
 end
@@ -29,8 +30,14 @@ end
 -- or nil if nothing was found
 -- (todo: consider pairs version?)
 function table.index_of(t, a)
-  if a == nil then return nil end
-  for i, b in ipairs(t) do if a == b then return i end end
+  if a == nil then
+    return nil
+  end
+  for i, b in ipairs(t) do
+    if a == b then
+      return i
+    end
+  end
   return nil
 end
 
@@ -64,7 +71,9 @@ end
 
 -- pick a random value from a table (or nil if it's empty)
 function table.pick_random(t, r)
-  if #t == 0 then return nil end
+  if #t == 0 then
+    return nil
+  end
   return t[_random(1, #t, r)]
 end
 
@@ -93,7 +102,9 @@ if table.clear == nil then
   -- so you cannot just pop a new table out of nowhere
   function table.clear(t)
     assert(type(to) == "table", "table.clear - argument 't' must be a table")
-    while t[1] ~= nil do table.remove(t) end
+    while t[1] ~= nil do
+      table.remove(t)
+    end
   end
 end
 
@@ -101,7 +112,9 @@ end
 function table.overlay(to, from)
   assert(type(to) == "table", "table.overlay - argument 'to' must be a table")
   assert(type(from) == "table", "table.overlay - argument 'from' must be a table")
-  for k, v in pairs(from) do to[k] = v end
+  for k, v in pairs(from) do
+    to[k] = v
+  end
   return to
 end
 
@@ -134,4 +147,3 @@ function table.copy(t, deep_or_into)
   end
   return into
 end
-

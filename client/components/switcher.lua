@@ -1,6 +1,6 @@
 local Button = require("lib.button")
 
-local Switcher = Class {width = 150, height = 60, radius = 5, button = Button(), id = "switcher"}
+local Switcher = Class({ width = 150, height = 60, radius = 5, button = Button(), id = "switcher" })
 
 function Switcher:init(states)
   self.states = states
@@ -22,8 +22,7 @@ function Switcher:switch(state)
   self.index = math.wrap(self.index + 1, 0, #self.states)
 end
 
-function Switcher:update(dt)
-end
+function Switcher:update(dt) end
 
 function Switcher:draw()
   love.graphics.push()
@@ -41,7 +40,7 @@ function Switcher:draw()
   local highlight = {
     width = (self.width / #self.states) - 20,
     height = self.height - 20,
-    x = (10) + (self.index * (self.width / #self.states)),
+    x = 10 + (self.index * (self.width / #self.states)),
     y = 10,
   }
   love.graphics.rectangle("fill", highlight.x, highlight.y, highlight.width, highlight.height, self.radius)
@@ -78,11 +77,15 @@ end
 function Switcher:mousepressed(x, y, button, isTouch, presses)
   local dx, dy = self.transform:inverseTransformPoint(x, y)
   local hit = dx >= 0 and dx <= self.width and dy >= 0 and dy <= self.height
-  if hit then self:pressed() end
+  if hit then
+    self:pressed()
+  end
 end
 
 function Switcher:mousereleased(x, y, button, isTouch, presses)
-  if self.isPressed then self:released() end
+  if self.isPressed then
+    self:released()
+  end
 end
 
 return Switcher

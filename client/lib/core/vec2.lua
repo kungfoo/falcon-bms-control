@@ -1,6 +1,7 @@
 --[[
 	2d vector type
-]] --[[
+]]
+--[[
 	notes:
 
 	depends on a class() function as in oo.lua
@@ -9,7 +10,8 @@
 
 		math.clamp(v, min, max) - return v clamped between min and max
 		math.round(v) - round v downwards if fractional part is < 0.5
-]] local vec2 = class()
+]]
+local vec2 = class()
 
 vec2.type = "vec2"
 
@@ -31,15 +33,15 @@ end
 
 -- explicit ctors
 function vec2:copy()
-  return self:init({x = self.x, y = self.y})
+  return self:init({ x = self.x, y = self.y })
 end
 
 function vec2:xy(x, y)
-  return self:init({x = x, y = y})
+  return self:init({ x = x, y = y })
 end
 
 function vec2:filled(v)
-  return self:init({x = v, y = v})
+  return self:init({ x = v, y = v })
 end
 
 function vec2:zero()
@@ -57,12 +59,16 @@ end
 
 -- flush the entire pool
 function vec2.flush_pool()
-  if vec2.pool_size() > 0 then _vec2_pool = {} end
+  if vec2.pool_size() > 0 then
+    _vec2_pool = {}
+  end
 end
 
 -- drain one element from the pool, if it exists
 function vec2.drain_pool()
-  if #_vec2_pool > 0 then return table.remove(_vec2_pool) end
+  if #_vec2_pool > 0 then
+    return table.remove(_vec2_pool)
+  end
   return nil
 end
 
@@ -78,7 +84,9 @@ end
 
 -- release a vector to the pool
 function vec2:release()
-  if vec2.pool_size() < _vec2_pool_limit then table.insert(_vec2_pool, self) end
+  if vec2.pool_size() < _vec2_pool_limit then
+    table.insert(_vec2_pool, self)
+  end
 end
 
 -- unpack for multi-args
@@ -91,13 +99,15 @@ end
 -- (not particularly useful)
 
 function vec2:pack()
-  return {self:unpack()}
+  return { self:unpack() }
 end
 
 -- modify
 
 function vec2:sset(x, y)
-  if not y then y = x end
+  if not y then
+    y = x
+  end
   self.x = x
   self.y = y
   return self
@@ -167,28 +177,36 @@ end
 
 -- scalar
 function vec2:saddi(x, y)
-  if not y then y = x end
+  if not y then
+    y = x
+  end
   self.x = self.x + x
   self.y = self.y + y
   return self
 end
 
 function vec2:ssubi(x, y)
-  if not y then y = x end
+  if not y then
+    y = x
+  end
   self.x = self.x - x
   self.y = self.y - y
   return self
 end
 
 function vec2:smuli(x, y)
-  if not y then y = x end
+  if not y then
+    y = x
+  end
   self.x = self.x * x
   self.y = self.y * y
   return self
 end
 
 function vec2:sdivi(x, y)
-  if not y then y = x end
+  if not y then
+    y = x
+  end
   self.x = self.x / x
   self.y = self.y / y
   return self
@@ -266,7 +284,9 @@ end
 
 function vec2:normalisei_both()
   local len = self:length()
-  if len == 0 then return self, 0 end
+  if len == 0 then
+    return self, 0
+  end
   return self:sdivi(len), len
 end
 
@@ -469,14 +489,18 @@ end
 -- scalar projection a onto b
 function vec2.sproj(a, b)
   local len = b:length()
-  if len == 0 then return 0 end
+  if len == 0 then
+    return 0
+  end
   return a:dot(b) / len
 end
 
 -- vector projection a onto b (writes into a)
 function vec2.vproji(a, b)
   local div = b:dot(b)
-  if div == 0 then return a:sset(0, 0) end
+  if div == 0 then
+    return a:sset(0, 0)
+  end
   local fac = a:dot(b) / div
   return a:vset(b):smuli(fac)
 end

@@ -22,7 +22,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-]] --
+]]
+--
 local sqrt, cos, sin, atan2 = math.sqrt, math.cos, math.sin, math.atan2
 
 local function str(x, y)
@@ -106,7 +107,9 @@ end
 
 local function normalize(x, y)
   local l = len(x, y)
-  if l > 0 then return x / l, y / l end
+  if l > 0 then
+    return x / l, y / l
+  end
   return x, y
 end
 
@@ -137,7 +140,9 @@ local function trim(maxLen, x, y)
 end
 
 local function angleTo(x, y, u, v)
-  if u and v then return atan2(y, x) - atan2(v, u) end
+  if u and v then
+    return atan2(y, x) - atan2(v, u)
+  end
   return atan2(y, x)
 end
 

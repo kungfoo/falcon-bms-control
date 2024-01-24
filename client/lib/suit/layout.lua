@@ -1,7 +1,7 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
 local Layout = {}
 function Layout.new(x, y, padx, pady)
-  return setmetatable({_stack = {}}, {__index = Layout}):reset(x, y, padx, pady)
+  return setmetatable({ _stack = {} }, { __index = Layout }):reset(x, y, padx, pady)
 end
 
 function Layout:reset(x, y, padx, pady)
@@ -60,8 +60,7 @@ end
 function Layout:pop()
   assert(#self._stack > 0, "Nothing to pop")
   local w, h = self._w, self._h
-  self._x, self._y, self._padx, self._pady, self._w, self._h, self._widths, self._heights = unpack(
-                                                                                              self._stack[#self._stack])
+  self._x, self._y, self._padx, self._pady, self._w, self._h, self._widths, self._heights = unpack(self._stack[#self._stack])
   self._isFirstCell = false
   self._stack[#self._stack] = nil
 
@@ -88,7 +87,9 @@ local function insert_sorted_helper(t, i0, i1, v)
 end
 
 local function insert_sorted(t, v)
-  if v <= 0 then return end
+  if v <= 0 then
+    return
+  end
   insert_sorted_helper(t, 1, #t, v)
 end
 
@@ -117,7 +118,9 @@ local function calc_width_height(self, w, h)
     error("width: invalid value (" .. tostring(w) .. ")", 3)
   end
 
-  if not w or not h then error("Invalid cell size", 3) end
+  if not w or not h then
+    error("Invalid cell size", 3)
+  end
 
   insert_sorted(self._widths, w)
   insert_sorted(self._heights, h)
@@ -128,7 +131,9 @@ function Layout:row(w, h)
   w, h = calc_width_height(self, w, h)
   local x, y = self._x, self._y + (self._h or 0)
 
-  if not self._isFirstCell then y = y + self._pady end
+  if not self._isFirstCell then
+    y = y + self._pady
+  end
   self._isFirstCell = false
 
   self._y, self._w, self._h = y, w, h
@@ -142,7 +147,9 @@ function Layout:up(w, h)
   w, h = calc_width_height(self, w, h)
   local x, y = self._x, self._y - (self._h and h or 0)
 
-  if not self._isFirstCell then y = y - self._pady end
+  if not self._isFirstCell then
+    y = y - self._pady
+  end
   self._isFirstCell = false
 
   self._y, self._w, self._h = y, w, h
@@ -155,7 +162,9 @@ function Layout:col(w, h)
 
   local x, y = self._x + (self._w or 0), self._y
 
-  if not self._isFirstCell then x = x + self._padx end
+  if not self._isFirstCell then
+    x = x + self._padx
+  end
   self._isFirstCell = false
 
   self._x, self._w, self._h = x, w, h
@@ -170,7 +179,9 @@ function Layout:left(w, h)
 
   local x, y = self._x - (self._w and w or 0), self._y
 
-  if not self._isFirstCell then x = x - self._padx end
+  if not self._isFirstCell then
+    x = x - self._padx
+  end
   self._isFirstCell = false
 
   self._x, self._w, self._h = x, w, h
@@ -180,27 +191,39 @@ end
 
 local function layout_iterator(t, idx)
   idx = (idx or 1) + 1
-  if t[idx] == nil then return nil end
+  if t[idx] == nil then
+    return nil
+  end
   return idx, unpack(t[idx])
 end
 
 local function layout_retained_mode(self, t, constructor, string_argument_to_table, fill_width, fill_height)
   -- sanity check
-  local p = t.pos or {0, 0}
-  if type(p) ~= "table" then error("Invalid argument `pos' (table expected, got " .. type(p) .. ")", 2) end
+  local p = t.pos or { 0, 0 }
+  if type(p) ~= "table" then
+    error("Invalid argument `pos' (table expected, got " .. type(p) .. ")", 2)
+  end
   local pad = t.padding or {}
-  if type(p) ~= "table" then error("Invalid argument `padding' (table expected, got " .. type(p) .. ")", 2) end
+  if type(p) ~= "table" then
+    error("Invalid argument `padding' (table expected, got " .. type(p) .. ")", 2)
+  end
 
   self:push(p[1] or 0, p[2] or 0)
   self:padding(pad[1] or self._padx, pad[2] or self._pady)
 
   -- first pass: get dimensions, add layout info
-  local layout = {n_fill_w = 0, n_fill_h = 0}
+  local layout = { n_fill_w = 0, n_fill_h = 0 }
   for i, v in ipairs(t) do
-    if type(v) == "string" then v = string_argument_to_table(v) end
+    if type(v) == "string" then
+      v = string_argument_to_table(v)
+    end
     local x, y, w, h = 0, 0, v[1], v[2]
-    if v[1] == "fill" then w = 0 end
-    if v[2] == "fill" then h = 0 end
+    if v[1] == "fill" then
+      w = 0
+    end
+    if v[2] == "fill" then
+      h = 0
+    end
 
     x, y, w, h = constructor(self, w, h)
 
@@ -212,7 +235,7 @@ local function layout_retained_mode(self, t, constructor, string_argument_to_tab
       h = "fill"
       layout.n_fill_h = layout.n_fill_h + 1
     end
-    layout[i] = {x, y, w, h, unpack(v, 3)}
+    layout[i] = { x, y, w, h, unpack(v, 3) }
   end
 
   -- second pass: extend "fill" cells and shift others accordingly
@@ -250,25 +273,37 @@ local function layout_retained_mode(self, t, constructor, string_argument_to_tab
 end
 
 function Layout:rows(t)
-  return layout_retained_mode(self, t, self.row, function(v)
-    return {nil, v}
-  end, function()
-    return self._widths[#self._widths]
-  end, -- fill width
-  function(l, mh, h)
-    return (mh - h) / l.n_fill_h
-  end) -- fill height
+  return layout_retained_mode(
+    self,
+    t,
+    self.row,
+    function(v)
+      return { nil, v }
+    end,
+    function()
+      return self._widths[#self._widths]
+    end, -- fill width
+    function(l, mh, h)
+      return (mh - h) / l.n_fill_h
+    end
+  ) -- fill height
 end
 
 function Layout:cols(t)
-  return layout_retained_mode(self, t, self.col, function(v)
-    return {v}
-  end, function(l, mw, w)
-    return (mw - w) / l.n_fill_w
-  end, -- fill width
-  function()
-    return self._heights[#self._heights]
-  end) -- fill height
+  return layout_retained_mode(
+    self,
+    t,
+    self.col,
+    function(v)
+      return { v }
+    end,
+    function(l, mw, w)
+      return (mw - w) / l.n_fill_w
+    end, -- fill width
+    function()
+      return self._heights[#self._heights]
+    end
+  ) -- fill height
 end
 
 --[[ "Tests"

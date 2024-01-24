@@ -1,6 +1,6 @@
-local utf8 = require 'utf8'
+local utf8 = require("utf8")
 
-local Component = Class {has_focus = false, width = 500, height = 40, place_holder = "Enter some text..."}
+local Component = Class({ has_focus = false, width = 500, height = 40, place_holder = "Enter some text..." })
 
 function Component:init(value, options, callback)
   self.callback = callback or function()
@@ -47,8 +47,7 @@ function Component:updateGeometry(x, y, w, h)
   self.h = h
 end
 
-function Component:update(dt)
-end
+function Component:update(dt) end
 
 function Component:mousepressed(x, y, button, touch, presses)
   local dx, dy = self.transform:inverseTransformPoint(x, y)
@@ -60,8 +59,7 @@ function Component:mousepressed(x, y, button, touch, presses)
   end
 end
 
-function Component:mousereleased(x, y, button, touch, presses)
-end
+function Component:mousereleased(x, y, button, touch, presses) end
 
 function Component:focus(value)
   self.has_focus = value
@@ -79,7 +77,9 @@ end
 
 function Component:keypressed(key)
   if self.has_focus then
-    if self.allows_input(self.value, key) then self.value = self.value .. key end
+    if self.allows_input(self.value, key) then
+      self.value = self.value .. key
+    end
     if key == "backspace" and string.len(self.value) > 0 then
       self.value = string.sub(self.value, 0, string.len(self.value) - 1)
     end

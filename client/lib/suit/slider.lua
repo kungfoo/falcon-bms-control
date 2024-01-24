@@ -1,5 +1,5 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
-local BASE = (...):match('(.-)[^%.]+$')
+local BASE = (...):match("(.-)[^%.]+$")
 
 return function(core, info, ...)
   local opt, x, y, w, h = core.getOptionsAndSize(...)
@@ -29,8 +29,8 @@ return function(core, info, ...)
     end
 
     -- keyboard update
-    local key_up = opt.vertical and 'up' or 'right'
-    local key_down = opt.vertical and 'down' or 'left'
+    local key_up = opt.vertical and "up" or "right"
+    local key_down = opt.vertical and "down" or "left"
     if core:getPressedKey() == key_up then
       info.value = math.min(info.max, info.value + info.step)
       value_changed = true

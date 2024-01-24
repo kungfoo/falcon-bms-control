@@ -1,6 +1,7 @@
 --[[
 	3d vector type
-]] --[[
+]]
+--[[
 	notes:
 
 	depends on a class() function as in oo.lua
@@ -9,7 +10,8 @@
 
 		math.clamp(v, min, max) - return v clamped between min and max
 		math.round(v) - round v downwards if fractional part is < 0.5
-]] -- defined globally? otherwise import vec2
+]]
+-- defined globally? otherwise import vec2
 if not vec2 then
   local path = ...
   local vec2_path = path:sub(1, path:len() - 1) .. "2"
@@ -39,15 +41,15 @@ end
 
 -- explicit ctors
 function vec3:copy()
-  return self:init({x = self.x, y = self.y, z = self.z})
+  return self:init({ x = self.x, y = self.y, z = self.z })
 end
 
 function vec3:xyz(x, y, z)
-  return self:init({x = x, y = y, z = z})
+  return self:init({ x = x, y = y, z = z })
 end
 
 function vec3:filled(v)
-  return self:init({x = v, y = v, z = v})
+  return self:init({ x = v, y = v, z = v })
 end
 
 function vec3:zero()
@@ -65,12 +67,16 @@ end
 
 -- flush the entire pool
 function vec3.flush_pool()
-  if vec3.pool_size() > 0 then _vec3_pool = {} end
+  if vec3.pool_size() > 0 then
+    _vec3_pool = {}
+  end
 end
 
 -- drain one element from the pool, if it exists
 function vec3.drain_pool()
-  if #_vec3_pool > 0 then return table.remove(_vec3_pool) end
+  if #_vec3_pool > 0 then
+    return table.remove(_vec3_pool)
+  end
   return nil
 end
 
@@ -86,7 +92,9 @@ end
 
 -- release a vector to the pool
 function vec3:release()
-  if vec3.pool_size() < _vec3_pool_limit then table.insert(_vec3_pool, self) end
+  if vec3.pool_size() < _vec3_pool_limit then
+    table.insert(_vec3_pool, self)
+  end
 end
 
 -- unpack for multi-args
@@ -99,14 +107,18 @@ end
 -- (not particularly useful)
 
 function vec3:pack()
-  return {self:unpack()}
+  return { self:unpack() }
 end
 
 -- modify
 
 function vec3:sset(x, y, z)
-  if not y then y = x end
-  if not z then z = y end
+  if not y then
+    y = x
+  end
+  if not z then
+    z = y
+  end
   self.x = x
   self.y = y
   self.z = z
@@ -136,15 +148,13 @@ local EQUALS_EPSILON = 1e-9
 
 -- true if a and b are functionally equivalent
 function vec3.equals(a, b)
-  return (math.abs(a.x - b.x) <= EQUALS_EPSILON and math.abs(a.y - b.y) <= EQUALS_EPSILON and math.abs(a.z - b.z) <=
-           EQUALS_EPSILON)
+  return (math.abs(a.x - b.x) <= EQUALS_EPSILON and math.abs(a.y - b.y) <= EQUALS_EPSILON and math.abs(a.z - b.z) <= EQUALS_EPSILON)
 end
 
 -- true if a and b are not functionally equivalent
 -- (very slightly faster than `not vec3.equals(a, b)`)
 function vec3.nequals(a, b)
-  return (math.abs(a.x - b.x) > EQUALS_EPSILON or math.abs(a.y - b.y) > EQUALS_EPSILON or math.abs(a.z - b.z) >
-           EQUALS_EPSILON)
+  return (math.abs(a.x - b.x) > EQUALS_EPSILON or math.abs(a.y - b.y) > EQUALS_EPSILON or math.abs(a.z - b.z) > EQUALS_EPSILON)
 end
 
 -----------------------------------------------------------
@@ -184,8 +194,12 @@ end
 
 -- scalar
 function vec3:saddi(x, y, z)
-  if not y then y = x end
-  if not z then z = y end
+  if not y then
+    y = x
+  end
+  if not z then
+    z = y
+  end
   self.x = self.x + x
   self.y = self.y + y
   self.z = self.z + z
@@ -193,8 +207,12 @@ function vec3:saddi(x, y, z)
 end
 
 function vec3:ssubi(x, y, z)
-  if not y then y = x end
-  if not z then z = y end
+  if not y then
+    y = x
+  end
+  if not z then
+    z = y
+  end
   self.x = self.x - x
   self.y = self.y - y
   self.z = self.z - z
@@ -202,8 +220,12 @@ function vec3:ssubi(x, y, z)
 end
 
 function vec3:smuli(x, y, z)
-  if not y then y = x end
-  if not z then z = y end
+  if not y then
+    y = x
+  end
+  if not z then
+    z = y
+  end
   self.x = self.x * x
   self.y = self.y * y
   self.z = self.z * z
@@ -211,8 +233,12 @@ function vec3:smuli(x, y, z)
 end
 
 function vec3:sdivi(x, y, z)
-  if not y then y = x end
-  if not z then z = y end
+  if not y then
+    y = x
+  end
+  if not z then
+    z = y
+  end
   self.x = self.x / x
   self.y = self.y / y
   self.z = self.z / z
@@ -293,7 +319,9 @@ end
 
 function vec3:normalisei_both()
   local len = self:length()
-  if len == 0 then return self, 0 end
+  if len == 0 then
+    return self, 0
+  end
   return self:sdivi(len), len
 end
 
@@ -313,19 +341,25 @@ end
 
 -- swizzle extraction
 -- not as nice as property accessors so might be worth doing that later :)
-local _allowed_swizzle = {x = true, y = true, z = true}
+local _allowed_swizzle = { x = true, y = true, z = true }
 function vec3:extract_single(swizzle)
-  if _allowed_swizzle[swizzle] then return self[swizzle] end
+  if _allowed_swizzle[swizzle] then
+    return self[swizzle]
+  end
   return 0
 end
 
 function vec3:infuse_single(swizzle, v)
-  if _allowed_swizzle[swizzle] then self[swizzle] = v end
+  if _allowed_swizzle[swizzle] then
+    self[swizzle] = v
+  end
   return self
 end
 
 function vec3:extract_vec2(swizzle, into)
-  if not into then into = vec2:zero() end
+  if not into then
+    into = vec2:zero()
+  end
   local x = self:extract_single(swizzle:sub(1, 1))
   local y = self:extract_single(swizzle:sub(2, 2))
   return into:sset(x, y)
@@ -347,7 +381,7 @@ function vec3:rotatei(swizzle, angle)
   return self
 end
 
-local _euler_macro = {"yz", "xz", "xy"}
+local _euler_macro = { "yz", "xz", "xy" }
 function vec3:rotate_euleri(angle_x_axis, angle_y_axis, angle_z_axis)
   for i, swizzle in ipairs(_euler_macro) do
     local angle = i == 1 and angle_x_axis or i == 2 and angle_y_axis or i == 3 and angle_z_axis
@@ -514,21 +548,27 @@ function vec3.dot(a, b)
 end
 
 function vec3.cross(a, b, into)
-  if not into then into = vec3:zero() end
+  if not into then
+    into = vec3:zero()
+  end
   return into:sset(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x)
 end
 
 -- scalar projection a onto b
 function vec3.sproj(a, b)
   local len = b:length()
-  if len == 0 then return 0 end
+  if len == 0 then
+    return 0
+  end
   return a:dot(b) / len
 end
 
 -- vector projection a onto b (writes into a)
 function vec3.vproji(a, b)
   local div = b:dot(b)
-  if div == 0 then return a:sset(0, 0, 0) end
+  if div == 0 then
+    return a:sset(0, 0, 0)
+  end
   local fac = a:dot(b) / div
   return a:vset(b):smuli(fac)
 end

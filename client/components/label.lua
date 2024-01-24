@@ -1,4 +1,4 @@
-local Component = Class {}
+local Component = Class({})
 
 function Component:init(value, options)
   local p = options or {}
@@ -30,13 +30,10 @@ function Component:updateGeometry(x, y, w, h)
   -- }))
 end
 
-function Component:update(dt)
-end
+function Component:update(dt) end
 
-function Component:mousepressed(x, y, button, touch, presses)
-end
+function Component:mousepressed(x, y, button, touch, presses) end
 
-function Component:mousereleased(x, y, button, touch, presses)
-end
+function Component:mousereleased(x, y, button, touch, presses) end
 
 return Component

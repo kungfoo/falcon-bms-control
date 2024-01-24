@@ -1,7 +1,7 @@
 local msgpack = require("lib.msgpack")
 
-local defaults = {refresh_rate = 30, quality = 80, vibrate = false, ip = nil}
-local Settings = Class {}
+local defaults = { refresh_rate = 30, quality = 80, vibrate = false, ip = nil }
+local Settings = Class({})
 local file_name = "settings.msgpack"
 
 function Settings:init()
@@ -11,7 +11,9 @@ function Settings:init()
     success, from_file = pcall(function()
       return msgpack.unpack(file_data)
     end)
-    if not success then print("Failed to load settings, falling back to defaults because of " .. from_file) end
+    if not success then
+      print("Failed to load settings, falling back to defaults because of " .. from_file)
+    end
   end
   self.proxy = {}
   self.proxy.refresh_rate = from_file.refresh_rate or defaults.refresh_rate
@@ -29,7 +31,9 @@ function Settings:changed()
     ip = self.proxy.ip,
   })
   local success, error = love.filesystem.write(file_name, bytes)
-  if not success then print("Failed to write settings.") end
+  if not success then
+    print("Failed to write settings.")
+  end
 end
 
 function Settings:setRefreshRate(value)

@@ -1,5 +1,5 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
-local BASE = (...):match('(.-)[^%.]+$')
+local BASE = (...):match("(.-)[^%.]+$")
 
 return function(core, checkbox, ...)
   local opt, x, y, w, h = core.getOptionsAndSize(...)
@@ -11,7 +11,9 @@ return function(core, checkbox, ...)
 
   opt.state = core:registerHitbox(opt.id, x, y, w, h)
   local hit = core:mouseReleasedOn(opt.id)
-  if hit then checkbox.checked = not checkbox.checked end
+  if hit then
+    checkbox.checked = not checkbox.checked
+  end
   core:registerDraw(opt.draw or core.theme.Checkbox, checkbox, opt, x, y, w, h)
 
   return {

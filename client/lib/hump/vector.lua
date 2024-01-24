@@ -22,7 +22,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-]] --
+]]
+--
 local assert = assert
 local sqrt, cos, sin, atan2 = math.sqrt, math.cos, math.sin, math.atan2
 
@@ -30,7 +31,7 @@ local vector = {}
 vector.__index = vector
 
 local function new(x, y)
-  return setmetatable({x = x or 0, y = y or 0}, vector)
+  return setmetatable({ x = x or 0, y = y or 0 }, vector)
 end
 local zero = new(0, 0)
 
@@ -50,7 +51,7 @@ local function randomDirection(len_min, len_max)
 end
 
 local function isvector(v)
-  return type(v) == 'table' and type(v.x) == 'number' and type(v.y) == 'number'
+  return type(v) == "table" and type(v.x) == "number" and type(v.y) == "number"
 end
 
 function vector:clone()
@@ -140,7 +141,9 @@ end
 
 function vector:normalizeInplace()
   local l = self:len()
-  if l > 0 then self.x, self.y = self.x / l, self.y / l end
+  if l > 0 then
+    self.x, self.y = self.x / l, self.y / l
+  end
   return self
 end
 
@@ -191,7 +194,9 @@ function vector:trimInplace(maxLen)
 end
 
 function vector:angleTo(other)
-  if other then return atan2(self.y, self.x) - atan2(other.y, other.x) end
+  if other then
+    return atan2(self.y, self.x) - atan2(other.y, other.x)
+  end
   return atan2(self.y, self.x)
 end
 

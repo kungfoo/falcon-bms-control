@@ -1,13 +1,13 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
-local BASE = (...):match('(.-)[^%.]+$')
+local BASE = (...):match("(.-)[^%.]+$")
 
 local theme = {}
 theme.cornerRadius = 4
 
 theme.color = {
-  normal = {bg = {0.25, 0.25, 0.25}, fg = {0.73, 0.73, 0.73}},
-  hovered = {bg = {0.19, 0.6, 0.73}, fg = {1, 1, 1}},
-  active = {bg = {1, 0.6, 0}, fg = {1, 1, 1}},
+  normal = { bg = { 0.25, 0.25, 0.25 }, fg = { 0.73, 0.73, 0.73 } },
+  hovered = { bg = { 0.19, 0.6, 0.73 }, fg = { 1, 1, 1 } },
+  active = { bg = { 1, 0.6, 0 }, fg = { 1, 1, 1 } },
 }
 
 -- HELPER
@@ -20,10 +20,12 @@ function theme.drawBox(x, y, w, h, colors, cornerRadius)
   colors = colors or theme.getColorForState(opt)
   cornerRadius = cornerRadius or theme.cornerRadius
   w = math.max(cornerRadius / 2, w)
-  if h < cornerRadius / 2 then y, h = y - (cornerRadius - h), cornerRadius / 2 end
+  if h < cornerRadius / 2 then
+    y, h = y - (cornerRadius - h), cornerRadius / 2
+  end
 
   love.graphics.setColor(colors.bg)
-  love.graphics.rectangle('fill', x, y, w, h, cornerRadius)
+  love.graphics.rectangle("fill", x, y, w, h, cornerRadius)
 end
 
 function theme.getVerticalOffsetForAlign(valign, font, h)
@@ -60,13 +62,13 @@ function theme.Checkbox(chk, opt, x, y, w, h)
   local c = theme.getColorForState(opt)
   local th = opt.font:getHeight()
 
-  theme.drawBox(x + h / 10, y + h / 10, h * .8, h * .8, c, opt.cornerRadius)
+  theme.drawBox(x + h / 10, y + h / 10, h * 0.8, h * 0.8, c, opt.cornerRadius)
   love.graphics.setColor(c.fg)
   if chk.checked then
-    love.graphics.setLineStyle('smooth')
+    love.graphics.setLineStyle("smooth")
     love.graphics.setLineWidth(5)
     love.graphics.setLineJoin("bevel")
-    love.graphics.line(x + h * .2, y + h * .55, x + h * .45, y + h * .75, x + h * .8, y + h * .2)
+    love.graphics.line(x + h * 0.2, y + h * 0.55, x + h * 0.45, y + h * 0.75, x + h * 0.8, y + h * 0.2)
   end
 
   if chk.text then
@@ -80,29 +82,29 @@ function theme.Slider(fraction, opt, x, y, w, h)
   local xb, yb, wb, hb -- size of the progress bar
   local r = math.min(w, h) / 2.1
   if opt.vertical then
-    x, w = x + w * .25, w * .5
+    x, w = x + w * 0.25, w * 0.5
     xb, yb, wb, hb = x, y + h * (1 - fraction), w, h * fraction
   else
-    y, h = y + h * .25, h * .5
+    y, h = y + h * 0.25, h * 0.5
     xb, yb, wb, hb = x, y, w * fraction, h
   end
 
   local c = theme.getColorForState(opt)
   theme.drawBox(x, y, w, h, c, opt.cornerRadius)
-  theme.drawBox(xb, yb, wb, hb, {bg = c.fg}, opt.cornerRadius)
+  theme.drawBox(xb, yb, wb, hb, { bg = c.fg }, opt.cornerRadius)
 
   if opt.state ~= nil and opt.state ~= "normal" then
     love.graphics.setColor((opt.color and opt.color.active or {}).fg or theme.color.active.fg)
     if opt.vertical then
-      love.graphics.circle('fill', x + wb / 2, yb, r)
+      love.graphics.circle("fill", x + wb / 2, yb, r)
     else
-      love.graphics.circle('fill', x + wb, yb + hb / 2, r)
+      love.graphics.circle("fill", x + wb, yb + hb / 2, r)
     end
   end
 end
 
 function theme.Input(input, opt, x, y, w, h)
-  local utf8 = require 'utf8'
+  local utf8 = require("utf8")
   theme.drawBox(x, y, w, h, (opt.color and opt.color.normal) or theme.color.normal, opt.cornerRadius)
   x = x + 3
   w = w - 6
@@ -129,14 +131,16 @@ function theme.Input(input, opt, x, y, w, h)
   love.graphics.rectangle("line", x + tw, y + (h - th) / 2, ctw, th)
 
   -- cursor
-  if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > .5 then
-    local ct = input.candidate_text;
+  if opt.hasKeyboardFocus and (love.timer.getTime() % 1) > 0.5 then
+    local ct = input.candidate_text
     local ss = ct.text:sub(1, utf8.offset(ct.text, ct.start))
     local ws = opt.font:getWidth(ss)
-    if ct.start == 0 then ws = 0 end
+    if ct.start == 0 then
+      ws = 0
+    end
 
     love.graphics.setLineWidth(1)
-    love.graphics.setLineStyle('rough')
+    love.graphics.setLineStyle("rough")
     love.graphics.line(x + opt.cursor_pos + ws, y + (h - th) / 2, x + opt.cursor_pos + ws, y + (h + th) / 2)
   end
 

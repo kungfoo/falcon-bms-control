@@ -1,7 +1,7 @@
 local triangles = require("lib.triangles")
 local Button = require("lib.button")
 
-local RockerButton = Class {radius = 5, size = 30}
+local RockerButton = Class({ radius = 5, size = 30 })
 
 function RockerButton:init(id, opts, x, y, width, height)
   opts = opts or {}
@@ -34,14 +34,14 @@ end
 function RockerButton:pressed()
   Button.pressed()
   self.isPressed = true
-  local message = {type = "icp-pressed", button = self.id}
+  local message = { type = "icp-pressed", button = self.id }
   Signal.emit("send-to-server", message)
 end
 
 function RockerButton:released()
   Button.released()
   self.isPressed = false
-  local message = {type = "icp-released", button = self.id}
+  local message = { type = "icp-released", button = self.id }
   Signal.emit("send-to-server", message)
 end
 

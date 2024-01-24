@@ -22,11 +22,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-]] --
+]]
+--
 local function include_helper(to, from, seen)
   if from == nil then
     return to
-  elseif type(from) ~= 'table' then
+  elseif type(from) ~= "table" then
     return from
   elseif seen[from] then
     return seen[from]
@@ -35,7 +36,9 @@ local function include_helper(to, from, seen)
   seen[from] = to
   for k, v in pairs(from) do
     k = include_helper({}, k, seen) -- keys might also be tables
-    if to[k] == nil then to[k] = include_helper({}, v, seen) end
+    if to[k] == nil then
+      to[k] = include_helper({}, v, seen)
+    end
   end
   return to
 end
@@ -55,17 +58,20 @@ local function new(class)
   -- mixins
   class = class or {} -- class can be nil
   local inc = class.__includes or {}
-  if getmetatable(inc) then inc = {inc} end
+  if getmetatable(inc) then
+    inc = { inc }
+  end
 
   for _, other in ipairs(inc) do
-    if type(other) == "string" then other = _G[other] end
+    if type(other) == "string" then
+      other = _G[other]
+    end
     include(class, other)
   end
 
   -- class implementation
   class.__index = class
-  class.init = class.init or class[1] or function()
-  end
+  class.init = class.init or class[1] or function() end
   class.include = class.include or include
   class.clone = class.clone or clone
 
@@ -83,7 +89,7 @@ end
 if class_commons ~= false and not common then
   common = {}
   function common.class(name, prototype, parent)
-    return new {__includes = {prototype, parent}}
+    return new({ __includes = { prototype, parent } })
   end
   function common.instance(class, ...)
     return class(...)
@@ -91,7 +97,7 @@ if class_commons ~= false and not common then
 end
 
 -- the module
-return setmetatable({new = new, include = include, clone = clone}, {
+return setmetatable({ new = new, include = include, clone = clone }, {
   __call = function(_, ...)
     return new(...)
   end,

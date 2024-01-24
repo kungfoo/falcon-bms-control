@@ -1,19 +1,19 @@
 local socket = require("socket")
 local enet = require("enet")
-local Screen = Class {padding = 10, dimensions = {w = 0, h = 0}}
+local Screen = Class({ padding = 10, dimensions = { w = 0, h = 0 } })
 
 local Label = require("components.label")
 local ImageButton = require("components.image-button")
 
-local connection_state_label = Label("Discovering server...", {size = 30})
-local broadcast = {port = 9020}
-local connecting = {port = 9022, channels = 255}
+local connection_state_label = Label("Discovering server...", { size = 30 })
+local broadcast = { port = 9020 }
+local connecting = { port = 9022, channels = 255 }
 
 function Screen:init()
-  self.settings_button = ImageButton("icons/settings.png", {align = "right"}, function()
+  self.settings_button = ImageButton("icons/settings.png", { align = "right" }, function()
     State.switch(self.settings_screen, self)
   end)
-  self.components = {connection_state_label, self.settings_button}
+  self.components = { connection_state_label, self.settings_button }
 end
 
 function Screen:enter(previous, settings_screen)
@@ -43,7 +43,7 @@ function Screen:connect(ip)
 end
 
 function Screen:sendHello()
-  local message = msgpack.pack({type = "hello"})
+  local message = msgpack.pack({ type = "hello" })
   broadcast.socket:sendto(message, "255.255.255.255", broadcast.port)
 end
 
@@ -52,7 +52,7 @@ function Screen:receiveAck()
   if datagram and ip and port then
     local message = msgpack.unpack(datagram)
     if message.type == "ack" then
-      print("Discovered server at [${ip}] on port [${port}]" % {ip = ip, port = port})
+      print("Discovered server at [${ip}] on port [${port}]" % { ip = ip, port = port })
       Screen:connect(ip)
     end
   end
@@ -76,7 +76,9 @@ function Screen:update(dt)
     self.dimensions.w = w
     self.dimensions.h = h
   end
-  for _, component in ipairs(self.components) do component:update(dt) end
+  for _, component in ipairs(self.components) do
+    component:update(dt)
+  end
 end
 
 function Screen:handleReceive(event)
@@ -84,12 +86,12 @@ function Screen:handleReceive(event)
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
-  self.flup = Flup.split {
+  self.flup = Flup.split({
     direction = "y",
     ratio = 0.95,
     margin = 10,
-    components = {top = connection_state_label, bottom = self.settings_button},
-  }
+    components = { top = connection_state_label, bottom = self.settings_button },
+  })
 end
 
 function Screen:draw()
@@ -97,11 +99,15 @@ function Screen:draw()
 end
 
 function Screen:mousepressed(x, y, button, isTouch, presses)
-  for _, component in ipairs(self.components) do component:mousepressed(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do
+    component:mousepressed(x, y, button, isTouch, presses)
+  end
 end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
-  for _, component in ipairs(self.components) do component:mousereleased(x, y, button, isTouch, presses) end
+  for _, component in ipairs(self.components) do
+    component:mousereleased(x, y, button, isTouch, presses)
+  end
 end
 
 return Screen

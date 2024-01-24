@@ -1,5 +1,5 @@
 -- This file is part of SUIT, copyright (c) 2016 Matthias Richter
-local BASE = (...):match('(.-)[^%.]+$')
+local BASE = (...):match("(.-)[^%.]+$")
 
 local function isType(val, typ)
   return type(val) == "userdata" and val.typeOf and val:typeOf(typ)
@@ -16,8 +16,10 @@ return function(core, normal, ...)
 
   core:registerMouseHit(opt.id, x, y, function(u, v)
     -- mouse in image?
-    u, v = math.floor(u + .5), math.floor(v + .5)
-    if u < 0 or u >= image:getWidth() or v < 0 or v >= image:getHeight() then return false end
+    u, v = math.floor(u + 0.5), math.floor(v + 0.5)
+    if u < 0 or u >= image:getWidth() or v < 0 or v >= image:getHeight() then
+      return false
+    end
 
     if opt.mask then
       -- alpha test

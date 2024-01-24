@@ -9,7 +9,8 @@
 
 	TODO: refactor storage to be pooled rather than fully local
 	      so these functions can be reentrant
-]] local intersect = {}
+]]
+local intersect = {}
 
 -- epsilon for collisions
 local COLLIDE_EPS = 1e-6
@@ -43,7 +44,9 @@ function intersect.circle_circle_collide(a_pos, a_rad, b_pos, b_rad, into)
       dist = math.sqrt(dist)
     end
     -- allocate if needed
-    if into == nil then into = vec2:zero() end
+    if into == nil then
+      into = vec2:zero()
+    end
     -- normalise, scale to separating distance
     into:vset(_ccc_delta):sdiv(dist):smuli(rad - dist)
     return into
@@ -57,11 +60,15 @@ end
 
 -- vector from line seg to point
 function intersect._line_to_point(a_start, a_end, b_pos, into)
-  if into == nil then into = vec2:zero() end
+  if into == nil then
+    into = vec2:zero()
+  end
   -- direction of line
   into:vset(a_end):vsub(a_start)
   -- detect degenerate case
-  if into:length_squared() <= COLLIDE_EPS then return intersect.circle_circle_collide(a_start, a_rad, b_pos, b_rad) end
+  if into:length_squared() <= COLLIDE_EPS then
+    return intersect.circle_circle_collide(a_start, a_rad, b_pos, b_rad)
+  end
   -- solve for factor along line
   local dx = (b_pos.x - a_start.x) * (a_end.x - a_start.x)
   local dy = (b_pos.y - a_start.y) * (a_end.y - a_start.y)
@@ -110,14 +117,18 @@ function intersect.line_line_collide(a_start, a_end, a_rad, b_start, b_end, b_ra
   elseif a_degen then
     -- a is just circle; annoying, need reversed msv
     local collided = intersect.line_circle_collide(b_start, b_end, b_rad, a_start, a_rad, into)
-    if collided then collided:smuli(-1) end
+    if collided then
+      collided:smuli(-1)
+    end
     return collided
   elseif b_degen then
     -- b is just circle
     return intersect.line_circle_collide(a_start, a_end, a_rad, b_start, b_rad, into)
   end
   -- otherwise we're _actually_ 2 line segs :)
-  if into == nil then into = vec2:zero() end
+  if into == nil then
+    into = vec2:zero()
+  end
 
   -- first, check intersection
 
@@ -177,13 +188,13 @@ function intersect.line_line_collide(a_start, a_end, a_rad, b_start, b_end, b_ra
     -- since intersected line is potentially the apex
     if intersected ~= "a" then
       -- a endpoints
-      table.insert(search_tab, {intersect._line_to_point(b_start, b_end, a_start), 1})
-      table.insert(search_tab, {intersect._line_to_point(b_start, b_end, a_end), 1})
+      table.insert(search_tab, { intersect._line_to_point(b_start, b_end, a_start), 1 })
+      table.insert(search_tab, { intersect._line_to_point(b_start, b_end, a_end), 1 })
     end
     if intersected ~= "b" then
       -- b endpoints
-      table.insert(search_tab, {intersect._line_to_point(a_start, a_end, b_start), -1})
-      table.insert(search_tab, {intersect._line_to_point(a_start, a_end, b_end), -1})
+      table.insert(search_tab, { intersect._line_to_point(a_start, a_end, b_start), -1 })
+      table.insert(search_tab, { intersect._line_to_point(a_start, a_end, b_end), -1 })
     end
 
     local best = table.find_best(search_tab, function(v)
@@ -225,7 +236,9 @@ local _aac_abs_delta = vec2:zero()
 local _aac_size = vec2:zero()
 local _aac_abs_amount = vec2:zero()
 function intersect.aabb_aabb_collide(apos, ahs, bpos, bhs, into)
-  if not into then into = vec2:zero() end
+  if not into then
+    into = vec2:zero()
+  end
   _aac_delta:vset(apos):vsubi(bpos)
   _aac_abs_delta:vset(_aac_delta):absi()
   _aac_size:vset(ahs):vaddi(bhs)
@@ -254,7 +267,9 @@ end
 -- return normal and fraction of dt encountered on collision, false otherwise
 -- TODO: re-pool storage here
 function intersect.aabb_aabb_collide_continuous(a_startpos, a_endpos, ahs, b_startpos, b_endpos, bhs, into)
-  if not into then into = vec2:zero() end
+  if not into then
+    into = vec2:zero()
+  end
 
   -- compute delta motion
   local _self_delta_motion = a_endpos:vsub(a_startpos)
@@ -289,24 +304,28 @@ function intersect.aabb_aabb_collide_continuous(a_startpos, a_endpos, ahs, b_sta
   local _rmy = _relative_delta_motion.y
 
   local _inv_x = math.huge
-  if _rmx ~= 0 then _inv_x = 1 / _rmx end
+  if _rmx ~= 0 then
+    _inv_x = 1 / _rmx
+  end
   local _inv_y = math.huge
-  if _rmy ~= 0 then _inv_y = 1 / _rmy end
+  if _rmy ~= 0 then
+    _inv_y = 1 / _rmy
+  end
 
   local _minkowski_tl = _minkowski_pos:vsub(_minkowski_halfsize)
   local _minkowski_br = _minkowski_pos:vadd(_minkowski_halfsize)
 
   -- clip x
   -- get edge t along line
-  local tx1 = (_minkowski_tl.x) * _inv_x
-  local tx2 = (_minkowski_br.x) * _inv_x
+  local tx1 = _minkowski_tl.x * _inv_x
+  local tx2 = _minkowski_br.x * _inv_x
   -- clip to existing clip space
   local txmin = math.min(tx1, tx2)
   local txmax = math.max(tx1, tx2)
   -- clip y
   -- get edge t along line
-  local ty1 = (_minkowski_tl.y) * _inv_y
-  local ty2 = (_minkowski_br.y) * _inv_y
+  local ty1 = _minkowski_tl.y * _inv_y
+  local ty2 = _minkowski_br.y * _inv_y
   -- clip to existing clip space
   local tymin = math.min(ty1, ty2)
   local tymax = math.max(ty1, ty2)
@@ -342,7 +361,9 @@ function intersect.aabb_aabb_collide_continuous(a_startpos, a_endpos, ahs, b_sta
     end
 
     -- travelling away from normal?
-    if _self_collide_normal:dot(_self_delta_motion) >= 0 then return false end
+    if _self_collide_normal:dot(_self_delta_motion) >= 0 then
+      return false
+    end
 
     -- just "slide" projection for now
     _self_collide_post:vreji(_self_collide_normal)

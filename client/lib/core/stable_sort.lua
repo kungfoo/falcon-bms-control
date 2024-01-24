@@ -32,7 +32,8 @@
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 	DEALINGS IN THE SOFTWARE.
-]] -- (modifications by Max Cahill 2018)
+]]
+-- (modifications by Max Cahill 2018)
 local _sort_core = {}
 
 -- tunable size for
@@ -67,7 +68,9 @@ function _sort_core.merge(array, workspace, low, middle, high, less)
   j = middle + 1
   k = low
   while true do
-    if (k >= j) or (j > high) then break end
+    if (k >= j) or (j > high) then
+      break
+    end
     if less(array[j], workspace[i]) then
       array[k] = array[j]
       j = j + 1
@@ -134,7 +137,9 @@ end
 function _sort_core.insertion_sort(array, less)
   -- setup
   local trivial, n, less = _sort_core.sort_setup(array, less)
-  if not trivial then _sort_core.insertion_sort_impl(array, 1, n, less) end
+  if not trivial then
+    _sort_core.insertion_sort_impl(array, 1, n, less)
+  end
   return array
 end
 

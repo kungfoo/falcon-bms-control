@@ -3,11 +3,14 @@
 	supports basic inheritance and means you don't have to build/set your own metatable each time
 
 	todo: collect some stats on classes/optional global class registry
-]] function class(inherits)
+]]
+function class(inherits)
   local c = {}
-  c.__mt = {__index = c}
+  c.__mt = { __index = c }
   -- handle single inheritence
-  if type(inherits) == "table" and inherits.__mt then setmetatable(c, inherits.__mt) end
+  if type(inherits) == "table" and inherits.__mt then
+    setmetatable(c, inherits.__mt)
+  end
   -- common class functions
 
   -- internal initialisation

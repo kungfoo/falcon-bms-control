@@ -1,4 +1,4 @@
-local Component = Class {padding = 10, width = 30}
+local Component = Class({ padding = 10, width = 30 })
 
 function Component:init(value, min, max, setter, style, options)
   self.transform = love.math.newTransform()
@@ -9,9 +9,9 @@ function Component:init(value, min, max, setter, style, options)
 
   local p = style or {}
   self.width = p.width or self.width
-  self.orientation = p.orientation or 'horizontal'
-  self.track = p.track or 'rectangle'
-  self.knob = p.knob or 'rectangle'
+  self.orientation = p.orientation or "horizontal"
+  self.track = p.track or "rectangle"
+  self.knob = p.knob or "rectangle"
 
   local o = options or {}
   self.values = o.values or nil
@@ -24,17 +24,17 @@ function Component:draw()
   love.graphics.applyTransform(self.transform)
   love.graphics.setColor(Colors.white)
 
-  if self.track == 'rectangle' then
-    if self.orientation == 'horizontal' then
-      love.graphics.rectangle('line', 0, 0, self.bounds.w, self.width)
-    elseif self.orientation == 'vertical' then
-      love.graphics.rectangle('line', 0, 0, self.width, self.bounds.h)
+  if self.track == "rectangle" then
+    if self.orientation == "horizontal" then
+      love.graphics.rectangle("line", 0, 0, self.bounds.w, self.width)
+    elseif self.orientation == "vertical" then
+      love.graphics.rectangle("line", 0, 0, self.width, self.bounds.h)
     end
-  elseif self.track == 'line' then
+  elseif self.track == "line" then
     love.graphics.setLineWidth(3)
-    if self.orientation == 'horizontal' then
+    if self.orientation == "horizontal" then
       love.graphics.line(0, self.width / 2, self.bounds.w, self.width / 2)
-    elseif self.orientation == 'vertical' then
+    elseif self.orientation == "vertical" then
       love.graphics.line(self.width / 2, 0, self.width / 2, self.bounds.h)
     end
     love.graphics.setLineWidth(1)
@@ -42,18 +42,20 @@ function Component:draw()
 
   local knobX = 0
   local knobY = 0
-  if self.orientation == 'horizontal' then
+  if self.orientation == "horizontal" then
     knobX = (self.bounds.w - self.width) * self.value
-  elseif self.orientation == 'vertical' then
+  elseif self.orientation == "vertical" then
     knobY = (self.bounds.h - self.width) * self.value
   end
 
-  if self.grabbed then love.graphics.setColor(Colors.green) end
+  if self.grabbed then
+    love.graphics.setColor(Colors.green)
+  end
 
-  if self.knob == 'rectangle' then
-    love.graphics.rectangle('fill', knobX, knobY, self.width, self.width)
-  elseif self.knob == 'circle' then
-    love.graphics.circle('fill', knobX + self.width / 2, knobY + self.width / 2, self.width / 2)
+  if self.knob == "rectangle" then
+    love.graphics.rectangle("fill", knobX, knobY, self.width, self.width)
+  elseif self.knob == "circle" then
+    love.graphics.circle("fill", knobX + self.width / 2, knobY + self.width / 2, self.width / 2)
   end
   love.graphics.setColor(Colors.white)
 
@@ -77,11 +79,13 @@ end
 
 function Component:mousepressed(x, y, button, touch, presses)
   local dx, dy = self.transform:inverseTransformPoint(x, y)
-  if self:slider_hit(dx, dy) then self:dragged(dx, dy) end
+  if self:slider_hit(dx, dy) then
+    self:dragged(dx, dy)
+  end
 end
 
 function Component:slider_hit(x, y)
-  if self.orientation == 'horizontal' then
+  if self.orientation == "horizontal" then
     return x >= 0 and x <= self.bounds.w and y >= 0 and y <= self.width
   else
     return x >= 0 and x <= self.width and y >= 0 and y <= self.bounds.h
@@ -115,9 +119,9 @@ end
 function Component:dragged(x, y)
   local knobX = 0
   local knobY = 0
-  if self.orientation == 'horizontal' then
+  if self.orientation == "horizontal" then
     knobX = self.bounds.w * self.value
-  elseif self.orientation == 'vertical' then
+  elseif self.orientation == "vertical" then
     knobY = self.bounds.h * self.value
   end
 
@@ -125,9 +129,9 @@ function Component:dragged(x, y)
   local dy = y - knobY
 
   self.grabbed = true
-  if self.orientation == 'horizontal' then
+  if self.orientation == "horizontal" then
     self.value = self.value + dx / self.bounds.w
-  elseif self.orientation == 'vertical' then
+  elseif self.orientation == "vertical" then
     self.value = self.value + dy / self.bounds.h
   end
 

@@ -15,7 +15,7 @@ local _MAP_VARS = setmetatable({}, {
 function unique_mapping:new()
   local r = setmetatable({}, unique_mapping.mt)
   -- set up the actual vars
-  _MAP_VARS[r] = {current_index = 0}
+  _MAP_VARS[r] = { current_index = 0 }
   return r
 end
 
@@ -27,7 +27,9 @@ end
 
 function unique_mapping:map(value)
   local val = self[value]
-  if val then return val end
+  if val then
+    return val
+  end
   local i = self:_increment()
   self[value] = i
   return i
