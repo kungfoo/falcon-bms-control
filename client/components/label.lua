@@ -21,13 +21,6 @@ function Component:updateGeometry(x, y, w, h)
   self.transform = love.math.newTransform():translate(x, y)
   self.w = w
   self.h = h
-  -- print(inspect({
-  --   value = self.value,
-  --   x = x,
-  --   y =  y,
-  --   w = self.w,
-  --   h = self.h
-  -- }))
 end
 
 function Component:update(dt) end

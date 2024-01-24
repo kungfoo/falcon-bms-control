@@ -19,6 +19,7 @@ Colors = require("lib.colors")
 msgpack = require("lib.msgpack")
 inspect = require("lib.inspect")
 
+-- fix your simulation time step
 local tick = require("lib.tick")
 
 -- screen states
