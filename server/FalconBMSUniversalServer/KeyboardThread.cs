@@ -1,4 +1,4 @@
-﻿﻿//  Copyright 2014 Craig Courtney
+﻿//  Copyright 2014 Craig Courtney
 //    
 //  Helios is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
