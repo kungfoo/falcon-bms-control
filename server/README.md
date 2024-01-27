@@ -30,3 +30,7 @@ To change code, it is probably easiest to use either Visual Studio (Community Ed
 ## Running it
 
 Run the executable from the `bin/[Release/Debug]` folder.
+
+## License
+
+This part of `falcon-bms-control` is using the GPL license because it is using a few classes of Helios that fall under the GPL license.
