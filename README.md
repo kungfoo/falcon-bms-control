@@ -2,7 +2,7 @@
 
 ## What is this?
 
-falcon-bms-control` lets you control Falcon BMS from any touch enabled device (tablet or computer).
+`falcon-bms-control` lets you control Falcon BMS from any touch enabled device (tablet or computer).
 
 Releases for iOS, android and Windows are available for free.
 
@@ -51,7 +51,7 @@ The windows client can be built using the appropriate script and run on a Surfac
 
 ### Android and iOS Builds
 
-Clients are built for iOS and android are using seperate repositories that are quite involved and require code-signing to push new releases to the Apple store and Play store, hence they are currently not open source.
+Clients are built for iOS and android are using seperate repositories that are quite involved and require code-signing and certificates to push new releases to the Apple store and Play store, hence they are currently not open source.
 
 # Development prerequisites
 

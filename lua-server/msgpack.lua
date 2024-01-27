@@ -486,7 +486,8 @@ packers["float"] = function(buffer, n)
   else
     expo = expo + 0x7E
     mant = floor((mant * 2.0 - 1.0) * ldexp(0.5, 24))
-    buffer[#buffer + 1] = char(0xCA, sign + floor(expo / 0x2), (expo % 0x2) * 0x80 + floor(mant / 0x10000), floor(mant / 0x100) % 0x100, mant % 0x100)
+    buffer[#buffer + 1] =
+      char(0xCA, sign + floor(expo / 0x2), (expo % 0x2) * 0x80 + floor(mant / 0x10000), floor(mant / 0x100) % 0x100, mant % 0x100)
   end
 end
 
@@ -846,7 +847,11 @@ local function unpack_int64(c)
   else
     return (
       (
-          ((((((b1 - 0xFF) * 0x100 + (b2 - 0xFF)) * 0x100 + (b3 - 0xFF)) * 0x100 + (b4 - 0xFF)) * 0x100 + (b5 - 0xFF)) * 0x100 + (b6 - 0xFF)) * 0x100
+          (
+              (((((b1 - 0xFF) * 0x100 + (b2 - 0xFF)) * 0x100 + (b3 - 0xFF)) * 0x100 + (b4 - 0xFF)) * 0x100 + (b5 - 0xFF)) * 0x100
+              + (b6 - 0xFF)
+            )
+            * 0x100
           + (b7 - 0xFF)
         )
         * 0x100
