@@ -11,40 +11,47 @@ local width, height = nil, nil
 -- they are placed in and have weights/percentages defined. Think html table.
 -- Default weights are all components get the same amount of space, equally divided.
 
-local grid = Flup.grid {
+local grid = Flup.grid({
   rows = {
     {
       columns = {
-        Snip("1.1"), Snip("1.2"), Snip("1.3")
+        Snip("1.1"),
+        Snip("1.2"),
+        Snip("1.3"),
       },
     },
     {
       columns = {
-        Snip("2.1"), Snip("2.2"), Snip("2.3"), Snip("2.4")
-      }
+        Snip("2.1"),
+        Snip("2.2"),
+        Snip("2.3"),
+        Snip("2.4"),
+      },
     },
     {
       columns = {
         -- empty rows should be possible and take space too
-      }
+      },
     },
     {
       columns = {
         Snip("4.1"),
         Snip("4.2"),
-        Flup.grid {
+        Flup.grid({
           rows = {
             {
               columns = {
-                Snip("4.3.1"), Snip("4.3.2"), Snip("4.3.3")
+                Snip("4.3.1"),
+                Snip("4.3.2"),
+                Snip("4.3.3"),
               },
             },
-          }
-        }
-      }
-    }
-  }
-}
+          },
+        }),
+      },
+    },
+  },
+})
 
 function love.load()
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
@@ -66,6 +73,9 @@ function love.draw()
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  if key == "escape" then love.event.quit() end
-  if key == "space" then end
+  if key == "escape" then
+    love.event.quit()
+  end
+  if key == "space" then
+  end
 end

@@ -1,12 +1,16 @@
-local tick = {framerate = nil, rate = .03, timescale = 1, sleep = .001, dt = 0, accum = 0, tick = 1, frame = 1}
+local tick = { framerate = nil, rate = 0.03, timescale = 1, sleep = 0.001, dt = 0, accum = 0, tick = 1, frame = 1 }
 
 local timer = love.timer
 local graphics = love.graphics
 
 love.run = function()
-  if not timer then error('love.timer is required for tick') end
+  if not timer then
+    error("love.timer is required for tick")
+  end
 
-  if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
+  if love.load then
+    love.load(love.arg.parseGameArguments(arg), arg)
+  end
   timer.step()
   local lastframe = 0
 
@@ -21,24 +25,34 @@ love.run = function()
       if love.event then
         love.event.pump()
         for name, a, b, c, d, e, f in love.event.poll() do
-          if name == 'quit' then if not love.quit or not love.quit() then return a or 0 end end
+          if name == "quit" then
+            if not love.quit or not love.quit() then
+              return a or 0
+            end
+          end
 
           love.handlers[name](a, b, c, d, e, f)
         end
       end
 
       tick.tick = tick.tick + 1
-      if love.update then love.update(tick.rate) end
+      if love.update then
+        love.update(tick.rate)
+      end
     end
 
-    while tick.framerate and timer.getTime() - lastframe < 1 / tick.framerate do timer.sleep(.0005) end
+    while tick.framerate and timer.getTime() - lastframe < 1 / tick.framerate do
+      timer.sleep(0.0005)
+    end
 
     lastframe = timer.getTime()
     if graphics and graphics.isActive() then
       graphics.origin()
       graphics.clear(graphics.getBackgroundColor())
       tick.frame = tick.frame + 1
-      if love.draw then love.draw() end
+      if love.draw then
+        love.draw()
+      end
       graphics.present()
     end
 

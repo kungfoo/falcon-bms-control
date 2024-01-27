@@ -11,32 +11,31 @@ local width, height = nil, nil
 -- components can be dynamically layouted to use the most space of whatever
 -- they are placed in. Think tiling window manager for components/things.
 
-
-local flup1 = Flup.split {
+local flup1 = Flup.split({
   direction = "y",
   ratio = 0.4,
   margin = 20,
   components = {
-    top = Flup.split {direction = "x", ratio = 0.3, components = {left = Snip("Top Left"), right = Snip("Top Right")}},
-    bottom = Flup.split {
+    top = Flup.split({ direction = "x", ratio = 0.3, components = { left = Snip("Top Left"), right = Snip("Top Right") } }),
+    bottom = Flup.split({
       direction = "x",
       ratio = 0.5,
       components = {
         left = Snip("Bottom Left"),
-        right = Flup.split {
+        right = Flup.split({
           direction = "y",
           ratio = 0.5,
           components = {
             top = Snip("Subby Top"),
-            bottom = Flup.split {direction = "x", components = {left = Snip("X"), right = Snip("Y")}},
+            bottom = Flup.split({ direction = "x", components = { left = Snip("X"), right = Snip("Y") } }),
           },
-        },
+        }),
       },
-    },
+    }),
   },
-}
+})
 
-local flup2 = Flup.split {direction = "x", components = {left = Snip("Left"), right = Snip("Right")}, margin = 40}
+local flup2 = Flup.split({ direction = "x", components = { left = Snip("Left"), right = Snip("Right") }, margin = 40 })
 
 local flup = flup1
 
