@@ -65,5 +65,6 @@ Clients are built for iOS and android are using seperate repositories that are q
 # Contributions guidelines
 
 - Please format your code, there are scripts to do it with consistent settings across platforms.
-
+- Your contributions will be subject to the same license as the overall project is
+- 
 

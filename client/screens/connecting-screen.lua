@@ -38,6 +38,8 @@ end
 function Screen:connect(ip)
   connection_state_label.value = "Connecting to " .. ip .. "..."
   Connection.ip = ip or Settings:ip()
+  version = enet.linked_version()
+  print("enet version: ${version}" % { version = version })
   Connection.host = enet.host_create()
   Connection.server = Connection.host:connect(Connection.ip .. ":" .. connecting.port, connecting.channels)
 end
