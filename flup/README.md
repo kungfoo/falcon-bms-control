@@ -12,9 +12,13 @@ sizes passed down.
 Whenever the screen size changes (or device orientation in mobile devices),
 the layout is recalculated and widget sizes are updated recursively.
 
-# Elements needed for a widget
+## Elements needed for a widget
 
 - position: x,y
 - dimensions: w, h
 - function `updateGeometry(x,y,w,h)`
+
+## Running the test applications
+
+Both layouts can be tested using either `bsp.sh` or `grid.sh`.
 
