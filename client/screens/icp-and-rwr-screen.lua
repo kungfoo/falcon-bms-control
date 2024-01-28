@@ -43,10 +43,10 @@ end
 function Screen:update(dt)
   local t1 = love.timer.getTime()
 
-  local w, h = love.graphics.getDimensions()
+  local x, y, w, h = love.window.getSafeArea()
   if self.dimensions.w ~= w or self.dimensions.h ~= h then
     self:adjustLayoutIfNeeded(w, h)
-    self.flup:fill(self.padding, self.padding, w - self.padding * 2, h - self.padding * 2)
+    self.flup:fill(x + self.padding, y + self.padding, w - self.padding * 2, h - self.padding * 2)
     self.dimensions.w = w
     self.dimensions.h = h
   end
