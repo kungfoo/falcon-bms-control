@@ -56,15 +56,23 @@ Clients are built for iOS and android are using seperate repositories that are q
 # Development prerequisites
 
 - Any text editor, try `vscode`, `vim` or something fancier
+
+## Client development tools
+
 - `love2d` installed using a package manager of sorts
 - `stylua` installed using a package manager or `cargo` to format lua code
 - (_Recommended_) Unix or linux or the linux subsystem (on windows) to run any of the scripts
 - (_Not required_) An android or windows touch device to test using touch features
 - (_Not required_) `cargo` and a rust toolchain to build `boon` to build release packages
 
+## Server development tools
+
+- the 'simple' `lua-server` requires the same tools as the `client`
+- `server` requires `msbuild` and `nuget` and (probably) a Windows machine with Visual Studio or respective tools installed.
+
 # Contributions guidelines
 
+- Please contribute changes back to this project via a fork and pull-request.
 - Please format your code, there are scripts to do it with consistent settings across platforms.
-- Your contributions will be subject to the same license as the overall project is
-- 
+- Your contributions will be subject to the same license as the overall project is.
 
