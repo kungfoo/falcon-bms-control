@@ -1,7 +1,16 @@
+-- for things that should be development only
+function isDevelopment()
+  return os.getenv("RUN_MODE") == "development"
+end
+
 -- a bunch of functions
 require("lib.interpolate")
 require("lib.core.table")
 require("lib.core.math")
+
+if isDevelopment() then
+  -- hot reloading here...
+end
 
 -- globals that are used all over the place.
 Class = require("lib.hump.class")
@@ -21,6 +30,10 @@ inspect = require("lib.inspect")
 
 -- fix your simulation time step
 local tick = require("lib.tick")
+
+-- load predefined layouts
+local layouts = require("lib.layouts")
+local Layouts = layouts()
 
 -- screen states
 local mfd_screen = require("screens.mfd-screen")
@@ -58,6 +71,10 @@ end
 function love.update(dt)
   -- always update timers
   Timer.update(dt)
+
+  if isDevelopment() then
+    -- development hot reloading
+  end
 
   -- service enet host.
   local success, event = pcall(Connection.service)
