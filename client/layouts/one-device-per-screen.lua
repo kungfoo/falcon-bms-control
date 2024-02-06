@@ -1,4 +1,4 @@
-layout = {
+return {
   name = "one device per screen",
   description = "Puts each device (each MFD, ICP) on a separate screen. Useful for people with multiple tablets.",
   metadata = {
@@ -15,5 +15,3 @@ layout = {
     },
   },
 }
-
-return layout
