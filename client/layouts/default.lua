@@ -1,6 +1,6 @@
 return {
-  name = "default",
-  description = "The default layout, puts two MFDs side-by-side and the ICP and RWR on another screen.",
+  name = "default-landscape",
+  description = "The default landscape layout, puts two MFDs side-by-side and the ICP and RWR on another screen.",
   metadata = {
     version = "1.0",
   },
@@ -15,13 +15,19 @@ return {
             components = {
               {
                 type = "mfd",
-                identifier = "f16/left-mfd",
+                identifier = "f16/mfd",
                 data_channel = 1,
+                metadata = {
+                  kind = "left",
+                },
               },
               {
                 type = "mfd",
-                identifier = "f16/right-mfd",
+                identifier = "f16/mfd",
                 data_channel = 2,
+                metadata = {
+                  kind = "right",
+                },
               },
             },
           },
@@ -60,6 +66,7 @@ return {
                 identifier = "f16/rwr",
                 data_channel = 4,
               },
+              nil,
             },
           },
         },

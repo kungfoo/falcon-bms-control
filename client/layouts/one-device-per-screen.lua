@@ -8,9 +8,48 @@ return {
     screens = {
       {
         name = "Left MFD",
+        components = {
+          {
+            type = "mfd",
+            identifier = "f16/mfd",
+            data_channel = 1,
+            metadata = {
+              kind = "left",
+            },
+          },
+        },
       },
       {
         name = "Right MFD",
+        components = {
+          {
+            type = "mfd",
+            identifier = "f16/mfd",
+            data_channel = 2,
+            metadata = {
+              kind = "right",
+            },
+          },
+        },
+      },
+      {
+        name = "ICP/DED",
+        components = {
+          type = "split",
+          direction = "y",
+          ratio = 0.3,
+          components = {
+            {
+              type = "ded",
+              identifier = "f16/ded",
+              data_channel = 3,
+            },
+            {
+              type = "icp",
+              identifier = "f16/icp",
+            },
+          },
+        },
       },
     },
   },

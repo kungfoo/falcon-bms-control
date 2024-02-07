@@ -50,6 +50,10 @@ local switcher = Switcher({ mfd_screen, icp_and_rwr_screen })
 local footer = require("components.footer")
 Footer = footer(switcher, settings_screen)
 
+-- component regisrty for predefined and custom layouts
+local registry = require("lib.component-registry")
+ComponentRegistry = registry()
+
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
 function love.load()

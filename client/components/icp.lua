@@ -2,7 +2,12 @@ local layout = require("lib.suit.layout").new()
 local IcpButton = require("components.icp-button")
 local RockerButton = require("components.rocker")
 
-local Icp = Class({ padding = 25, width = 460, height = 490 })
+local Icp = Class({
+  padding = 25,
+  width = 460,
+  height = 490,
+  identifier = "f16/icp",
+})
 
 function Icp:init(id, x, y)
   self.id = id

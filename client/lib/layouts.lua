@@ -1,35 +1,17 @@
+local loadFile = require("lib.loadfile")
+
 local Layouts = Class({
-  path = ".",
+  path = "layouts",
   layouts = {},
   state = "init",
 })
 
-local function loadFile(path)
-  print("Loading " .. path)
-  -- load the chunk safely
-  local ok, chunk, err = pcall(love.filesystem.load, path)
-  if not ok then
-    return false, "Failed loading code: " .. chunk
-  end
-  if not chunk then
-    return false, "Failed reading file: " .. err
-  end
-
-  -- execute the chunk safely
-  local ok, value = pcall(chunk)
-  if not ok then
-    return false, "Failed calling chunk: " .. tostring(value)
-  end
-
-  return true, value
-end
-
-local function listLayouts()
+local function listLayouts(path)
   local result = {}
-  local files = love.filesystem.getDirectoryItems("layouts")
+  local files = love.filesystem.getDirectoryItems(path)
   print("Found " .. #files .. " layouts")
   for _, f in ipairs(files) do
-    local ok, layout = loadFile("layouts/" .. f)
+    local ok, layout = loadFile(path .. "/" .. f)
     if ok then
       table.insert(result, layout)
     else
@@ -40,7 +22,7 @@ local function listLayouts()
 end
 
 function Layouts:init()
-  self.layouts = listLayouts()
+  self.layouts = listLayouts(self.path)
   self.state = "loaded"
 end
 
