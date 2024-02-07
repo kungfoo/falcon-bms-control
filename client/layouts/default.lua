@@ -42,18 +42,20 @@ return {
             direction = "x",
             ratio = 0.3,
             components = {
-              type = "split",
-              direction = "y",
-              ratio = 0.3,
-              components = {
-                {
-                  type = "ded",
-                  identifier = "f16/ded",
-                  data_channel = 3,
-                },
-                {
-                  type = "icp",
-                  identifier = "f16/icp",
+              {
+                type = "split",
+                direction = "y",
+                ratio = 0.3,
+                components = {
+                  {
+                    type = "ded",
+                    identifier = "f16/ded",
+                    data_channel = 3,
+                  },
+                  {
+                    type = "icp",
+                    identifier = "f16/icp",
+                  },
                 },
               },
             },

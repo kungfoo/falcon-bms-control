@@ -1,6 +1,11 @@
 local ScreenFactory = Class({})
 
 function ScreenFactory:listComponentsR(node)
+  if node.components then
+    for _, child in ipairs(node.components) do
+      self:listComponentsR(child)
+    end
+  end
   if node.identifier then
     local c = self.component_registry:find(node.identifier)
     if c then
@@ -8,10 +13,8 @@ function ScreenFactory:listComponentsR(node)
     end
   end
 
-  if node.components then
-    for _, child in ipairs(node.components) do
-      self:listComponentsR(child)
-    end
+  if node.type == "split" then
+    print("Layout node " .. node.type)
   end
 end
 
