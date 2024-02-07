@@ -59,9 +59,9 @@ function love.load()
 end
 
 function love.update(dt)
-  local w, h = love.graphics.getDimensions()
+  local x, y, w, h = love.window.getSafeArea()
   if width ~= w or height ~= h then
-    grid:fill(0, 0, w, h - 100)
+    grid:fill(x, y, w, h - 100)
     width, height = w, h
   end
 end
