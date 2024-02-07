@@ -2,8 +2,6 @@ local loadFile = require("lib.loadfile")
 
 local Layouts = Class({
   path = "layouts",
-  layouts = {},
-  state = "init",
 })
 
 local function listLayouts(path)
@@ -13,7 +11,7 @@ local function listLayouts(path)
   for _, f in ipairs(files) do
     local ok, layout = loadFile(path .. "/" .. f)
     if ok then
-      table.insert(result, layout)
+      result[layout.id] = layout
     else
       print("Failed to load " .. layout)
     end
@@ -23,7 +21,10 @@ end
 
 function Layouts:init()
   self.layouts = listLayouts(self.path)
-  self.state = "loaded"
+end
+
+function Layouts:find(id)
+  return self.layouts[id]
 end
 
 return Layouts

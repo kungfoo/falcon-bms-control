@@ -13,10 +13,16 @@ local Screen = Class({
   padding = 10,
 })
 
+local function parseComponentTree(components)
+  print(inspect(components[1]))
+end
+
 function Screen:init(definition)
+  print("Initializing custom layout screen")
   self.name = definition.name
 
   -- todo: build flup/component tree using ComponentRegistry
+  self.componentRoot = parseComponentTree(definition.components)
 
   self.components = { leftMfd, rightMfd, Footer }
 end
@@ -51,27 +57,15 @@ function Screen:update(dt)
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)
-  if w >= h then
-    self.flup = Flup.split({
-      direction = "y",
-      ratio = 0.95,
-      margin = 10,
-      components = {
-        top = Flup.split({ direction = "x", margin = 20, components = { left = leftMfd, right = rightMfd } }),
-        bottom = Footer,
-      },
-    })
-  else
-    self.flup = Flup.split({
-      direction = "y",
-      ratio = 0.95,
-      margin = 10,
-      components = {
-        top = Flup.split({ direction = "y", margin = 20, components = { top = leftMfd, bottom = rightMfd } }),
-        bottom = Footer,
-      },
-    })
-  end
+  self.flup = Flup.split({
+    direction = "y",
+    ratio = 0.95,
+    margin = 10,
+    components = {
+      top = componentRoot,
+      bottom = Footer,
+    },
+  })
 end
 
 function Screen:handleReceive(event)

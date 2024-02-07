@@ -2,8 +2,6 @@ local loadFile = require("lib.loadfile")
 
 local ComponentRegistry = Class({
   path = "components",
-  components = {},
-  state = "init",
 })
 
 local function findAllComponents(path)
@@ -29,7 +27,6 @@ end
 
 function ComponentRegistry:init()
   self.components = findAllComponents(self.path)
-  self.state = "loaded"
 end
 
 function ComponentRegistry:find(identifier)

@@ -1,5 +1,6 @@
 return {
-  name = "default-landscape",
+  id = "default-landscape",
+  name = "default landscape",
   description = "The default landscape layout, puts two MFDs side-by-side and the ICP and RWR on another screen.",
   metadata = {
     version = "1.0",
@@ -11,7 +12,7 @@ return {
         components = {
           {
             type = "split",
-            direction = "y",
+            direction = "x",
             components = {
               {
                 type = "mfd",

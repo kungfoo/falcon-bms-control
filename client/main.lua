@@ -8,10 +8,6 @@ require("lib.interpolate")
 require("lib.core.table")
 require("lib.core.math")
 
-if isDevelopment() then
-  -- hot reloading here...
-end
-
 -- globals that are used all over the place.
 Class = require("lib.hump.class")
 Signal = require("lib.hump.signal")
@@ -22,6 +18,7 @@ Connection = { ip = nil, server = nil, host = nil, peer = nil }
 
 -- initialize settings straight away.
 local settings = require("lib.settings")
+-- load settings
 Settings = settings()
 
 Colors = require("lib.colors")
@@ -33,13 +30,16 @@ local tick = require("lib.tick")
 
 -- load predefined layouts
 local layouts = require("lib.layouts")
-local Layouts = layouts()
+local ScreenFactory = require("lib.screen-factory")
+-- component regisrty for predefined and custom layouts
+local ComponentRegistry = require("lib.component-registry")
 
 -- screen states
 local mfd_screen = require("screens.mfd-screen")
 local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
 local settings_screen = require("screens.settings-screen")
 local connecting_screen = require("screens.connecting-screen")
+local custom_layout_screen = require("screens.custom-layout-screen")
 
 local debug = { enabled = true, stats = { time_update = 0, time_draw = 0 } }
 
@@ -50,13 +50,21 @@ local switcher = Switcher({ mfd_screen, icp_and_rwr_screen })
 local footer = require("components.footer")
 Footer = footer(switcher, settings_screen)
 
--- component regisrty for predefined and custom layouts
-local registry = require("lib.component-registry")
-ComponentRegistry = registry()
-
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
 function love.load()
+  if isDevelopment() then
+    -- hot reloading here...
+    lovebird = require("lib.development.lovebird")
+  end
+
+  Layouts = layouts()
+  registry = ComponentRegistry()
+  screen_factory = ScreenFactory(registry)
+  -- tbd: replace with layout from settings
+  layout = Layouts:find("default-landscape")
+  screens_from_layout = screen_factory:createScreens(layout.definition.screens)
+
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second
 
@@ -78,6 +86,7 @@ function love.update(dt)
 
   if isDevelopment() then
     -- development hot reloading
+    lovebird.update()
   end
 
   -- service enet host.
@@ -90,7 +99,7 @@ function love.update(dt)
       print("Connected ...")
       Connection.peer = event.peer
       -- switch to first screen
-      switcher:switch(icp_and_rwr_screen)
+      switcher:switch()
     elseif event.type == "receive" then
       State.current():handleReceive(event)
     end
