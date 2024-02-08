@@ -45,6 +45,11 @@ return {
             ratio = 0.3,
             components = {
               {
+                type = "rwr",
+                identifier = "f16/rwr",
+                data_channel = 4,
+              },
+              {
                 type = "split",
                 direction = "y",
                 ratio = 0.3,
@@ -60,18 +65,6 @@ return {
                   },
                 },
               },
-            },
-          },
-          {
-            type = "split",
-            direction = "y",
-            components = {
-              {
-                type = "rwr",
-                identifier = "f16/rwr",
-                data_channel = 4,
-              },
-              nil,
             },
           },
         },

@@ -36,13 +36,14 @@ function ScreenParser:createComponents(node, result)
         result,
         Flup.split({
           direction = node.direction,
+          ratio = node.ratio,
           components = child_components,
         })
       )
     end,
     screen = function()
       log.debug("Visited screen node " .. node.name)
-      table.push(result, child_components)
+      table.push(result, unpack(child_components))
     end,
     default = function()
       local msg = "Unknown node " .. inspect(node) .. " with child components found."
