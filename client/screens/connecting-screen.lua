@@ -22,10 +22,10 @@ function Screen:enter(previous, settings_screen)
   self.settings_screen = settings_screen
 
   if Settings:ip() then
-    print("Connecting to " .. Settings:ip() .. ", stored in settings.")
+    log.info("Connecting to " .. Settings:ip() .. ", stored in settings.")
     Screen:connect(Settings:ip())
   else
-    print("Starting server discovery...")
+    log.info("Starting server discovery...")
     connection_state_label.value = "Discovering server..."
     broadcast.socket = socket.udp4()
     broadcast.socket:settimeout(0)
@@ -39,7 +39,7 @@ function Screen:connect(ip)
   connection_state_label.value = "Connecting to " .. ip .. "..."
   Connection.ip = ip or Settings:ip()
   version = enet.linked_version()
-  print("enet version: ${version}" % { version = version })
+  log.debug("enet version: ${version}" % { version = version })
   Connection.host = enet.host_create()
   Connection.server = Connection.host:connect(Connection.ip .. ":" .. connecting.port, connecting.channels)
 end
@@ -54,7 +54,7 @@ function Screen:receiveAck()
   if datagram and ip and port then
     local message = msgpack.unpack(datagram)
     if message.type == "ack" then
-      print("Discovered server at [${ip}] on port [${port}]" % { ip = ip, port = port })
+      log.info("Discovered server at [${ip}] on port [${port}]" % { ip = ip, port = port })
       Screen:connect(ip)
     end
   end
@@ -63,7 +63,7 @@ end
 function Screen:leave()
   -- are we even sending?
   if broadcast.send then
-    print("Stopping server discovery.")
+    log.info("Stopping server discovery.")
     Timer.cancel(broadcast.send)
     Timer.cancel(broadcast.receive)
     broadcast.socket:close()

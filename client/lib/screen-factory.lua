@@ -6,33 +6,54 @@ function ScreenFactory:findComponentId(node)
 end
 
 function ScreenFactory:createComponents(node, result)
-  if node.type == "split" then
-    -- this is a layout node
-    local child_components = {}
-    self:createComponents(node.components, child_components)
-    table.push(
-      result,
-      Flup.split({
-        direction = node.direction,
-        components = child_components,
-      })
-    )
-  end
-
-  if node.components then
-    for _, child in ipairs(node.components) do
-      self:createComponents(child, result)
-    end
-  end
   if node.identifier then
-    -- this is an actual component
+    -- this is a leaf component
     local c = self.component_registry:find(node.identifier)
     if c then
       local id = self:findComponentId(node)
       table.push(result, c(id))
+      return
     else
-      print("Could not find component with identifier " .. node.identifier)
+      local msg = "Could not find component with identifier " .. node.identifier
+      log.error(msg)
+      error(msg)
     end
+  end
+
+  local child_components = {}
+  if node.components then
+    for _, child in ipairs(node.components) do
+      self:createComponents(child, child_components)
+    end
+  end
+
+  -- lua poor man's match-statement
+  local cases = {
+    split = function()
+      log.debug("Creating a split with " .. #child_components .. " child components")
+      -- this is a layout node
+      table.push(
+        result,
+        Flup.split({
+          direction = node.direction,
+          components = child_components,
+        })
+      )
+    end,
+    screen = function()
+      log.debug("Visited screen node " .. node.name)
+      table.push(result, child_components)
+    end,
+    default = function()
+      local msg = "Unknown node " .. inspect(node) .. " with child components found."
+      log.error(msg)
+      error(msg)
+    end,
+  }
+
+  if node.type then
+    local case = cases[node.type] or cases.default
+    case()
   end
 
   return result
@@ -47,10 +68,11 @@ function ScreenFactory:init(component_registry)
 end
 
 function ScreenFactory:createScreens(screen_definitions)
-  print("Found " .. #screen_definitions .. " screens")
+  log.debug("Found " .. #screen_definitions .. " screens")
   local result = {}
   for i, screen in ipairs(screen_definitions) do
     local components = self:createComponentsOnScreen(screen)
+    log.debug("Created " .. #components .. " components")
     local name = screen.name or "undefined-" .. i
     table.push(result, Screen(name, components))
   end

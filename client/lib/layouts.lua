@@ -7,13 +7,13 @@ local Layouts = Class({
 local function listLayouts(path)
   local result = {}
   local files = love.filesystem.getDirectoryItems(path)
-  print("Found " .. #files .. " layouts")
+  log.debug("Found " .. #files .. " layouts")
   for _, f in ipairs(files) do
     local ok, layout = loadFile(path .. "/" .. f)
     if ok then
       result[layout.id] = layout
     else
-      print("Failed to load " .. layout)
+      log.error("Failed to load " .. layout)
     end
   end
   return result

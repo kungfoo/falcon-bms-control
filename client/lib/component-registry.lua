@@ -15,12 +15,12 @@ local function findAllComponents(path)
         result[component.identifier] = component
       end
     else
-      print("Failed to load component due to " .. component)
+      log.error("Failed to load component due to ", component)
     end
   end
-  print("Found the following components:")
+  log.debug("Found the following components:")
   for id, c in pairs(result) do
-    print("\t" .. id)
+    log.debug(id)
   end
   return result
 end

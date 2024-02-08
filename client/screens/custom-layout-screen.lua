@@ -6,7 +6,7 @@ local Screen = Class({
     -- general purpose reliable channel
     [0] = function(event)
       local payload = msgpack.unpack(event.data)
-      print("Received general purpose event: ", inspect(payload))
+      log.debug("Received general purpose event: ", inspect(payload))
     end,
   },
   dimensions = { w = 0, h = 0 },
@@ -18,7 +18,7 @@ local function parseComponentTree(components)
 end
 
 function Screen:init(definition)
-  print("Initializing custom layout screen")
+  log.info("Initializing custom layout screen")
   self.name = definition.name
 
   -- todo: build flup/component tree using ComponentRegistry

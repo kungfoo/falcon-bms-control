@@ -4,9 +4,11 @@ function isDevelopment()
 end
 
 -- a bunch of functions
+log = require("lib.log")
 require("lib.interpolate")
 require("lib.core.table")
 require("lib.core.math")
+require("lib.core.functional")
 
 -- globals that are used all over the place.
 Class = require("lib.hump.class")
@@ -65,9 +67,6 @@ function love.load()
   layout = Layouts:find("one-device")
   screens_from_layout = screen_factory:createScreens(layout.definition.screens)
 
-  print("Screens from layout")
-  print(inspect(screens_from_layout))
-
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second
 
@@ -96,10 +95,10 @@ function love.update(dt)
   local success, event = pcall(Connection.service)
   while success and event do
     if event.type == "disconnect" then
-      print("Disconnected.")
+      log.info("Disconnected.")
       State.switch(connecting_screen, settings_screen)
     elseif event.type == "connect" then
-      print("Connected ...")
+      log.info("Connected ...")
       Connection.peer = event.peer
       -- switch to first screen
       switcher:switch()
@@ -119,7 +118,7 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.quit()
-  print("Quitting client...")
+  log.info("Quitting client...")
   if Connection.peer then
     Connection.peer:disconnect()
     Connection.host:flush()

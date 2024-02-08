@@ -12,7 +12,7 @@ local Screen = Class({
     -- general purpose reliable channel
     [0] = function(event)
       local payload = msgpack.unpack(event.data)
-      print("Received general purpose event: ", inspect(payload))
+      log.debug("Received general purpose event: ", inspect(payload))
     end,
     -- texture memory channels are unrealiable and pure image data.
     [3] = function(event)

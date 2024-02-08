@@ -1,5 +1,5 @@
 local function loadFile(path)
-  print("Loading " .. path)
+  log.debug("Loading", path)
   -- load the chunk safely
   local ok, chunk, err = pcall(love.filesystem.load, path)
   if not ok then
