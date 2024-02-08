@@ -8,6 +8,7 @@ return {
   definition = {
     screens = {
       {
+        type = "screen",
         name = "Left MFD",
         components = {
           {
@@ -21,6 +22,7 @@ return {
         },
       },
       {
+        type = "screen",
         name = "Right MFD",
         components = {
           {
@@ -34,6 +36,7 @@ return {
         },
       },
       {
+        type = "screen",
         name = "ICP/DED",
         components = {
           {
