@@ -48,7 +48,7 @@ local function to_bool(value)
     if value == 1 then
       return true
     else
-      print("Intederminate value of bool: " .. value)
+      log.error("Intederminate value of bool: " .. value)
       return false
     end
   end

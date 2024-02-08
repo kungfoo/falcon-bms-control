@@ -1,13 +1,20 @@
 # Falcon BMS Control Client Code
 
+## How can I run this?
+
+- `./run.sh/bat` runs the client code with `trace` log level. Useful to debug things.
+
+You'll need `love2d` and `bash` installed to run it like that.
+
 ## Interesting folders
 
 - `client/`: main application startup file
 - `client/components`: most of the things that you can interact with on screen
+- `lib/*`: interesting stuff like supporting functions to load layouts and create component trees
 
 ## Less interesting folders
 
-- `lib`: A bunch of supporting libraries and files. Not all the files/functions are currently used.
+- `lib/*/*`: A bunch of supporting libraries and files. Not all the files/functions are currently used. I will clean this up soon. Promise.
 
 ## How does this all work?
 
@@ -31,3 +38,8 @@ Probably not.
 ## I touched the discovery code and now things don't work!
 
 I hate to say it, but I told you so.
+
+## Why are there no tests?
+
+Good question. Let me find someone who knows.
+So far the code did not really mandate tests, but with configurable layouts it gets to the point where there probably should be some tests.

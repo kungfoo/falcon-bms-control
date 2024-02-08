@@ -14,7 +14,7 @@ local Screen = Class({
 })
 
 local function parseComponentTree(components)
-  print(inspect(components[1]))
+  log.debug(inspect(components[1]))
 end
 
 function Screen:init(definition)

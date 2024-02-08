@@ -12,7 +12,7 @@ function Settings:init()
       return msgpack.unpack(file_data)
     end)
     if not success then
-      print("Failed to load settings, falling back to defaults because of " .. from_file)
+      log.error("Failed to load settings, falling back to defaults because of " .. from_file)
     end
   end
   self.proxy = {}
@@ -32,7 +32,7 @@ function Settings:changed()
   })
   local success, error = love.filesystem.write(file_name, bytes)
   if not success then
-    print("Failed to write settings.")
+    log.error("Failed to write settings.")
   end
 end
 

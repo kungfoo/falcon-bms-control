@@ -12,6 +12,7 @@ require("lib.core.functional")
 
 if not isDevelopment() then
   log.level = "info"
+  log.usecolor = false
 end
 
 -- globals that are used all over the place.
