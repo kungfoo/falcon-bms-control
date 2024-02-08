@@ -6,10 +6,8 @@ local MfdButton = require("components.mfd-button")
 
 local Mfd = Class({
   max_size = 502,
+  -- todo: might want to rename this to component-id or so
   identifier = "f16/mfd",
-  metadata = {
-    kind = { "left", "right" },
-  },
 })
 
 function Mfd:init(identifier, x, y)

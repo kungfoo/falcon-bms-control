@@ -62,8 +62,11 @@ function love.load()
   registry = ComponentRegistry()
   screen_factory = ScreenFactory(registry)
   -- tbd: replace with layout from settings
-  layout = Layouts:find("default-landscape")
+  layout = Layouts:find("one-device")
   screens_from_layout = screen_factory:createScreens(layout.definition.screens)
+
+  print("Screens from layout")
+  print(inspect(screens_from_layout))
 
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second

@@ -1,9 +1,29 @@
 local flup = { split = Class({}), fixed = Class({}), grid = Class({ rows = {} }), internal = {} }
 
+local function convertArrayOfComponents(direction, components)
+  if components.left or components.right or components.top or components.bottom then
+    return components
+  end
+  -- components passed as array
+  if direction == "x" then
+    return {
+      left = components[1],
+      right = components[2],
+    }
+  end
+
+  if direction == "y" then
+    return {
+      top = components[1],
+      bottom = components[2],
+    }
+  end
+end
+
 function flup.split:init(options)
   self.direction = options.direction or "x"
   self.ratio = options.ratio or 0.5
-  self.components = options.components or {}
+  self.components = convertArrayOfComponents(self.direction, options.components or {})
   self.margin = options.margin or 0
 end
 

@@ -15,7 +15,7 @@ return {
             identifier = "f16/mfd",
             data_channel = 1,
             metadata = {
-              kind = "left",
+              id = "f16/left-mfd",
             },
           },
         },
@@ -28,7 +28,7 @@ return {
             identifier = "f16/mfd",
             data_channel = 2,
             metadata = {
-              kind = "right",
+              id = "f16/right-mfd",
             },
           },
         },
