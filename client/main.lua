@@ -32,7 +32,7 @@ local tick = require("lib.tick")
 
 -- load predefined layouts
 local layouts = require("lib.layouts")
-local ScreenFactory = require("lib.screen-factory")
+local ScreenParser = require("lib.screen-parser")
 -- component regisrty for predefined and custom layouts
 local ComponentRegistry = require("lib.component-registry")
 
@@ -62,10 +62,10 @@ function love.load()
 
   Layouts = layouts()
   registry = ComponentRegistry()
-  screen_factory = ScreenFactory(registry)
+  screen_parser = ScreenParser(registry)
   -- tbd: replace with layout from settings
   layout = Layouts:find("one-device")
-  screens_from_layout = screen_factory:createScreens(layout.definition.screens)
+  screens_from_layout = screen_parser:createScreens(layout.definition.screens)
 
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second

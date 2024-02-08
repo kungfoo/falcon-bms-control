@@ -1,11 +1,11 @@
 local Screen = require("lib.screen")
-local ScreenFactory = Class({})
+local ScreenParser = Class({})
 
-function ScreenFactory:findComponentId(node)
+function ScreenParser:findComponentId(node)
   return (node.metadata or {}).id or node.identifier
 end
 
-function ScreenFactory:createComponents(node, result)
+function ScreenParser:createComponents(node, result)
   if node.identifier then
     -- this is a leaf component
     local c = self.component_registry:find(node.identifier)
@@ -59,15 +59,15 @@ function ScreenFactory:createComponents(node, result)
   return result
 end
 
-function ScreenFactory:createComponentsOnScreen(screen)
+function ScreenParser:createComponentsOnScreen(screen)
   return self:createComponents(screen, {})
 end
 
-function ScreenFactory:init(component_registry)
+function ScreenParser:init(component_registry)
   self.component_registry = component_registry
 end
 
-function ScreenFactory:createScreens(screen_definitions)
+function ScreenParser:createScreens(screen_definitions)
   log.debug("Found " .. #screen_definitions .. " screens")
   local result = {}
   for i, screen in ipairs(screen_definitions) do
@@ -79,4 +79,4 @@ function ScreenFactory:createScreens(screen_definitions)
   return result
 end
 
-return ScreenFactory
+return ScreenParser
