@@ -10,6 +10,10 @@ require("lib.core.table")
 require("lib.core.math")
 require("lib.core.functional")
 
+if not isDevelopment() then
+  log.level = "info"
+end
+
 -- globals that are used all over the place.
 Class = require("lib.hump.class")
 Signal = require("lib.hump.signal")
