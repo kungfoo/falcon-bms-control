@@ -64,7 +64,7 @@ function table.add_value(t, a)
 end
 
 -- helper for optionally passed random
-local _global_random = love.math.random or math.random
+local _global_random = ((love or {}).math or {}).random or math.random
 local function _random(min, max, r)
   return r and r:random(min, max) or _global_random(min, max)
 end

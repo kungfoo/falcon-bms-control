@@ -1,3 +1,4 @@
+-- custom loadFile that works in love VFS
 local function loadFile(path)
   log.debug("Loading", path)
   -- load the chunk safely
