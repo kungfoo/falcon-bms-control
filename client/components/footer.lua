@@ -14,7 +14,10 @@ function Footer:init(switcher, settings_screen)
     direction = "x",
     components = {
       left = self.switcher,
-      right = Flup.split({ direction = "x", components = { self.layouts_button, self.settings_button } }),
+      right = Flup.split({
+        direction = "x",
+        components = { self.layouts_button, self.settings_button },
+      }),
     },
   })
 end

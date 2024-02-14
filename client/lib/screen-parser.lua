@@ -35,8 +35,9 @@ function ScreenParser:createComponents(node, result)
       table.push(
         result,
         Flup.split({
-          direction = node.direction,
-          ratio = node.ratio,
+          direction = node.direction or "x",
+          ratio = node.ratio or 0.5,
+          margin = node.margin or 0,
           components = child_components,
         })
       )

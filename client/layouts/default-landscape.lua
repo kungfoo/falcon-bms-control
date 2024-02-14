@@ -14,6 +14,7 @@ return {
           {
             type = "split",
             direction = "x",
+            margin = 20,
             components = {
               {
                 type = "mfd",

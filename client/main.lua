@@ -46,16 +46,14 @@ local mfd_screen = require("screens.mfd-screen")
 local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
 local settings_screen = require("screens.settings-screen")
 local connecting_screen = require("screens.connecting-screen")
-local custom_layout_screen = require("screens.custom-layout-screen")
+local CustomLayoutScreen = require("screens.custom-layout-screen")
 
 local debug = { enabled = true, stats = { time_update = 0, time_draw = 0 } }
 
 local Switcher = require("components.switcher")
-local switcher = Switcher({ mfd_screen, icp_and_rwr_screen })
 
 -- footer component is present on most screens
 local footer = require("components.footer")
-Footer = footer(switcher, settings_screen)
 
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
 
@@ -69,14 +67,23 @@ function love.load()
   registry = ComponentRegistry()
   screen_parser = ScreenParser(registry)
   -- tbd: replace with layout from settings
-  layout = Layouts:find("one-device")
+  layout = Layouts:find("default-landscape")
   screens_from_layout = screen_parser:createScreens(layout.definition.screens)
+
+  local custom_screens = table.map(screens_from_layout, function(spec)
+    log.debug("Creating a screen for", spec.name)
+    return CustomLayoutScreen(spec)
+  end)
+
+  switcher = Switcher(custom_screens)
+
+  Footer = footer(switcher, settings_screen)
 
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second
 
   State.registerEvents()
-  State.switch(connecting_screen, settings_screen)
+  State.switch(connecting_screen, settings_screen, custom_screens[1])
 
   Signal.register("send-to-server", function(message)
     Connection.server:send(msgpack.pack(message))

@@ -16,7 +16,7 @@ function Screen:init()
   self.components = { connection_state_label, self.settings_button }
 end
 
-function Screen:enter(previous, settings_screen)
+function Screen:enter(previous, settings_screen, next_screen)
   self.previous_screen = previous
   self.next_screen = next_screen
   self.settings_screen = settings_screen
