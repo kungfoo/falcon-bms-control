@@ -44,6 +44,7 @@ return {
             type = "split",
             direction = "x",
             ratio = 0.3,
+            margin = 20,
             components = {
               {
                 type = "rwr",
@@ -54,6 +55,7 @@ return {
                 type = "split",
                 direction = "y",
                 ratio = 0.3,
+                margin = 10,
                 components = {
                   {
                     type = "ded",

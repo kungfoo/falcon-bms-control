@@ -27,6 +27,18 @@ function Screen:init(spec)
 end
 
 function Screen:enter(previous)
+  local x, y, w, h = love.window.getSafeArea()
+  self.flup = Flup.split({
+    direction = "y",
+    ratio = 0.95,
+    margin = 10,
+    components = {
+      top = self.root_component,
+      bottom = Footer,
+    },
+  })
+  self.flup:fill(x + self.padding, y + self.padding, w - self.padding * 2, h - self.padding * 2)
+
   self:each_component(function(c)
     if c.start then
       c:start()
@@ -62,7 +74,6 @@ function Screen:update(dt)
 
   local x, y, w, h = love.window.getSafeArea()
   if self.dimensions.w ~= w or self.dimensions.h ~= h then
-    self:adjustLayoutIfNeeded(w, h)
     self.flup:fill(x + self.padding, y + self.padding, w - self.padding * 2, h - self.padding * 2)
     self.dimensions.w = w
     self.dimensions.h = h
@@ -82,18 +93,6 @@ function Screen:update(dt)
 
   local t2 = love.timer.getTime()
   self.stats.time_update = (t2 - t1) * 1000
-end
-
-function Screen:adjustLayoutIfNeeded(w, h)
-  self.flup = Flup.split({
-    direction = "y",
-    ratio = 0.95,
-    margin = 10,
-    components = {
-      top = self.root_component,
-      bottom = Footer,
-    },
-  })
 end
 
 function Screen:handleReceive(event)
