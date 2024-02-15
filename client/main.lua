@@ -59,7 +59,7 @@ local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "norma
 
 function love.load()
   if isDevelopment() then
-    -- hot reloading here...
+    -- todo: hot reloading here...
     lovebird = require("lib.development.lovebird")
   end
 
@@ -99,7 +99,7 @@ function love.update(dt)
   Timer.update(dt)
 
   if isDevelopment() then
-    -- development hot reloading
+    -- todo: development hot reloading
     lovebird.update()
   end
 
