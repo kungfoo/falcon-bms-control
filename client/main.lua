@@ -36,14 +36,12 @@ inspect = require("lib.inspect")
 local tick = require("lib.tick")
 
 -- load predefined layouts
-local layouts = require("lib.layouts")
+local Layouts = require("lib.layouts")
 local ScreenParser = require("lib.screen-parser")
 -- component regisrty for predefined and custom layouts
 local ComponentRegistry = require("lib.component-registry")
 
 -- screen states
-local mfd_screen = require("screens.mfd-screen")
-local icp_and_rwr_screen = require("screens.icp-and-rwr-screen")
 local settings_screen = require("screens.settings-screen")
 local connecting_screen = require("screens.connecting-screen")
 local CustomLayoutScreen = require("screens.custom-layout-screen")
@@ -63,11 +61,11 @@ function love.load()
     lovebird = require("lib.development.lovebird")
   end
 
-  Layouts = layouts()
+  layouts = Layouts()
   registry = ComponentRegistry()
   screen_parser = ScreenParser(registry)
   -- tbd: replace with layout from settings
-  layout = Layouts:find("default-landscape")
+  layout = layouts:find("default-landscape")
   screens_from_layout = screen_parser:createScreens(layout.definition.screens)
 
   local custom_screens = table.map(screens_from_layout, function(spec)
