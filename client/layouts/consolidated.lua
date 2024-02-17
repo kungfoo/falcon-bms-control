@@ -23,13 +23,13 @@ return {
                 margin = 10,
                 components = {
                   {
+                    type = "icp",
+                    identifier = "f16/icp-landscape",
+                  },
+                  {
                     type = "ded",
                     identifier = "f16/ded",
                     data_channel = 3,
-                  },
-                  {
-                    type = "icp",
-                    identifier = "f16/icp-landscape",
                   },
                 },
               },
