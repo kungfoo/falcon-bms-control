@@ -81,7 +81,7 @@ function love.load()
   tick.rate = 0.02 -- 50 updates per second
 
   State.registerEvents()
-  State.switch(connecting_screen, settings_screen, custom_screens[1])
+  State.switch(connecting_screen, settings_screen)
 
   Signal.register("send-to-server", function(message)
     Connection.server:send(msgpack.pack(message))
