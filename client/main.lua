@@ -65,7 +65,7 @@ function love.load()
   registry = ComponentRegistry()
   screen_parser = ScreenParser(registry)
   -- tbd: replace with layout from settings
-  layout = layouts:find("default-landscape")
+  layout = layouts:find("consolidated")
   screens_from_layout = screen_parser:createScreens(layout.definition.screens)
 
   local custom_screens = table.map(screens_from_layout, function(spec)
