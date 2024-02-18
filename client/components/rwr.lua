@@ -107,6 +107,10 @@ function Rwr:determineScale(w, h)
   end
 end
 
+function Rwr:consumes(event)
+  return event.channel == 4
+end
+
 function Rwr:consume(data)
   self.imageData = love.image.newImageData(love.data.newByteData(data))
   self.image = nil

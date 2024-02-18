@@ -78,6 +78,10 @@ function Ded:determineScale(w, h)
   end
 end
 
+function Ded:consumes(event)
+  return event.channel == 3
+end
+
 function Ded:consume(data)
   self.imageData = love.image.newImageData(love.data.newByteData(data))
   self.image = nil

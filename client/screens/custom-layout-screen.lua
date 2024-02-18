@@ -2,13 +2,6 @@ local Flup = require("lib.flup")
 
 local Screen = Class({
   stats = {},
-  channels = {
-    -- general purpose reliable channel
-    [0] = function(event)
-      local payload = msgpack.unpack(event.data)
-      log.debug("Received general purpose event: ", inspect(payload))
-    end,
-  },
   dimensions = { w = 0, h = 0 },
   padding = 10,
 })
@@ -96,10 +89,11 @@ function Screen:update(dt)
 end
 
 function Screen:handleReceive(event)
-  local handler = self.channels[event.channel]
-  if handler then
-    handler(event)
-  end
+  self:each_component(function(c)
+    if c.consumes and c:consumes(event) then
+      c:consume(event.data)
+    end
+  end)
 end
 
 function Screen:draw()

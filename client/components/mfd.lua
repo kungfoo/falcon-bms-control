@@ -86,6 +86,20 @@ function Mfd:updateGeometry(x, y, w, h)
   self:createButtons(self.id)
 end
 
+-- returns whether this component wants to consume this event
+function Mfd:consumes(event)
+  return event.channel == self:expected_channel()
+end
+
+function Mfd:expected_channel()
+  -- this is a hack, I have to stop littering this over the code base.
+  local channels = {
+    ["f16/left-mfd"] = 1,
+    ["f16/right-mfd"] = 2,
+  }
+  return channels[self.id]
+end
+
 function Mfd:consume(data)
   self.imageData = love.image.newImageData(love.data.newByteData(data))
   self.image = nil
