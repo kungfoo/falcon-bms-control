@@ -99,6 +99,7 @@ function love.load()
     local layout = Layouts:find(Settings:layout()) or Layouts:find("default-landscape")
 
     while #custom_screens > 0 do
+      -- hack, since we can't simply clear the table
       table.pop(custom_screens)
     end
     local from_layout = createScreensForLayout(layout)
