@@ -2,22 +2,18 @@ local Footer = Class({})
 
 local ImageButton = require("components.image-button")
 
-function Footer:init(switcher, settings_screen)
+function Footer:init(switcher, settings_screen, layout_selection_screen)
   self.switcher = switcher
   self.settings_button = ImageButton("icons/settings.png", { align = "right" }, function()
     State.switch(settings_screen)
   end)
-  self.layouts_button = ImageButton("icons/layouts.png", { align = "left" }, function() end)
   self.transform = love.math.newTransform()
 
   self.flup = Flup.split({
     direction = "x",
     components = {
       left = self.switcher,
-      right = Flup.split({
-        direction = "x",
-        components = { self.layouts_button, self.settings_button },
-      }),
+      right = self.settings_button,
     },
   })
 end
@@ -30,7 +26,6 @@ function Footer:draw()
 
   self.switcher:draw()
   self.settings_button:draw()
-  self.layouts_button:draw()
 
   love.graphics.pop()
 end
@@ -42,13 +37,11 @@ end
 function Footer:mousepressed(x, y, button, isTouch, presses)
   self.switcher:mousepressed(x, y, button, isTouch, presses)
   self.settings_button:mousepressed(x, y, button, isTouch, presses)
-  self.layouts_button:mousepressed(x, y, button, isTouch, presses)
 end
 
 function Footer:mousereleased(x, y, button, isTouch, presses)
   self.switcher:mousereleased(x, y, button, isTouch, presses)
   self.settings_button:mousereleased(x, y, button, isTouch, presses)
-  self.layouts_button:mousereleased(x, y, button, isTouch, presses)
 end
 
 return Footer

@@ -1,5 +1,5 @@
 --[[
-	extra table routines
+  extra table routines
 ]]
 -- return the back element of a table
 function table.back(t)
@@ -119,15 +119,15 @@ function table.overlay(to, from)
 end
 
 -- copy a table
---	deep_or_into is either:
---		a boolean value, used as deep flag directly
---		or a table to copy into, which implies a deep copy
---	if deep specified:
---		calls copy method of member directly if it exists
---		and recurses into all "normal" table children
---	if into specified, copies into that table
---		but doesn't clear anything out
---		(useful for deep overlays and avoiding garbage)
+--  deep_or_into is either:
+--    a boolean value, used as deep flag directly
+--    or a table to copy into, which implies a deep copy
+--  if deep specified:
+--    calls copy method of member directly if it exists
+--    and recurses into all "normal" table children
+--  if into specified, copies into that table
+--    but doesn't clear anything out
+--    (useful for deep overlays and avoiding garbage)
 function table.copy(t, deep_or_into)
   assert(type(t) == "table", "table.copy - argument 't' must be a table")
   local is_bool = type(deep_or_into) == "boolean"

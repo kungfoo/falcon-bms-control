@@ -11,15 +11,14 @@ local connecting = { port = 9022, channels = 255 }
 
 function Screen:init()
   self.settings_button = ImageButton("icons/settings.png", { align = "right" }, function()
-    State.switch(self.settings_screen, self)
+    State.switch(settings_screen, self)
   end)
   self.components = { connection_state_label, self.settings_button }
 end
 
-function Screen:enter(previous, settings_screen, next_screen)
+function Screen:enter(previous)
   self.previous_screen = previous
   self.next_screen = next_screen
-  self.settings_screen = settings_screen
 
   if Settings:ip() then
     log.info("Connecting to " .. Settings:ip() .. ", stored in settings.")
@@ -84,7 +83,14 @@ function Screen:update(dt)
 end
 
 function Screen:handleReceive(event)
-  -- intentionally left blank
+  if event and event.type == "connect" then
+    log.info("Connected ...")
+    Connection.peer = event.peer
+    State.switch(custom_screens[1])
+  elseif event and event.type == "disconnect" then
+    log.info("Disconnected...")
+    Connection.peer = nil
+  end
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)

@@ -8,13 +8,12 @@ local Screen = Class({
 
 function Screen:init(spec)
   if not spec then
-    -- gets called a second time with nil once we enter the screen, :/
     return
   end
   self.name = spec.name
 
   if #spec.components > 1 then
-    log.error("Creating a screen with more than one root component.")
+    log.error("Entering a screen with more than one root component.")
   end
   self.root_component = table.shift(spec.components)
 end
@@ -89,11 +88,15 @@ function Screen:update(dt)
 end
 
 function Screen:handleReceive(event)
-  self:each_component(function(c)
-    if c.consumes and c:consumes(event) then
-      c:consume(event.data)
-    end
-  end)
+  if event and event.type == "disconnect" then
+    State.switch(connecting_screen)
+  elseif event and event.type == "receive" then
+    self:each_component(function(c)
+      if c.consumes and c:consumes(event) then
+        c:consume(event.data)
+      end
+    end)
+  end
 end
 
 function Screen:draw()

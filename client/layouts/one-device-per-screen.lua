@@ -1,6 +1,6 @@
 return {
   id = "one-device",
-  name = "one device per screen",
+  name = "One device per screen",
   description = "Puts each device (each MFD, ICP) on a separate screen. Useful for people with multiple tablets.",
   metadata = {
     version = "1.0",

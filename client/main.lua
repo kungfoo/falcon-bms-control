@@ -36,24 +36,35 @@ inspect = require("lib.inspect")
 local tick = require("lib.tick")
 
 -- load predefined layouts
-local Layouts = require("lib.layouts")
+Layouts = require("lib.layouts")()
 local ScreenParser = require("lib.screen-parser")
 -- component regisrty for predefined and custom layouts
 local ComponentRegistry = require("lib.component-registry")
-
--- screen states
-local settings_screen = require("screens.settings-screen")
-local connecting_screen = require("screens.connecting-screen")
 local CustomLayoutScreen = require("screens.custom-layout-screen")
 
-local debug = { enabled = true, stats = { time_update = 0, time_draw = 0 } }
-
+-- switcher component
 local Switcher = require("components.switcher")
 
 -- footer component is present on most screens
 local footer = require("components.footer")
 
+-- screen states have to be loaded globally
+settings_screen = require("screens.settings-screen")
+connecting_screen = require("screens.connecting-screen")
+
 local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
+
+-- this will hold custom screens later
+custom_screens = {}
+
+local function createScreensForLayout(layout)
+  local screens_from_layout = screen_parser:createScreens(layout.definition.screens)
+
+  return table.map(screens_from_layout, function(spec)
+    log.debug("Creating a screen for", spec.name)
+    return CustomLayoutScreen(spec)
+  end)
+end
 
 function love.load()
   if isDevelopment() then
@@ -61,31 +72,43 @@ function love.load()
     lovebird = require("lib.development.lovebird")
   end
 
-  layouts = Layouts()
   registry = ComponentRegistry()
   screen_parser = ScreenParser(registry)
-  -- tbd: replace with layout from settings
-  layout = layouts:find("consolidated")
-  screens_from_layout = screen_parser:createScreens(layout.definition.screens)
 
-  local custom_screens = table.map(screens_from_layout, function(spec)
-    log.debug("Creating a screen for", spec.name)
-    return CustomLayoutScreen(spec)
-  end)
+  local switcher = Switcher(custom_screens)
 
-  switcher = Switcher(custom_screens)
-
-  Footer = footer(switcher, settings_screen)
+  Footer = footer(switcher, settings_screen, layout_selection_screen)
 
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second
 
   State.registerEvents()
-  State.switch(connecting_screen, settings_screen)
+  State.switch(connecting_screen)
 
   Signal.register("send-to-server", function(message)
     Connection.server:send(msgpack.pack(message))
   end)
+
+  Signal.register("settings-changed", function(settings)
+    log.debug("Settings changed, reconnecting...")
+    State.switch(connecting_screen)
+  end)
+
+  Signal.register("layout-changed", function(layout)
+    log.debug("Updating layout to:", Settings:layout())
+    local layout = Layouts:find(Settings:layout()) or Layouts:find("default-landscape")
+
+    while #custom_screens > 0 do
+      table.pop(custom_screens)
+    end
+    local from_layout = createScreensForLayout(layout)
+    table.foreach(from_layout, function(screen)
+      table.push(custom_screens, screen)
+    end)
+  end)
+
+  -- trigger layout loading once
+  Signal.emit("layout-changed")
 end
 
 function Connection:service()
@@ -103,20 +126,7 @@ function love.update(dt)
 
   -- service enet host.
   local success, event = pcall(Connection.service)
-  while success and event do
-    if event.type == "disconnect" then
-      log.info("Disconnected.")
-      State.switch(connecting_screen, settings_screen)
-    elseif event.type == "connect" then
-      log.info("Connected ...")
-      Connection.peer = event.peer
-      -- switch to first screen
-      switcher:switch()
-    elseif event.type == "receive" then
-      State.current():handleReceive(event)
-    end
-    success, event = pcall(Connection.service)
-  end
+  State.current():handleReceive(event)
 end
 
 function love.draw() end
