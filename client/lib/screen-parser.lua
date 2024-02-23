@@ -1,5 +1,6 @@
 local Screen = require("lib.screen")
 local ScreenParser = Class({})
+local CustomLayoutScreen = require("screens.custom-layout-screen")
 
 function ScreenParser:findComponentId(node)
   return (node.metadata or {}).id or node.identifier
@@ -79,6 +80,15 @@ function ScreenParser:createScreens(screen_definitions)
     table.push(result, Screen(name, components))
   end
   return result
+end
+
+function ScreenParser:createScreensForLayout(layout)
+  local screens_from_layout = self:createScreens(layout.definition.screens)
+
+  return table.map(screens_from_layout, function(spec)
+    log.debug("Creating a screen for", spec.name)
+    return CustomLayoutScreen(spec)
+  end)
 end
 
 return ScreenParser

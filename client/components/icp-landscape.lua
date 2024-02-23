@@ -5,7 +5,7 @@ local RockerButton = require("components.rocker")
 local Icp = Class({
   padding = 25,
   width = 800,
-  height = 300,
+  height = 280,
   identifier = "f16/icp-landscape",
 })
 

@@ -103,10 +103,8 @@ function Choice:mousepressed(x, y, button, touch, presses)
 end
 
 function Choice:setValue(value)
-  log.debug("value:", value)
   for i, v in ipairs(self.values) do
     if v.value == value then
-      log.debug("found index of ", value, i)
       self.index = i
     end
   end

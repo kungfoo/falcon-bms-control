@@ -40,7 +40,6 @@ Layouts = require("lib.layouts")()
 local ScreenParser = require("lib.screen-parser")
 -- component regisrty for predefined and custom layouts
 local ComponentRegistry = require("lib.component-registry")
-local CustomLayoutScreen = require("screens.custom-layout-screen")
 
 -- switcher component
 local Switcher = require("components.switcher")
@@ -56,15 +55,6 @@ local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "norma
 
 -- this will hold custom screens later
 custom_screens = {}
-
-local function createScreensForLayout(layout)
-  local screens_from_layout = screen_parser:createScreens(layout.definition.screens)
-
-  return table.map(screens_from_layout, function(spec)
-    log.debug("Creating a screen for", spec.name)
-    return CustomLayoutScreen(spec)
-  end)
-end
 
 function love.load()
   if isDevelopment() then
@@ -102,7 +92,7 @@ function love.load()
       -- hack, since we can't simply clear the table
       table.pop(custom_screens)
     end
-    local from_layout = createScreensForLayout(layout)
+    local from_layout = screen_parser:createScreensForLayout(layout)
     table.foreach(from_layout, function(screen)
       table.push(custom_screens, screen)
     end)
