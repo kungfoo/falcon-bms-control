@@ -29,7 +29,6 @@ return {
                   {
                     type = "ded",
                     identifier = "f16/ded",
-                    data_channel = 3,
                   },
                 },
               },
@@ -41,7 +40,6 @@ return {
                   {
                     type = "mfd",
                     identifier = "f16/mfd",
-                    data_channel = 1,
                     metadata = {
                       id = "f16/left-mfd",
                     },
@@ -49,7 +47,6 @@ return {
                   {
                     type = "mfd",
                     identifier = "f16/mfd",
-                    data_channel = 2,
                     metadata = {
                       id = "f16/right-mfd",
                     },
