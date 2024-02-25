@@ -11,21 +11,20 @@ local connecting = { port = 9022, channels = 255 }
 
 function Screen:init()
   self.settings_button = ImageButton("icons/settings.png", { align = "right" }, function()
-    State.switch(self.settings_screen, self)
+    State.switch(settings_screen, self)
   end)
   self.components = { connection_state_label, self.settings_button }
 end
 
-function Screen:enter(previous, settings_screen)
+function Screen:enter(previous)
   self.previous_screen = previous
   self.next_screen = next_screen
-  self.settings_screen = settings_screen
 
   if Settings:ip() then
-    print("Connecting to " .. Settings:ip() .. ", stored in settings.")
+    log.info("Connecting to " .. Settings:ip() .. ", stored in settings.")
     Screen:connect(Settings:ip())
   else
-    print("Starting server discovery...")
+    log.info("Starting server discovery...")
     connection_state_label.value = "Discovering server..."
     broadcast.socket = socket.udp4()
     broadcast.socket:settimeout(0)
@@ -39,7 +38,7 @@ function Screen:connect(ip)
   connection_state_label.value = "Connecting to " .. ip .. "..."
   Connection.ip = ip or Settings:ip()
   version = enet.linked_version()
-  print("enet version: ${version}" % { version = version })
+  log.debug("enet version: ${version}" % { version = version })
   Connection.host = enet.host_create()
   Connection.server = Connection.host:connect(Connection.ip .. ":" .. connecting.port, connecting.channels)
 end
@@ -54,7 +53,7 @@ function Screen:receiveAck()
   if datagram and ip and port then
     local message = msgpack.unpack(datagram)
     if message.type == "ack" then
-      print("Discovered server at [${ip}] on port [${port}]" % { ip = ip, port = port })
+      log.info("Discovered server at [${ip}] on port [${port}]" % { ip = ip, port = port })
       Screen:connect(ip)
     end
   end
@@ -63,7 +62,7 @@ end
 function Screen:leave()
   -- are we even sending?
   if broadcast.send then
-    print("Stopping server discovery.")
+    log.info("Stopping server discovery.")
     Timer.cancel(broadcast.send)
     Timer.cancel(broadcast.receive)
     broadcast.socket:close()
@@ -84,7 +83,14 @@ function Screen:update(dt)
 end
 
 function Screen:handleReceive(event)
-  -- intentionally left blank
+  if event and event.type == "connect" then
+    log.info("Connected ...")
+    Connection.peer = event.peer
+    State.switch(custom_screens[1])
+  elseif event and event.type == "disconnect" then
+    log.info("Disconnected...")
+    Connection.peer = nil
+  end
 end
 
 function Screen:adjustLayoutIfNeeded(w, h)

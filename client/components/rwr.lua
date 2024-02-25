@@ -7,6 +7,7 @@ local Rwr = Class({
   height = 240,
   corner_radius = 10,
   font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
+  identifier = "f16/rwr",
 })
 
 function Rwr:init(id, x, y)
@@ -104,6 +105,10 @@ function Rwr:determineScale(w, h)
     local a, b = w / dw, h / dh
     return math.min(a, b)
   end
+end
+
+function Rwr:consumes(event)
+  return event.channel == 4
 end
 
 function Rwr:consume(data)

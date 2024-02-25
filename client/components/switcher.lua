@@ -10,14 +10,10 @@ function Switcher:init(states)
 end
 
 function Switcher:switch(state)
-  if state then
-    self.currentState = state
-    table.remove_value(self.states, state)
-    table.push(self.states, state)
-  else
-    self.currentState = table.shift(self.states)
-    table.push(self.states, self.currentState)
-  end
+  log.debug("Switching to next state")
+  self.currentState = table.shift(self.states)
+  table.push(self.states, self.currentState)
+
   State.switch(self.currentState)
   self.index = math.wrap(self.index + 1, 0, #self.states)
 end
@@ -25,6 +21,10 @@ end
 function Switcher:update(dt) end
 
 function Switcher:draw()
+  if #self.states == 1 then
+    -- do not draw
+    return
+  end
   love.graphics.push()
   love.graphics.applyTransform(self.transform)
 
@@ -75,6 +75,9 @@ function Switcher:released()
 end
 
 function Switcher:mousepressed(x, y, button, isTouch, presses)
+  if #self.states == 1 then
+    return
+  end
   local dx, dy = self.transform:inverseTransformPoint(x, y)
   local hit = dx >= 0 and dx <= self.width and dy >= 0 and dy <= self.height
   if hit then

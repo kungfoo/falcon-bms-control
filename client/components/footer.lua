@@ -2,14 +2,20 @@ local Footer = Class({})
 
 local ImageButton = require("components.image-button")
 
-function Footer:init(switcher, settings_screen)
+function Footer:init(switcher, settings_screen, layout_selection_screen)
   self.switcher = switcher
   self.settings_button = ImageButton("icons/settings.png", { align = "right" }, function()
     State.switch(settings_screen)
   end)
   self.transform = love.math.newTransform()
 
-  self.flup = Flup.split({ direction = "x", components = { left = self.switcher, right = self.settings_button } })
+  self.flup = Flup.split({
+    direction = "x",
+    components = {
+      left = self.switcher,
+      right = self.settings_button,
+    },
+  })
 end
 
 function Footer:update(dt) end

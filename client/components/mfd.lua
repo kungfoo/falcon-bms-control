@@ -4,7 +4,11 @@ local layout = require("lib.suit.layout").new()
 
 local MfdButton = require("components.mfd-button")
 
-local Mfd = Class({ max_size = 502 })
+local Mfd = Class({
+  max_size = 502,
+  -- todo: might want to rename this to component-id or so
+  identifier = "f16/mfd",
+})
 
 function Mfd:init(identifier, x, y)
   self.id = identifier
@@ -80,6 +84,20 @@ function Mfd:updateGeometry(x, y, w, h)
   self.transform = love.math.newTransform()
   self.transform:translate(x, y):scale(scale)
   self:createButtons(self.id)
+end
+
+-- returns whether this component wants to consume this event
+function Mfd:consumes(event)
+  return event.channel == self:expected_channel()
+end
+
+function Mfd:expected_channel()
+  -- this is a hack, I have to stop littering this over the code base.
+  local channels = {
+    ["f16/left-mfd"] = 1,
+    ["f16/right-mfd"] = 2,
+  }
+  return channels[self.id]
 end
 
 function Mfd:consume(data)

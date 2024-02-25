@@ -3,6 +3,7 @@ local Slider = require("components.slider")
 local Label = require("components.label")
 local ImageButton = require("components.image-button")
 local Input = require("components.input")
+local Choice = require("components.choice")
 
 -- adjusts max RTT texture update frequency, may be beneficial for slow devices
 local function describe_refresh_rate(value)
@@ -48,7 +49,7 @@ local function to_bool(value)
     if value == 1 then
       return true
     else
-      print("Intederminate value of bool: " .. value)
+      log.error("Indeterminate value of bool: " .. value)
       return false
     end
   end
@@ -98,17 +99,67 @@ end, {}, { values = { 0, 1 } })
 
 local settings_label = Label("Settings", { size = 30 })
 
+local screen_layout_label = Label("Screen layout", { size = 30 })
+
+local screen_layout_description_label = Label("Descibes the currently selected screen layout")
+
+local function describe_layout(id)
+  return (Layouts:descriptor(id) or {}).description or "Cannot describe selected layout."
+end
+
+local options = table.map(Layouts:descriptors(), function(d)
+  return {
+    text = d.name,
+    value = d.id,
+  }
+end)
+
+local layout_choice = Choice(options, function(selected)
+  screen_layout_description_label.value = describe_layout(selected.value)
+  Settings:setLayout(selected.value)
+  Signal.emit("layout-changed")
+end)
+
+layout_choice:setValue(Settings:layout())
+screen_layout_description_label.value = describe_layout(Settings:layout())
+
 function Screen:init()
   self.close_button = ImageButton("icons/close.png", { align = "right" }, function()
-    State.switch(self.previous_screen, self)
+    if Settings.changed then
+      State.switch(connecting_screen, self)
+    else
+      if self.previous_screen then
+        State.switch(self.previous_screen, self)
+      else
+        State.switch(table.back(custom_screens))
+      end
+    end
   end)
-  self.labels = { settings_label, refresh_rate_label, quality_label, vibrate_label, server_ip_label }
-  self.components = { refresh_rate_slider, quality_slider, vibrate_slider, self.close_button, server_ip_input }
+
+  self.labels = {
+    settings_label,
+    refresh_rate_label,
+    quality_label,
+    vibrate_label,
+    server_ip_label,
+    screen_layout_label,
+    screen_layout_description_label,
+  }
+  self.components = {
+    refresh_rate_slider,
+    quality_slider,
+    vibrate_slider,
+    server_ip_input,
+    layout_choice,
+    self.close_button,
+  }
 end
 
 function Screen:enter(previous)
+  Settings.changed = false
   self.previous_screen = previous
   server_ip_input:setValue(Settings:ip())
+  layout_choice:setValue(Settings:layout())
 end
 
 function Screen:leave() end
@@ -121,9 +172,9 @@ function Screen:update(dt)
     self.dimensions.w = w
     self.dimensions.h = h
   end
-  for _, component in ipairs(self.components) do
+  table.foreach(self.components, function(component)
     component:update(dt)
-  end
+  end)
 end
 
 function Screen:handleReceive(event)
@@ -133,11 +184,13 @@ end
 function Screen:adjustLayoutIfNeeded(w, h)
   local settings_flup = Flup.grid({
     rows = {
-      { columns = { settings_label, {} } },
+      { columns = { settings_label } },
       { columns = { server_ip_label, server_ip_input } },
       { columns = { refresh_rate_label, refresh_rate_slider } },
       { columns = { quality_label, quality_slider } },
       { columns = { vibrate_label, vibrate_slider } },
+      { columns = { screen_layout_label } },
+      { columns = { screen_layout_description_label, layout_choice } },
     },
   })
 
@@ -154,39 +207,39 @@ function Screen:draw()
 end
 
 function Screen:mousepressed(x, y, button, isTouch, presses)
-  for _, component in ipairs(self.components) do
+  table.foreach(self.components, function(component)
     component:mousepressed(x, y, button, isTouch, presses)
-  end
+  end)
 end
 
 function Screen:mousereleased(x, y, button, isTouch, presses)
-  for _, component in ipairs(self.components) do
+  table.foreach(self.components, function(component)
     component:mousereleased(x, y, button, isTouch, presses)
-  end
+  end)
 end
 
 function Screen:textedited(text, start, length)
-  for _, component in ipairs(self.components) do
+  table.foreach(self.components, function(component)
     pcall(function()
       component:textedited(text, start, length)
     end)
-  end
+  end)
 end
 
 function Screen:textinput(t)
-  for _, component in ipairs(self.components) do
+  table.foreach(self.components, function(component)
     pcall(function()
       component:textinput(t)
     end)
-  end
+  end)
 end
 
 function Screen:keypressed(key)
-  for _, component in ipairs(self.components) do
+  table.foreach(self.components, function(component)
     pcall(function()
       component:keypressed(key)
     end)
-  end
+  end)
 end
 
 return Screen

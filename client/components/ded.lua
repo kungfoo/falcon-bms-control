@@ -7,6 +7,7 @@ local Ded = Class({
   height = 150,
   corner_radius = 10,
   font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal"),
+  identifier = "f16/ded",
 })
 
 function Ded:init(id, x, y)
@@ -75,6 +76,10 @@ function Ded:determineScale(w, h)
     local a, b = w / dw, h / dh
     return math.min(a, b)
   end
+end
+
+function Ded:consumes(event)
+  return event.channel == 3
 end
 
 function Ded:consume(data)

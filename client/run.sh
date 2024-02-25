@@ -1,3 +1,3 @@
 #!/bin/bash
 
-love .
+RUN_MODE=development love .

@@ -1,10 +1,11 @@
-Timer = require("lib.hump.timer")
-
 local socket = require("socket")
-local msgpack = require("msgpack")
 local enet = require("enet")
-local tick = require("tick")
-local inspect = require("inspect")
+
+log = require("lib.log")
+Timer = require("lib.hump.timer")
+local msgpack = require("lib.msgpack")
+local tick = require("lib.tick")
+local inspect = require("lib.inspect")
 
 local server = { host = nil, clients = {} }
 
@@ -30,7 +31,7 @@ function love.load()
   broadcast.socket = socket.udp4()
   broadcast.socket:setsockname("*", broadcast.port)
   broadcast.socket:settimeout(0)
-  print("Server is ready on broadcast port " .. broadcast.port .. " and connection port " .. connection.port)
+  log.info("Server is ready on broadcast port " .. broadcast.port .. " and connection port " .. connection.port)
 end
 
 function receiveHello()
@@ -38,7 +39,7 @@ function receiveHello()
 
   if not error and datagram then
     local message = msgpack.unpack(datagram)
-    print(inspect({ msg = message, from = ip, port = port }))
+    log.debug(inspect({ msg = message, from = ip, port = port }))
     if message.type == "hello" then
       local ack = msgpack.pack({ type = "ack" })
       broadcast.socket:sendto(ack, ip, port)
@@ -63,16 +64,16 @@ function love.update(dt)
   while success and event do
     if event.type == "connect" then
       server.clients[event.peer] = event.peer:connect_id()
-      print("Connected, clients are now:")
-      print(inspect(server.clients))
+      log.info("Connected, clients are now:")
+      log.info(inspect(server.clients))
     elseif event.type == "disconnect" then
       server.clients[event.peer] = nil
       chunks_to_send[event.peer] = nil
-      print("Disconnected, clients are now:")
-      print(inspect(server.clients))
+      log.info("Disconnected, clients are now:")
+      log.info(inspect(server.clients))
     elseif event.type == "receive" then
       local payload = msgpack.unpack(event.data)
-      print(inspect(payload))
+      log.info(inspect(payload))
 
       if string.match(payload.type, "osb-") then
         event.peer:send(msgpack.pack({ type = "ack", payload = payload }))
@@ -95,7 +96,7 @@ function love.update(dt)
         end
       end
     else
-      print("Not handled: ", event.type)
+      log.error("Unhandled event type:", event.type)
     end
     success, event = pcall(server.service)
   end
@@ -106,7 +107,7 @@ function server:service()
 end
 
 function love.quit()
-  print("Quitting server...")
+  log.info("Quitting server...")
   for peer, id in pairs(server.clients) do
     peer:disconnect()
   end
