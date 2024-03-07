@@ -1,7 +1,7 @@
 local socket = require("socket")
 local enet = require("enet")
 
-log = require("lib.log")
+local log = require("lib.log")
 Timer = require("lib.hump.timer")
 local msgpack = require("lib.msgpack")
 local tick = require("lib.tick")
@@ -20,21 +20,7 @@ local images = {
   ["f16/right-mfd"] = { channel = 2, data = love.filesystem.newFileData("images/right-mfd.jpeg") },
 }
 
-function love.load()
-  tick.framerate = 60 -- Limit framerate to 60 frames per second.
-  tick.rate = 0.016
-
-  server.host = enet.host_create("*:" .. connection.port, connection.max_peers, connection.channels)
-
-  broadcast.timer = Timer.every(1, receiveHello)
-  Timer.every(0.3, sendChunks)
-  broadcast.socket = socket.udp4()
-  broadcast.socket:setsockname("*", broadcast.port)
-  broadcast.socket:settimeout(0)
-  log.info("Server is ready on broadcast port " .. broadcast.port .. " and connection port " .. connection.port)
-end
-
-function receiveHello()
+local function receiveHello()
   local datagram, ip, port, error = broadcast.socket:receivefrom()
 
   if not error and datagram then
@@ -47,7 +33,7 @@ function receiveHello()
   end
 end
 
-function sendChunks()
+local function sendChunks()
   for peer, identifiers in pairs(chunks_to_send) do
     for _, id in ipairs(identifiers) do
       local image = images[id]
@@ -56,6 +42,20 @@ function sendChunks()
       end
     end
   end
+end
+
+function love.load()
+  tick.framerate = 60 -- Limit framerate to 60 frames per second.
+  tick.rate = 0.016
+
+  server.host = enet.host_create("*:" .. connection.port, connection.max_peers, connection.channels)
+
+  broadcast.timer = Timer.every(1, receiveHello)
+  Timer.every(0.3, sendChunks)
+  broadcast.socket = socket.udp4()
+  broadcast.socket:setsockname("*", broadcast.port)
+  broadcast.socket:settimeout(0)
+  log.info("Server is ready on broadcast port " .. broadcast.port .. " and connection port " .. connection.port)
 end
 
 function love.update(dt)
@@ -108,7 +108,7 @@ end
 
 function love.quit()
   log.info("Quitting server...")
-  for peer, id in pairs(server.clients) do
+  for peer, _ in pairs(server.clients) do
     peer:disconnect()
   end
   server.host:flush()
