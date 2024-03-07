@@ -32,6 +32,8 @@ Colors = require("lib.colors")
 msgpack = require("lib.msgpack")
 inspect = require("lib.inspect")
 
+local lovebird = {}
+
 -- fix your simulation time step
 local tick = require("lib.tick")
 
@@ -51,8 +53,6 @@ local footer = require("components.footer")
 settings_screen = require("screens.settings-screen")
 connecting_screen = require("screens.connecting-screen")
 
-local font = love.graphics.newFont("fonts/b612/B612Mono-Regular.ttf", 20, "normal")
-
 -- this will hold custom screens later
 custom_screens = {}
 
@@ -62,12 +62,12 @@ function love.load()
     lovebird = require("lib.development.lovebird")
   end
 
-  registry = ComponentRegistry()
-  screen_parser = ScreenParser(registry)
+  local registry = ComponentRegistry()
+  local screen_parser = ScreenParser(registry)
 
   local switcher = Switcher(custom_screens)
 
-  Footer = footer(switcher, settings_screen, layout_selection_screen)
+  Footer = footer(switcher, settings_screen)
 
   tick.framerate = 60 -- Limit framerate to 60 frames per second.
   tick.rate = 0.02 -- 50 updates per second
@@ -79,12 +79,12 @@ function love.load()
     Connection.server:send(msgpack.pack(message))
   end)
 
-  Signal.register("settings-changed", function(settings)
+  Signal.register("settings-changed", function(_)
     log.debug("Settings changed, reconnecting...")
     State.switch(connecting_screen)
   end)
 
-  Signal.register("layout-changed", function(layout)
+  Signal.register("layout-changed", function(_)
     log.debug("Updating layout to:", Settings:layout())
     local layout = Layouts:find(Settings:layout()) or Layouts:find("default-landscape")
 
@@ -117,7 +117,9 @@ function love.update(dt)
 
   -- service enet host.
   local success, event = pcall(Connection.service)
-  State.current():handleReceive(event)
+  if success then
+    State.current():handleReceive(event)
+  end
 end
 
 function love.draw() end

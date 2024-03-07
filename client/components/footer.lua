@@ -2,7 +2,7 @@ local Footer = Class({})
 
 local ImageButton = require("components.image-button")
 
-function Footer:init(switcher, settings_screen, layout_selection_screen)
+function Footer:init(switcher, settings_screen)
   self.switcher = switcher
   self.settings_button = ImageButton("icons/settings.png", { align = "right" }, function()
     State.switch(settings_screen)

@@ -30,7 +30,7 @@ end
 -- descriptors for all the available layouts
 function Layouts:descriptors()
   local result = {}
-  for i, l in pairs(self.layouts) do
+  for _, l in pairs(self.layouts) do
     table.push(result, {
       id = l.id,
       name = l.name,

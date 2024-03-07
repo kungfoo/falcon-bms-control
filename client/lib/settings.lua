@@ -13,8 +13,8 @@ local Settings = Class({})
 local file_name = "settings.msgpack"
 
 function Settings:init()
-  local file_data, size = love.filesystem.read(file_name)
-  local from_file = {}
+  local file_data, _ = love.filesystem.read(file_name)
+  local success, from_file = false, {}
   if file_data then
     success, from_file = pcall(function()
       return msgpack.unpack(file_data)
@@ -43,7 +43,7 @@ function Settings:onChange()
   })
   local success, error = love.filesystem.write(file_name, bytes)
   if not success then
-    log.error("Failed to write settings.")
+    log.error("Failed to write settings: ", error)
   end
   self.changed = true
 end

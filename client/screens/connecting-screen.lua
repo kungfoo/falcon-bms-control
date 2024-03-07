@@ -18,7 +18,6 @@ end
 
 function Screen:enter(previous)
   self.previous_screen = previous
-  self.next_screen = next_screen
 
   if Settings:ip() then
     log.info("Connecting to " .. Settings:ip() .. ", stored in settings.")
@@ -37,8 +36,7 @@ end
 function Screen:connect(ip)
   connection_state_label.value = "Connecting to " .. ip .. "..."
   Connection.ip = ip or Settings:ip()
-  version = enet.linked_version()
-  log.debug("enet version: ${version}" % { version = version })
+  log.debug("enet version: ${version}" % { version = enet.linked_version() })
   Connection.host = enet.host_create()
   Connection.server = Connection.host:connect(Connection.ip .. ":" .. connecting.port, connecting.channels)
 end

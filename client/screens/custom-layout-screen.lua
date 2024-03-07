@@ -18,7 +18,7 @@ function Screen:init(spec)
   self.root_component = table.shift(spec.components)
 end
 
-function Screen:enter(previous)
+function Screen:enter(_)
   local x, y, w, h = love.window.getSafeArea()
   self.flup = Flup.split({
     direction = "y",
