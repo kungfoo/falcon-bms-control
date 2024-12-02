@@ -219,7 +219,7 @@ namespace FalconBmsUniversalServer
     internal class StreamedTextureThread
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("StreamedTextureThread");
-        private static readonly int MAX_FAILED_CHUNKS = 180;
+        private static readonly int MAX_FAILED_CHUNKS_SECONDS = 3;
         private readonly IxxHash _hasher = xxHashFactory.Instance.Create();
         private readonly StreamedTextureRequest _request;
         private readonly ENetPeer _peer;
@@ -271,9 +271,10 @@ namespace FalconBmsUniversalServer
                 catch (Exception e)
                 {
                     _failedChunks++;
-                    if (_failedChunks > MAX_FAILED_CHUNKS)
+                    var maxFailedChunks = MAX_FAILED_CHUNKS_SECONDS * _request.refresh_rate;
+                    if (_failedChunks > maxFailedChunks)
                     {
-                        Logger.Error("Assuming peer {0} has died because {1} chunks failed while sending with '{2}'", _peer, MAX_FAILED_CHUNKS, e.Message);
+                        Logger.Error("Assuming peer {0} has died because {1} chunks failed while sending with '{2}'", _peer, maxFailedChunks, e.Message);
                         // probably this peer has died.
                         _onTooManyFailedChunks();
                     }
