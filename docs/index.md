@@ -8,7 +8,7 @@ Releases for both iOS and android are available for free. The client and server 
 
 - Install the app on your device
 - Install the windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/)
-- Enable RTT exports in `${falcon bms install}/user/config/falcon_bms.cfg`: set `g_bExportRTTTextures 1`
+- Enable RTT exports in `${falcon bms install}/user/config/Falcon BMS User.cfg`: set `g_bExportRTTTextures 1` (using the user.cfg file will pevent the updater from overwriting your settings during an update)
 - Allow the server application in Windows Firewall
 
 ## Can I disable automatic server discovery?
