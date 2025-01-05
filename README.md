@@ -1,5 +1,9 @@
 # Falcon BMS Control
 
+## Where is the user documentation?
+
+Please find the latest user documentation here: https://kungfoo.github.io/falcon-bms-control/
+
 ## What is this?
 
 `falcon-bms-control` lets you control Falcon BMS from any touch enabled device (tablet or computer).
