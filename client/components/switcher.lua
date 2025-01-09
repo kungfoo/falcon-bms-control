@@ -9,7 +9,7 @@ function Switcher:init(states)
   self.transform = love.math.newTransform()
 end
 
-function Switcher:switch(state)
+function Switcher:switch()
   log.debug("Switching to next state")
   self.currentState = table.shift(self.states)
   table.push(self.states, self.currentState)

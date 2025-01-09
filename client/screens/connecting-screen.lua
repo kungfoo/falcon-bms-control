@@ -84,7 +84,7 @@ function Screen:handleReceive(event)
   if event and event.type == "connect" then
     log.info("Connected ...")
     Connection.peer = event.peer
-    State.switch(custom_screens[1])
+    State.switch(table.back(custom_screens))
   elseif event and event.type == "disconnect" then
     log.info("Disconnected...")
     Connection.peer = nil
