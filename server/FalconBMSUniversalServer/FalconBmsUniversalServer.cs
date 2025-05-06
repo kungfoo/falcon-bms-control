@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using FalconBmsUniversalServer.Messages;
 using FalconBmsUniversalServer.SharedTextureMemory;
 using MessagePack;
+using System.Text;
 
 
 namespace FalconBmsUniversalServer
@@ -68,8 +69,32 @@ namespace FalconBmsUniversalServer
             Logger.Info("Running on {0}", endpoint);
 
             var host = new ENetHost(endpoint, ENetHost.MaximumPeers, 10);
-            host.OnConnect += Host_OnConnect;
-            host.Service();
+
+            while (true)
+            {
+                var _event = host.Service(TimeSpan.MaxValue);
+                switch (_event.Type)
+                {
+                    case ENetEventType.None:
+                        continue;
+
+                    case ENetEventType.Connect:
+                        HandleConnected(_event);
+                        continue;
+
+                    case ENetEventType.Disconnect:
+                        HandleDisconnect(_event);
+                        continue;
+
+                    case ENetEventType.Receive:
+                        HandleReceive(_event);
+                        continue;
+
+                    default:
+                        throw new NotImplementedException();
+                }
+
+            }
         }
 
         private void StartUdpListener()
@@ -94,19 +119,17 @@ namespace FalconBmsUniversalServer
             });
         }
 
-        private void Host_OnConnect(object sender, ENetConnectEventArgs e)
+        private void HandleConnected(ENetEvent @event)
         {
-            Logger.Info("Peer connected from {0}", e.Peer.RemoteEndPoint);
-
-            e.Peer.OnReceive += Peer_OnReceive;
-            e.Peer.OnDisconnect += Peer_OnDisconnect;
+            Logger.Info("Peer connected from {0}", @event.Peer.GetRemoteEndPoint());
         }
 
-        private void Peer_OnDisconnect(object sender, uint e)
+        private void HandleDisconnect(ENetEvent @event)
         {
+            var sender = @event.Peer;
             if (sender is ENetPeer peer)
             {
-                Logger.Info("Peer disconnected from {0}", peer.RemoteEndPoint);
+                Logger.Info("Peer disconnected from {0}", peer.GetRemoteEndPoint());
                 foreach (var key in _runningStreams.Keys.Where(key => key.Peer == peer))
                 {
                     _runningStreams.TryGetValue(key, out var cancellationTokenSource);
@@ -115,17 +138,18 @@ namespace FalconBmsUniversalServer
             }
         }
 
-        private void Peer_OnReceive(object sender, ENetPacket e)
+        private void HandleReceive(ENetEvent @event)
         {
-            var peer = sender as ENetPeer;
+            var peer = @event.Peer;
+            var e = @event.Packet.Data;
             var message = Unpack<Message>(e);
             switch (message.type)
             {
                 case string type when OsbButtonMessage.IsType(type):
-                    Task.Run(async () => await _osbButtonHandler.Handle(Unpack<OsbButtonMessage>(e)));
+                    Task.Run(async () => await _osbButtonHandler.Handle(Unpack<OsbButtonMessage>(@event.Packet.Data.ToArray())));
                     break;
                 case string type when IcpButtonMessage.IsType(type):
-                    Task.Run(async () => await _icpButtonHandler.Handle(Unpack<IcpButtonMessage>(e)));
+                    Task.Run(async () => await _icpButtonHandler.Handle(Unpack<IcpButtonMessage>(@event.Packet.Data.ToArray())));
                     break;
                 case string type when StreamedTextureRequest.IsType(type):
                     HandleStreamedTextureRequest(Unpack<StreamedTextureRequest>(e), peer);
@@ -134,6 +158,7 @@ namespace FalconBmsUniversalServer
                     Logger.Error("Received unhandled message type {0}", message.type);
                     break;
             }
+            @event.Packet.Destroy();
         }
 
         private void HandleStreamedTextureRequest(StreamedTextureRequest streamedTextureRequest, ENetPeer peer)
@@ -159,7 +184,7 @@ namespace FalconBmsUniversalServer
             try
             {
                 _mutex.WaitOne();
-                Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
+                Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.GetRemoteEndPoint());
                 var cancellationToken = new CancellationTokenSource();
                 var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken, () => {
                     StopStreamingTexture(streamedTextureRequest, peer);
@@ -186,7 +211,7 @@ namespace FalconBmsUniversalServer
             try
             {
                 _mutex.WaitOne();
-                Logger.Debug("Stopping to stream {0} to {1}", streamedTextureRequest.identifier, peer.RemoteEndPoint);
+                Logger.Debug("Stopping to stream {0} to {1}", streamedTextureRequest.identifier, peer.GetRemoteEndPoint());
                 var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
                 if (!_runningStreams.TryGetValue(streamKey, out var cancellationTokenSource)) return;
                 cancellationTokenSource.Cancel();
@@ -198,14 +223,14 @@ namespace FalconBmsUniversalServer
             }
         }
 
-        private T Unpack<T>(byte[] buffer)
+        private T Unpack<T>(Span<byte> buffer)
         {
-            return MessagePackSerializer.Deserialize<T>(new MemoryStream(buffer));
+            return MessagePackSerializer.Deserialize<T>(new MemoryStream(buffer.ToArray()));
         }
 
         private T Unpack<T>(ENetPacket e)
         {
-            return MessagePackSerializer.Deserialize<T>(e.GetPayloadStream(false));
+            return MessagePackSerializer.Deserialize<T>(e.Data.ToArray());
         }
 
         private byte[] Pack<T>(T thing)
@@ -263,7 +288,7 @@ namespace FalconBmsUniversalServer
             {
                 try
                 {
-                    _peer.Send(encoded, channel, ENetPacketFlags.UnreliableFragment);
+                    _peer.Send(channel, encoded, ENetPacketFlags.UnreliableFragment);
                     _oldHash = newHash;
                     // assume peer is back online
                     _failedChunks = 0;
@@ -470,7 +495,7 @@ namespace FalconBmsUniversalServer
             private static byte[] ToJpeg(Bitmap image, long quality)
             {
                 using (var encoderParameters = new EncoderParameters(1))
-                using (var encoderParameter = new EncoderParameter(Encoder.Quality, quality))
+                using (var encoderParameter = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality))
                 {
                     var buffer = new MemoryStream();
                     var codecInfo = ImageCodecInfo.GetImageDecoders()
