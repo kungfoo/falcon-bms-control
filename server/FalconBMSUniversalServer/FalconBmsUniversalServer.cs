@@ -113,7 +113,7 @@ namespace FalconBmsUniversalServer
 
                     var message = Unpack<Message>(result.Buffer);
                     if (message.type != "hello") continue;
-                    var buffer = Pack(new Message {type = "ack"});
+                    var buffer = Pack(new Message { type = "ack" });
                     udpClient.Send(buffer, buffer.Length, result.RemoteEndPoint);
                 }
             });
@@ -133,7 +133,8 @@ namespace FalconBmsUniversalServer
             }
         }
 
-        private void HandleDisconnect(ENetPeer peer) {
+        private void HandleDisconnect(ENetPeer peer)
+        {
             Logger.Info("Peer disconnected from {0}", peer.GetRemoteEndPoint());
             List<StreamKey> keysToRemove = new List<StreamKey>();
             foreach (var key in _runningStreams.Keys.Where(key => key.Peer.Equals(peer)))
@@ -142,7 +143,8 @@ namespace FalconBmsUniversalServer
                 cancellationTokenSource?.Cancel();
                 keysToRemove.Add(key);
             }
-            foreach (var key in keysToRemove) {
+            foreach (var key in keysToRemove)
+            {
                 _runningStreams.Remove(key);
             }
             peer.DisconnectNow(10);
@@ -196,13 +198,14 @@ namespace FalconBmsUniversalServer
                 _mutex.WaitOne();
                 Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.GetRemoteEndPoint());
                 var cancellationToken = new CancellationTokenSource();
-                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken, () => {
+                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken, () =>
+                {
                     HandleDisconnect(peer);
                 });
                 // TODO: should probably use a thread pool here and just submit some work instead of starting and stopping threads.
                 var thread = new Thread(streamer.Run);
 
-                var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
+                var streamKey = new StreamKey { Identifier = streamedTextureRequest.identifier, Peer = peer };
                 if (!_runningStreams.ContainsKey(streamKey))
                 {
                     _runningStreams.Add(streamKey, cancellationToken);
@@ -222,7 +225,7 @@ namespace FalconBmsUniversalServer
             {
                 _mutex.WaitOne();
                 Logger.Debug("Stopping to stream {0} to {1}", streamedTextureRequest.identifier, peer.GetRemoteEndPoint());
-                var streamKey = new StreamKey {Identifier = streamedTextureRequest.identifier, Peer = peer};
+                var streamKey = new StreamKey { Identifier = streamedTextureRequest.identifier, Peer = peer };
                 if (!_runningStreams.TryGetValue(streamKey, out var cancellationTokenSource)) return;
                 cancellationTokenSource.Cancel();
                 _runningStreams.Remove(streamKey);

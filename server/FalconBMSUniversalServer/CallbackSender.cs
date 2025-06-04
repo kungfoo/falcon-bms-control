@@ -27,7 +27,7 @@ namespace FalconBmsUniversalServer
             using (var reader = new F4SharedMem.Reader())
             {
                 falconKeyFilePath = reader.GetCurrentData()?.StringData?.data?
-                    .Where(x => x.strId == (uint) F4SharedMem.Headers.StringIdentifier.KeyFile)
+                    .Where(x => x.strId == (uint)F4SharedMem.Headers.StringIdentifier.KeyFile)
                     .First()
                     .value;
             }

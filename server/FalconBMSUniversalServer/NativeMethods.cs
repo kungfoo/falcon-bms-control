@@ -64,8 +64,8 @@ namespace FalconBMSUniversalServer
 
         [DllImport("user32.dll")]
         internal static extern short VkKeyScanEx(char ch, IntPtr layout);
-        
-        
+
+
         [DllImport("user32.dll")]
         internal static extern Int32 GetKeyboardLayoutList(Int32 bufferSize, IntPtr[] buffer);
 

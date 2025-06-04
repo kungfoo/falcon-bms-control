@@ -131,8 +131,8 @@ namespace FalconBMSUniversalServer
             foreach (IntPtr hkl in hkls)
             {
                 Logger.Debug(
-                    $"KeyboardEmulator: keyboard layout 0x{((UInt32) hkl):X8} detected (not necessarily active)");
-                if ((((UInt32) hkl) & 0xffff0000) == 0x04090000)
+                    $"KeyboardEmulator: keyboard layout 0x{((UInt32)hkl):X8} detected (not necessarily active)");
+                if ((((UInt32)hkl) & 0xffff0000) == 0x04090000)
                 {
                     Logger.Debug("Found qwerty layout for keycode conversion.");
                     return hkl;
@@ -170,7 +170,7 @@ namespace FalconBMSUniversalServer
                 }
                 else
                 {
-                    eventList.Add(CreateInput((ushort) NativeMethods.VkKeyScanEx(character, KeyboardLayout), keyDown));
+                    eventList.Add(CreateInput((ushort)NativeMethods.VkKeyScanEx(character, KeyboardLayout), keyDown));
                 }
             }
 
@@ -187,7 +187,7 @@ namespace FalconBMSUniversalServer
             ushort ourCode = virtualKeyCode;
             if (ourCode > 0xff)
             {
-                virtualKeyCode = (ushort) (virtualKeyCode & 0x00ff);
+                virtualKeyCode = (ushort)(virtualKeyCode & 0x00ff);
             }
 
             NativeMethods.Input input = new NativeMethods.Input();
@@ -219,11 +219,11 @@ namespace FalconBMSUniversalServer
 
             if (keyDown)
             {
-                input.inputs.ki.wScan = (ushort) (scanCode & 0xFF);
+                input.inputs.ki.wScan = (ushort)(scanCode & 0xFF);
             }
             else
             {
-                input.inputs.ki.wScan = (ushort) scanCode;
+                input.inputs.ki.wScan = (ushort)scanCode;
                 input.inputs.ki.dwFlags |= NativeMethods.KeyUp;
             }
 

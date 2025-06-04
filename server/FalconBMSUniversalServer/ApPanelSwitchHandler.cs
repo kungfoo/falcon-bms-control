@@ -41,7 +41,8 @@ namespace FalconBmsUniversalServer
                 Logger.Debug("cockpit-switch: {0}:{1}", message.identifier, callback);
                 return _callbackSender.SendKeyPressed(callback);
             }
-            else {
+            else
+            {
                 Logger.Error("cockpit-switch: {} not bound to a callback, ignoring it.", message.identifier);
                 return Task.Run(() => { });
             }
