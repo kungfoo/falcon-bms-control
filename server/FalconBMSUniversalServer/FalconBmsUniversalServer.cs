@@ -72,7 +72,7 @@ namespace FalconBmsUniversalServer
 
             while (true)
             {
-                var _event = host.Service(TimeSpan.MaxValue);
+                var _event = host.Service(TimeSpan.FromMilliseconds(5));
                 switch (_event.Type)
                 {
                     case ENetEventType.None:
@@ -129,13 +129,23 @@ namespace FalconBmsUniversalServer
             var sender = @event.Peer;
             if (sender is ENetPeer peer)
             {
-                Logger.Info("Peer disconnected from {0}", peer.GetRemoteEndPoint());
-                foreach (var key in _runningStreams.Keys.Where(key => key.Peer == peer))
-                {
-                    _runningStreams.TryGetValue(key, out var cancellationTokenSource);
-                    cancellationTokenSource?.Cancel();
-                }
+                HandleDisconnect(peer);
             }
+        }
+
+        private void HandleDisconnect(ENetPeer peer) {
+            Logger.Info("Peer disconnected from {0}", peer.GetRemoteEndPoint());
+            List<StreamKey> keysToRemove = new List<StreamKey>();
+            foreach (var key in _runningStreams.Keys.Where(key => key.Peer.Equals(peer)))
+            {
+                _runningStreams.TryGetValue(key, out var cancellationTokenSource);
+                cancellationTokenSource?.Cancel();
+                keysToRemove.Add(key);
+            }
+            foreach (var key in keysToRemove) {
+                _runningStreams.Remove(key);
+            }
+            peer.DisconnectNow(10);
         }
 
         private void HandleReceive(ENetEvent @event)
@@ -187,7 +197,7 @@ namespace FalconBmsUniversalServer
                 Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.GetRemoteEndPoint());
                 var cancellationToken = new CancellationTokenSource();
                 var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken, () => {
-                    StopStreamingTexture(streamedTextureRequest, peer);
+                    HandleDisconnect(peer);
                 });
                 // TODO: should probably use a thread pool here and just submit some work instead of starting and stopping threads.
                 var thread = new Thread(streamer.Run);
