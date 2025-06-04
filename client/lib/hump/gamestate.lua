@@ -67,7 +67,7 @@ end
 function GS.pop(...)
   assert(#stack > 1, "No more states to pop!")
   local pre, to = stack[#stack], stack[#stack - 1]
-  stack[#stack] = nil;
+  stack[#stack] = nil
   (pre.leave or __NULL__)(pre)
   state_is_dirty = true
   return (to.resume or __NULL__)(to, pre, ...)
