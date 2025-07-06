@@ -6,10 +6,41 @@ Releases for both iOS and android are available for free. The client and server 
 
 ## TL;DR: How to use it?
 
-- Install the app on your device
-- Install the windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/)
+- Install the app on your device (Tablet, Phone, Chromebook, Laptop with touchscreen)
+- Install the latest windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/)
 - Enable RTT exports in `${falcon bms install}/user/config/Falcon BMS User.cfg`: set `g_bExportRTTTextures 1` (using the user.cfg file will pevent the updater from overwriting your settings during an update)
 - Allow the server application in Windows Firewall
+
+## Screenshots (client)
+
+### Default layout
+
+The default layout either shows the ICP, DED and RWR or both MFDs on the screen. There is a switcher in the lower left corner to switch between screens.
+
+![Screenshot showing the default layout ICP](screenshots/default_icp.png)
+![Screenshot showing the default layout MFDs](screenshots/default_mfd.png)
+
+### Cockpit-like layout
+
+A new layout that emulates the layout of the F16 cockpit, no screen switching since all devices are present. This will only properly work on rather big touchscreens/tablets.
+
+![Screenshot showing the cockpit-like layout](screenshots/cockpit_like.png)
+
+### Consolidated layout
+
+A consolidated layout with all devices on one screen, but with a landscape ICP to save screen real estate. This can be quite useful on medium screens.
+
+![Screenshot showing the consolidated layout](screenshots/consolidated.png)
+
+### One device per screen
+
+There is also a layout with one device (LMFD, RMFD or ICP) per screen. This is useful when you want to have multiple tablets/phones show one device each.
+
+## How does it look?
+
+Here's a (rather old by now) video by Fish that explains most things much better than I can:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Z7E0uswkFmo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Can I disable automatic server discovery?
 
@@ -18,12 +49,6 @@ Yes. Go to the in-app settings screen and enter the ip address of your server in
 ## Can I re-enable automatic server discovery?
 
 Yes. Go to the in-app settings screen and clear the server ip address field. Once it's empty, the app will switch back to automatic discovery.
-
-## How does it look?
-
-Here's a video by Fish that explains most things much better than I can:
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Z7E0uswkFmo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Known Limitations
 
@@ -62,7 +87,7 @@ A linux client is available as an appimage from the releases page as of `1.3.1`:
 
 The client applications for both iOS and android will try to discover and connect to the `falcon-bms-control` server running on the same network automatically.
 
-Download the server application from here: 
+Download the server application from here:
 
 [Falcon BMS Control Server](https://github.com/kungfoo/falcon-bms-control/releases/) and run the application alongside Falcon BMS.
 
@@ -80,12 +105,12 @@ All client settings are effective immediately and persised across runs of the ap
   - 15fps
   - 30fps: default
   - 60fps
-  
+
 - Displays compression quality: lower for slow networks
   - Range from 50 to 90
 
 - Server IP: For network setups where automatic discovery is not desired or does not work.
-  
+
 - Vibration: Provide haptic feedback on button pushes on devices that have the hardware for it.
 
 ## FAQ
