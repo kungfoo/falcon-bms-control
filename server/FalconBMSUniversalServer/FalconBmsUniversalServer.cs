@@ -1,21 +1,21 @@
 ﻿using ENet.Managed;
 using F4TexSharedMem;
-using System.IO;
-using System.Net;
-using System.Collections.Generic;
-using System.Net.Sockets;
+using FalconBmsUniversalServer.Messages;
+using FalconBmsUniversalServer.SharedTextureMemory;
+using MessagePack;
 using System;
+using System.Collections.Generic;
 using System.Data.HashFunction;
 using System.Data.HashFunction.xxHash;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FalconBmsUniversalServer.Messages;
-using FalconBmsUniversalServer.SharedTextureMemory;
-using MessagePack;
-using System.Text;
 
 
 namespace FalconBmsUniversalServer
@@ -30,8 +30,6 @@ namespace FalconBmsUniversalServer
 
         private readonly IcpButtonHandler _icpButtonHandler;
         private readonly OsbButtonHandler _osbButtonHandler;
-
-        private readonly SharedTextureMemoryExtractor _extractor = new SharedTextureMemoryExtractor(new Reader());
 
         private FalconBmsUniversalServer()
         {
@@ -198,7 +196,7 @@ namespace FalconBmsUniversalServer
                 _mutex.WaitOne();
                 Logger.Debug("Starting to stream {0} to {1}", streamedTextureRequest.identifier, peer.GetRemoteEndPoint());
                 var cancellationToken = new CancellationTokenSource();
-                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, _extractor, cancellationToken, () =>
+                var streamer = new StreamedTextureThread(streamedTextureRequest, peer, cancellationToken, () =>
                 {
                     HandleDisconnect(peer);
                 });
@@ -267,12 +265,11 @@ namespace FalconBmsUniversalServer
         private IHashValue _oldHash = null;
         private int _failedChunks = 0;
 
-        public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer,
-            SharedTextureMemoryExtractor extractor, CancellationTokenSource cancellationToken, Action onTooManyFailedChunks)
+        public StreamedTextureThread(StreamedTextureRequest request, ENetPeer peer, CancellationTokenSource cancellationToken, Action onTooManyFailedChunks)
         {
             _request = request;
             _peer = peer;
-            _extractor = extractor;
+            _extractor = new SharedTextureMemoryExtractor(new Reader()); ;
             _cancellationToken = cancellationToken;
             _onTooManyFailedChunks = onTooManyFailedChunks;
             Logger.Debug("{}: Refresh rate is: {}, Quality is: {}", _request.identifier, _request.refresh_rate, _request.quality);
