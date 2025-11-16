@@ -6,9 +6,9 @@ Releases for both iOS and android are available for free. The client and server 
 
 ## TL;DR: How to use it?
 
-- Install the app on your device (Tablet, Phone, Chromebook, Laptop with touchscreen)
-- Install the latest windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control-server/releases/)
-- Enable RTT export in alt launcher (from 4.38.1 on): ![Screenshot showing the flag in Alt Launcher](screenshots/alt_launcher_rtt.png)
+- Install the app on your device (Tablet, Phone, Chromebook, Laptop with touchscreen): Download on the respective app stores or from here: [Client Release](https://github.com/kungfoo/falcon-bms-control/releases/tag/client-1.4.0)
+- Install the latest windows server application on your BMS host PC: [Server Releases](https://github.com/kungfoo/falcon-bms-control-server/releases/)
+- *Enable RTT export in alt launcher* (from 4.38.1 on): ![Screenshot showing the flag in Alt Launcher](screenshots/alt_launcher_rtt.png)
 - Or: Enable RTT exports in `${falcon bms install}/user/config/Falcon BMS User.cfg`: set `g_bExportRTTTextures 1` (using the user.cfg file will pevent the updater from overwriting your settings during an update)
 - Do not enable the flag in two places.
 - Allow the server application in Windows Firewall
