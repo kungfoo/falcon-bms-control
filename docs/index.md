@@ -7,9 +7,12 @@ Releases for both iOS and android are available for free. The client and server 
 ## TL;DR: How to use it?
 
 - Install the app on your device (Tablet, Phone, Chromebook, Laptop with touchscreen)
-- Install the latest windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control/releases/)
-- Enable RTT exports in `${falcon bms install}/user/config/Falcon BMS User.cfg`: set `g_bExportRTTTextures 1` (using the user.cfg file will pevent the updater from overwriting your settings during an update)
+- Install the latest windows server application on your BMS host PC: [Releases](https://github.com/kungfoo/falcon-bms-control-server/releases/)
+- Enable RTT export in alt launcher (from 4.38.1 on): ![Screenshot showing the flag in Alt Launcher](screenshots/alt_launcher_rtt.png)
+- Or: Enable RTT exports in `${falcon bms install}/user/config/Falcon BMS User.cfg`: set `g_bExportRTTTextures 1` (using the user.cfg file will pevent the updater from overwriting your settings during an update)
+- Do not enable the flag in two places.
 - Allow the server application in Windows Firewall
+- Run the server, run BMS, run the mobile app
 
 ## Screenshots (client)
 
@@ -89,7 +92,7 @@ The client applications for both iOS and android will try to discover and connec
 
 Download the server application from here:
 
-[Falcon BMS Control Server](https://github.com/kungfoo/falcon-bms-control/releases/) and run the application alongside Falcon BMS.
+[Falcon BMS Control Server](https://github.com/kungfoo/falcon-bms-control/server/releases/) and run the application alongside Falcon BMS.
 
 If automatic discovery does not work for you on your network, please file an issue at: [Issues](https://github.com/kungfoo/falcon-bms-control/issues)
 
@@ -112,6 +115,8 @@ All client settings are effective immediately and persised across runs of the ap
 - Server IP: For network setups where automatic discovery is not desired or does not work.
 
 - Vibration: Provide haptic feedback on button pushes on devices that have the hardware for it.
+
+The achievable display refresh rate also depends on the frame rate of BMS and your (wifi) networks ability to stream the textures to the device. Some people also have great success with tethered connections using android devices, but I cannot assist in setting those up.
 
 ## FAQ
 
