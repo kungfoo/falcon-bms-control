@@ -34,6 +34,13 @@ local function describe_vibration(value)
   return "Vibration: OFF"
 end
 
+local function describe_fullscreen(value)
+  if value == true then
+    return "Fullscreen: ON"
+  end
+  return "Fullscreen: OFF"
+end
+
 local function from_bool(value)
   if value then
     return 1
@@ -97,11 +104,17 @@ local vibrate_slider = Slider(from_bool(Settings:vibrate()), 0, 1, function(valu
   vibrate_label.value = describe_vibration(Settings:vibrate())
 end, {}, { values = { 0, 1 } })
 
+local fullscreen_label = Label(describe_fullscreen(Settings:fullscreen()))
+local fullscreen_slider = Slider(from_bool(Settings:fullscreen()), 0, 1, function(value)
+  Settings:setFullscreen(to_bool(value))
+  fullscreen_label.value = describe_fullscreen(Settings:fullscreen())
+end, {}, { values = { 0, 1 } })
+
 local settings_label = Label("Settings", { size = 30 })
 
 local screen_layout_label = Label("Screen layout", { size = 30 })
 
-local screen_layout_description_label = Label("Descibes the currently selected screen layout")
+local screen_layout_description_label = Label("Describes the currently selected screen layout")
 
 local function describe_layout(id)
   return (Layouts:descriptor(id) or {}).description or "Cannot describe selected layout."
@@ -141,6 +154,7 @@ function Screen:init()
     refresh_rate_label,
     quality_label,
     vibrate_label,
+    fullscreen_label,
     server_ip_label,
     screen_layout_label,
     screen_layout_description_label,
@@ -149,6 +163,7 @@ function Screen:init()
     refresh_rate_slider,
     quality_slider,
     vibrate_slider,
+    fullscreen_slider,
     server_ip_input,
     layout_choice,
     self.close_button,
@@ -189,6 +204,7 @@ function Screen:adjustLayoutIfNeeded(w, h)
       { columns = { refresh_rate_label, refresh_rate_slider } },
       { columns = { quality_label, quality_slider } },
       { columns = { vibrate_label, vibrate_slider } },
+      { columns = { fullscreen_label, fullscreen_slider } },
       { columns = { screen_layout_label } },
       { columns = { screen_layout_description_label, layout_choice } },
     },

@@ -7,6 +7,7 @@ local defaults = {
   ip = nil,
   dark_mode = false,
   layout = "default-landscape",
+  fullscreen = true,
 }
 
 local Settings = Class({})
@@ -30,6 +31,11 @@ function Settings:init()
   self.proxy.vibrate = from_file.vibrate or defaults.vibrate
   self.proxy.ip = from_file.ip or defaults.ip
   self.proxy.layout = from_file.layout or defaults.layout
+  self.proxy.fullscreen = from_file.fullscreen
+  if self.proxy.fullscreen == nil then
+    self.proxy.fullscreen = defaults.fullscreen
+  end
+  love.window.setFullscreen(self.proxy.fullscreen)
 end
 
 function Settings:onChange()
@@ -40,6 +46,7 @@ function Settings:onChange()
     vibrate = self.proxy.vibrate,
     ip = self.proxy.ip,
     layout = self.proxy.layout,
+    fullscreen = self.proxy.fullscreen,
   })
   local success, error = love.filesystem.write(file_name, bytes)
   if not success then
@@ -75,6 +82,13 @@ function Settings:setLayout(value)
   self:onChange()
 end
 
+function Settings:setFullscreen(value)
+  self.needs_reconnect = false
+  self.proxy.fullscreen = value
+  love.window.setFullscreen(value)
+  self:onChange()
+end
+
 function Settings:refreshRate()
   return self.proxy.refresh_rate
 end
@@ -93,6 +107,10 @@ end
 
 function Settings:layout()
   return self.proxy.layout
+end
+
+function Settings:fullscreen()
+  return self.proxy.fullscreen
 end
 
 return Settings
