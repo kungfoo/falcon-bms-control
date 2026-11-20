@@ -115,9 +115,12 @@ function love.update(dt)
     lovebird.update()
   end
 
-  -- service enet host.
-  local success, event = pcall(Connection.service)
-  if success then
+  -- service enet host, draining all pending events for this tick.
+  while Connection.host do
+    local success, event = pcall(Connection.service)
+    if not success or not event then
+      break
+    end
     State.current():handleReceive(event)
   end
 end
