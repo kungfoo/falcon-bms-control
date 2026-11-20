@@ -1,0 +1,58 @@
+[package]
+name = "falcon-bms-control-client"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "falcon_bms_control_client"
+path = "src/lib.rs"
+
+[[bin]]
+name = "falcon-bms-control-client"
+path = "src/main.rs"
+
+[features]
+dev = ["bevy/dynamic_linking"]
+
+[dependencies]
+bevy = { version = "0.20.1", default-features = false, features = [
+    "async_executor",
+    "bevy_asset",
+    "bevy_log",
+    "bevy_state",
+    "bevy_winit",
+    "bevy_core_pipeline",
+    "bevy_ui_render",
+    "ui_picking",
+    "bevy_audio",
+    "wav",
+    "png",
+] }
+crossbeam-channel = "0.5"
+enet = { version = "0.4.0", git = "https://github.com/kungfoo/enet-rs.git" }
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+rmp-serde = "1.3"
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+bevy = { version = "0.20.1", default-features = false, features = ["x11", "wayland"] }
+
+[target.'cfg(any(target_os = "linux", target_os = "windows", target_os = "macos"))'.dependencies]
+directories = "6"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+opt-level = "z"
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

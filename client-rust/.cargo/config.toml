@@ -1,0 +1,3 @@
+[alias]
+dev = "run --features dev"
+test-dev = "test --features dev"
