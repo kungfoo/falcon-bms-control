@@ -4,7 +4,9 @@ use std::time::{Duration, Instant};
 
 use bevy::log::{debug, error, info, warn};
 use crossbeam_channel::{Receiver, Sender};
-use enet::{Address, BandwidthLimit, ChannelLimit, Enet, EventKind, Host, Packet, PacketMode, PeerID};
+use enet::{
+    Address, BandwidthLimit, ChannelLimit, Enet, EventKind, Host, Packet, PacketMode, PeerID,
+};
 
 use crate::protocol::{ProtocolMessage, TextureChannel};
 
@@ -165,7 +167,8 @@ fn run_worker(cmd_rx: Receiver<NetworkCommand>, event_tx: Sender<NetworkEvent>) 
                     {
                         match msg.to_msgpack() {
                             Ok(bytes) => {
-                                if let Ok(packet) = Packet::new(bytes, PacketMode::ReliableSequenced)
+                                if let Ok(packet) =
+                                    Packet::new(bytes, PacketMode::ReliableSequenced)
                                     && let Err(e) = peer.send_packet(packet, 0)
                                 {
                                     warn!("Failed to queue ENet packet: {}", e);

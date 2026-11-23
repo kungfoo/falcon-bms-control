@@ -16,7 +16,7 @@ pub fn default_settings_path() -> Option<PathBuf> {
 
     #[cfg(target_os = "android")]
     {
-        bevy::window::ANDROID_APP
+        bevy::android::ANDROID_APP
             .get()
             .and_then(|app| app.internal_data_path())
             .map(|dir| dir.join(SETTINGS_FILE_NAME))

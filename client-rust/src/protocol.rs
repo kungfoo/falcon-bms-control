@@ -60,9 +60,15 @@ pub enum ProtocolMessage {
         button: String,
     },
     #[serde(rename = "osb-pressed")]
-    OsbButtonPressed { mfd: String, osb: String },
+    OsbButtonPressed {
+        mfd: String,
+        osb: String,
+    },
     #[serde(rename = "osb-released")]
-    OsbButtonReleased { mfd: String, osb: String },
+    OsbButtonReleased {
+        mfd: String,
+        osb: String,
+    },
     #[serde(rename = "streamed-texture")]
     StreamedTextureRequest {
         identifier: String,
@@ -165,7 +171,10 @@ mod tests {
             TextureChannel::Ded,
             TextureChannel::Rwr,
         ] {
-            assert_eq!(TextureChannel::from_channel_id(channel as u8), Some(channel));
+            assert_eq!(
+                TextureChannel::from_channel_id(channel as u8),
+                Some(channel)
+            );
             assert_eq!(
                 TextureChannel::from_identifier(channel.identifier()),
                 Some(channel)

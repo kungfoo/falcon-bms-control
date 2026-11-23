@@ -12,7 +12,7 @@ fn default_refresh_rate() -> u16 {
 }
 
 fn default_quality() -> u16 {
-    70
+    60
 }
 
 fn default_layout() -> String {
@@ -102,7 +102,10 @@ impl Plugin for SettingsPlugin {
                     Settings::default()
                 }
                 Err(e) => {
-                    warn!("Failed to load settings from {:?} ({}), using defaults", p, e);
+                    warn!(
+                        "Failed to load settings from {:?} ({}), using defaults",
+                        p, e
+                    );
                     Settings::default()
                 }
             },

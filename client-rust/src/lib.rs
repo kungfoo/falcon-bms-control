@@ -7,6 +7,7 @@ pub mod ui;
 use std::time::Duration;
 
 use bevy::prelude::*;
+use bevy::window::{MonitorSelection, WindowMode, WindowResolution};
 use bevy::winit::{UpdateMode, WinitSettings};
 
 pub fn build_app() -> App {
@@ -14,7 +15,12 @@ pub fn build_app() -> App {
     app.add_plugins(DefaultPlugins.set(WindowPlugin {
         primary_window: Some(Window {
             title: "Falcon BMS Control".into(),
-            resizable: true,
+            // Use BorderlessFullscreen on mobile so Bevy adopts the exact device viewport
+            #[cfg(any(target_os = "android", target_os = "ios"))]
+            mode: WindowMode::BorderlessFullscreen(MonitorSelection::Current),
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            resolution: WindowResolution::new(1280, 720),
+            // Do NOT set restrictive resize_constraints on mobile
             ..default()
         }),
         ..default()
@@ -32,6 +38,13 @@ pub fn build_app() -> App {
     app
 }
 
-pub fn run() {
+#[bevy_main]
+pub fn main() {
+    build_app().run();
+}
+
+#[cfg(target_os = "ios")]
+#[unsafe(no_mangle)] // use #[no_mangle] if on Rust 2021 edition
+pub extern "C" fn ios_main() {
     build_app().run();
 }
