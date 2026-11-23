@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::text::{FontSize, FontSource};
+use bevy::window::PrimaryWindow;
 
 use crate::layouts::LayoutRegistry;
 use crate::settings::{Settings, is_valid_ipv4};
@@ -7,6 +8,39 @@ use crate::ui::{AppState, PreviousState, ThemeColors};
 
 #[derive(Component)]
 struct SettingsScreenRoot;
+
+#[derive(Component)]
+struct SettingsColumnsContainer;
+
+#[derive(Component)]
+struct SettingsLeftColumn;
+
+#[derive(Component)]
+struct SettingsRightColumn;
+
+#[derive(Component)]
+struct SettingRow;
+
+#[derive(Component)]
+struct SettingsHeaderText;
+
+#[derive(Component)]
+struct SettingsSectionHeaderText;
+
+#[derive(Component)]
+struct SettingLabelText;
+
+#[derive(Component)]
+struct IpButton;
+
+#[derive(Component)]
+struct IpNumpadDialog;
+
+#[derive(Component)]
+struct IpNumpadPreviewBox;
+
+#[derive(Component)]
+struct IpNumpadTitleText;
 
 #[derive(Component)]
 struct IpDisplayText;
@@ -118,6 +152,141 @@ struct SettingsScreenState {
     needs_reconnect: bool,
     numpad_open: bool,
     numpad: IpNumpadBuffer,
+    last_viewport: Vec2,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub(crate) struct SettingsLayoutMetrics {
+    pub two_column: bool,
+    pub stack_rows: bool,
+    pub root_padding: f32,
+    pub root_gap: f32,
+    pub section_gap: f32,
+    pub row_gap: f32,
+    pub header_font: f32,
+    pub section_font: f32,
+    pub label_font: f32,
+    pub control_font: f32,
+    pub desc_font: f32,
+    pub control_height: f32,
+    pub ip_min_width: f32,
+    pub rate_btn_width: f32,
+    pub step_btn_width: f32,
+    pub toggle_btn_width: f32,
+    pub layout_pad_x: f32,
+    pub layout_pad_y: f32,
+    pub numpad_dialog_width: f32,
+    pub numpad_padding: f32,
+    pub numpad_gap: f32,
+    pub numpad_key_height: f32,
+    pub numpad_preview_height: f32,
+    pub numpad_font: f32,
+}
+
+pub(crate) fn compute_settings_layout_metrics(viewport: Vec2) -> SettingsLayoutMetrics {
+    let w = viewport.x.max(240.0);
+    let h = viewport.y.max(240.0);
+    let two_column = w >= 540.0 && h < 600.0;
+    let col_width = if two_column {
+        (w - 24.0 - 16.0) * 0.5
+    } else {
+        (w - 24.0).min(760.0)
+    };
+    let stack_rows = col_width < 430.0;
+
+    let (
+        root_padding,
+        root_gap,
+        section_gap,
+        row_gap,
+        header_font,
+        section_font,
+        label_font,
+        control_font,
+        desc_font,
+        control_height,
+    ) = if two_column {
+        let compact_h = (h / 440.0).clamp(0.72, 1.0);
+        let short = h < 420.0;
+        (
+            if short { 8.0 } else { 14.0 },
+            if short { 6.0 } else { 10.0 },
+            if short { 4.0 } else { 8.0 },
+            if short { 2.0 } else { 4.0 },
+            (26.0 * compact_h).round(),
+            (22.0 * compact_h).round(),
+            (16.0 * compact_h).round(),
+            (15.0 * compact_h).round(),
+            (14.0 * compact_h).round(),
+            (38.0 * compact_h).round(),
+        )
+    } else {
+        let compact_h = (h / 660.0).clamp(0.76, 1.0);
+        let compact_w = (w / 420.0).clamp(0.82, 1.0);
+        let scale = compact_h.min(compact_w);
+        (
+            if w < 420.0 || h < 600.0 { 12.0 } else { 20.0 },
+            (12.0 * scale).round(),
+            (10.0 * scale).round(),
+            (4.0 * scale).round(),
+            (30.0 * scale).round(),
+            (24.0 * scale).round(),
+            (18.0 * scale).round(),
+            (16.0 * scale).round(),
+            (15.0 * scale).round(),
+            (40.0 * scale).round(),
+        )
+    };
+
+    let ip_min_width = (col_width * 0.55).clamp(180.0, 260.0).round();
+    let rate_btn_width = if col_width < 290.0 {
+        ((col_width - 12.0) / 3.0).floor().max(54.0)
+    } else {
+        (82.0 * (col_width / 360.0).clamp(0.75, 1.0)).round()
+    };
+    let step_btn_width = if col_width < 290.0 { 36.0 } else { 44.0 };
+    let toggle_btn_width = if col_width < 290.0 { 88.0 } else { 110.0 };
+    let layout_pad_x = if col_width < 320.0 || h < 420.0 {
+        10.0
+    } else {
+        14.0
+    };
+    let layout_pad_y = if h < 420.0 { 6.0 } else { 10.0 };
+
+    let numpad_dialog_width = (w - 24.0).clamp(240.0, 340.0).round();
+    let compact_modal = h < 460.0;
+    let numpad_padding = if compact_modal { 10.0 } else { 18.0 };
+    let numpad_gap = if compact_modal { 6.0 } else { 12.0 };
+    let numpad_preview_height = if compact_modal { 36.0 } else { 46.0 };
+    let numpad_key_height = ((h - 175.0) / 5.0).clamp(28.0, 48.0).floor();
+    let numpad_font = if compact_modal { 15.0 } else { 18.0 };
+
+    SettingsLayoutMetrics {
+        two_column,
+        stack_rows,
+        root_padding,
+        root_gap,
+        section_gap,
+        row_gap,
+        header_font,
+        section_font,
+        label_font,
+        control_font,
+        desc_font,
+        control_height,
+        ip_min_width,
+        rate_btn_width,
+        step_btn_width,
+        toggle_btn_width,
+        layout_pad_x,
+        layout_pad_y,
+        numpad_dialog_width,
+        numpad_padding,
+        numpad_gap,
+        numpad_key_height,
+        numpad_preview_height,
+        numpad_font,
+    }
 }
 
 pub struct SettingsScreenPlugin;
@@ -129,7 +298,8 @@ impl Plugin for SettingsScreenPlugin {
             .add_systems(OnExit(AppState::Settings), despawn_settings_screen)
             .add_systems(
                 Update,
-                sync_settings_ui.run_if(in_state(AppState::Settings)),
+                (apply_responsive_settings_layout, sync_settings_ui)
+                    .run_if(in_state(AppState::Settings)),
             );
     }
 }
@@ -144,6 +314,7 @@ fn spawn_settings_screen(
     screen_state.needs_reconnect = false;
     screen_state.numpad_open = false;
     screen_state.numpad = IpNumpadBuffer::new(settings.ip.as_deref());
+    screen_state.last_viewport = Vec2::ZERO;
 
     let font = asset_server.load("fonts/b612/B612Mono-Regular.ttf");
     let close_icon = asset_server.load("icons/close.png");
@@ -154,110 +325,92 @@ fn spawn_settings_screen(
             Node {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
-                padding: UiRect::all(Val::Px(20.0)),
+                padding: UiRect::all(Val::Px(12.0)),
                 flex_direction: FlexDirection::Column,
                 justify_content: JustifyContent::SpaceBetween,
-                row_gap: Val::Px(14.0),
+                align_items: AlignItems::Center,
+                row_gap: Val::Px(10.0),
+                overflow: Overflow::clip(),
                 ..default()
             },
             BackgroundColor(ThemeColors::BACKGROUND),
         ))
         .with_children(|root| {
-            // Scrollable / flexible content column
-            root.spawn(Node {
-                width: Val::Percent(100.0),
-                flex_grow: 1.0,
-                flex_direction: FlexDirection::Column,
-                row_gap: Val::Px(14.0),
-                ..default()
-            })
-            .with_children(|content| {
-                // Header
-                content.spawn((
-                    Text::new("Settings"),
-                    TextFont {
-                        font: FontSource::Handle(font.clone()),
-                        font_size: FontSize::Px(30.0),
-                        ..default()
-                    },
-                    TextColor(ThemeColors::TEXT),
-                ));
-
-                // Row 1: Server IP
-                spawn_setting_row(
-                    content,
-                    "Server IP (empty = auto discovery)",
-                    font.clone(),
-                    |right| {
-                        let ip_label = settings
-                            .ip
-                            .clone()
-                            .unwrap_or_else(|| "[automatic discovery]".to_string());
-                        right
-                            .spawn((
-                                Node {
-                                    min_width: Val::Px(260.0),
-                                    height: Val::Px(42.0),
-                                    padding: UiRect::horizontal(Val::Px(12.0)),
-                                    justify_content: JustifyContent::Center,
-                                    align_items: AlignItems::Center,
-                                    border: UiRect::all(Val::Px(1.5)),
-                                    border_radius: BorderRadius::all(Val::Px(6.0)),
-                                    ..default()
-                                },
-                                BackgroundColor(ThemeColors::PANEL),
-                                BorderColor::all(ThemeColors::CYAN_OUTLINE),
-                            ))
-                            .observe(on_open_numpad)
-                            .with_children(|btn| {
-                                btn.spawn((
-                                    IpDisplayText,
-                                    Text::new(ip_label),
-                                    TextFont {
-                                        font: FontSource::Handle(font.clone()),
-                                        font_size: FontSize::Px(18.0),
-                                        ..default()
-                                    },
-                                    TextColor(ThemeColors::TEXT),
-                                ));
-                            });
-                    },
-                );
-
-                // Row 2: Refresh rate (15 / 30 / 60)
-                spawn_setting_row(content, "Display refresh rate", font.clone(), |right| {
-                    right
-                        .spawn(Node {
-                            flex_direction: FlexDirection::Row,
-                            column_gap: Val::Px(8.0),
+            root.spawn((
+                SettingsColumnsContainer,
+                Node {
+                    width: Val::Percent(100.0),
+                    max_width: Val::Px(760.0),
+                    flex_grow: 1.0,
+                    min_width: Val::Px(0.0),
+                    min_height: Val::Px(0.0),
+                    margin: UiRect::bottom(Val::Px(48.0)),
+                    flex_direction: FlexDirection::Column,
+                    row_gap: Val::Px(10.0),
+                    column_gap: Val::Px(16.0),
+                    overflow: Overflow::clip(),
+                    ..default()
+                },
+            ))
+            .with_children(|columns| {
+                // Left / top column: general settings
+                columns
+                    .spawn((
+                        SettingsLeftColumn,
+                        Node {
+                            width: Val::Percent(100.0),
+                            min_width: Val::Px(0.0),
+                            min_height: Val::Px(0.0),
+                            flex_direction: FlexDirection::Column,
+                            row_gap: Val::Px(10.0),
                             ..default()
-                        })
-                        .with_children(|group| {
-                            for rate in [15u16, 30, 60] {
-                                let active = settings.refresh_rate == rate;
-                                group
+                        },
+                    ))
+                    .with_children(|content| {
+                        // Header
+                        content.spawn((
+                            SettingsHeaderText,
+                            Text::new("Settings"),
+                            TextFont {
+                                font: FontSource::Handle(font.clone()),
+                                font_size: FontSize::Px(28.0),
+                                ..default()
+                            },
+                            TextColor(ThemeColors::TEXT),
+                        ));
+
+                        // Row 1: Server IP
+                        spawn_setting_row(
+                            content,
+                            "Server IP (empty = auto)",
+                            font.clone(),
+                            |right| {
+                                let ip_label = settings
+                                    .ip
+                                    .clone()
+                                    .unwrap_or_else(|| "[automatic discovery]".to_string());
+                                right
                                     .spawn((
-                                        RefreshRateOption(rate),
+                                        IpButton,
                                         Node {
-                                            width: Val::Px(82.0),
+                                            min_width: Val::Px(200.0),
+                                            max_width: Val::Percent(100.0),
                                             height: Val::Px(40.0),
+                                            padding: UiRect::horizontal(Val::Px(10.0)),
                                             justify_content: JustifyContent::Center,
                                             align_items: AlignItems::Center,
                                             border: UiRect::all(Val::Px(1.5)),
                                             border_radius: BorderRadius::all(Val::Px(6.0)),
                                             ..default()
                                         },
-                                        BackgroundColor(if active {
-                                            ThemeColors::BUTTON_PRESSED
-                                        } else {
-                                            ThemeColors::BUTTON
-                                        }),
+                                        BackgroundColor(ThemeColors::PANEL),
                                         BorderColor::all(ThemeColors::CYAN_OUTLINE),
                                     ))
-                                    .observe(on_select_refresh_rate)
+                                    .observe(on_open_numpad)
                                     .with_children(|btn| {
                                         btn.spawn((
-                                            Text::new(format!("{}/s", rate)),
+                                            IpDisplayText,
+                                            Text::new(ip_label),
                                             TextFont {
                                                 font: FontSource::Handle(font.clone()),
                                                 font_size: FontSize::Px(16.0),
@@ -266,142 +419,70 @@ fn spawn_settings_screen(
                                             TextColor(ThemeColors::TEXT),
                                         ));
                                     });
-                            }
-                        });
-                });
-
-                // Row 3: Compression quality (50..=90 in steps of 5)
-                spawn_setting_row(content, "Compression quality", font.clone(), |right| {
-                    right
-                        .spawn(Node {
-                            flex_direction: FlexDirection::Row,
-                            column_gap: Val::Px(10.0),
-                            align_items: AlignItems::Center,
-                            ..default()
-                        })
-                        .with_children(|group| {
-                            spawn_step_button(group, "-", -5, font.clone());
-                            group.spawn((
-                                QualityValueText,
-                                Text::new(format!("{}", settings.quality)),
-                                TextFont {
-                                    font: FontSource::Handle(font.clone()),
-                                    font_size: FontSize::Px(18.0),
-                                    ..default()
-                                },
-                                TextColor(ThemeColors::TEXT),
-                            ));
-                            spawn_step_button(group, "+", 5, font.clone());
-                        });
-                });
-
-                // Row 4: Vibration toggle
-                spawn_setting_row(content, "Vibration", font.clone(), |right| {
-                    right
-                        .spawn((
-                            VibrateToggleButton,
-                            Node {
-                                width: Val::Px(110.0),
-                                height: Val::Px(40.0),
-                                justify_content: JustifyContent::Center,
-                                align_items: AlignItems::Center,
-                                border: UiRect::all(Val::Px(1.5)),
-                                border_radius: BorderRadius::all(Val::Px(6.0)),
-                                ..default()
                             },
-                            BackgroundColor(toggle_color(settings.vibrate)),
-                            BorderColor::all(ThemeColors::CYAN_OUTLINE),
-                        ))
-                        .observe(on_toggle_vibrate)
-                        .with_children(|btn| {
-                            btn.spawn((
-                                VibrateToggleText,
-                                Text::new(if settings.vibrate { "ON" } else { "OFF" }),
-                                TextFont {
-                                    font: FontSource::Handle(font.clone()),
-                                    font_size: FontSize::Px(16.0),
+                        );
+
+                        // Row 2: Refresh rate (15 / 30 / 60)
+                        spawn_setting_row(content, "Display refresh rate", font.clone(), |right| {
+                            right
+                                .spawn(Node {
+                                    flex_direction: FlexDirection::Row,
+                                    column_gap: Val::Px(6.0),
+                                    max_width: Val::Percent(100.0),
                                     ..default()
-                                },
-                                TextColor(ThemeColors::TEXT),
-                            ));
+                                })
+                                .with_children(|group| {
+                                    for rate in [15u16, 30, 60] {
+                                        let active = settings.refresh_rate == rate;
+                                        group
+                                            .spawn((
+                                                RefreshRateOption(rate),
+                                                Node {
+                                                    width: Val::Px(72.0),
+                                                    height: Val::Px(38.0),
+                                                    justify_content: JustifyContent::Center,
+                                                    align_items: AlignItems::Center,
+                                                    border: UiRect::all(Val::Px(1.5)),
+                                                    border_radius: BorderRadius::all(Val::Px(6.0)),
+                                                    ..default()
+                                                },
+                                                BackgroundColor(if active {
+                                                    ThemeColors::BUTTON_PRESSED
+                                                } else {
+                                                    ThemeColors::BUTTON
+                                                }),
+                                                BorderColor::all(ThemeColors::CYAN_OUTLINE),
+                                            ))
+                                            .observe(on_select_refresh_rate)
+                                            .with_children(|btn| {
+                                                btn.spawn((
+                                                    Text::new(format!("{}/s", rate)),
+                                                    TextFont {
+                                                        font: FontSource::Handle(font.clone()),
+                                                        font_size: FontSize::Px(15.0),
+                                                        ..default()
+                                                    },
+                                                    TextColor(ThemeColors::TEXT),
+                                                ));
+                                            });
+                                    }
+                                });
                         });
-                });
 
-                // Row 5: Fullscreen toggle
-                spawn_setting_row(content, "Fullscreen", font.clone(), |right| {
-                    right
-                        .spawn((
-                            FullscreenToggleButton,
-                            Node {
-                                width: Val::Px(110.0),
-                                height: Val::Px(40.0),
-                                justify_content: JustifyContent::Center,
-                                align_items: AlignItems::Center,
-                                border: UiRect::all(Val::Px(1.5)),
-                                border_radius: BorderRadius::all(Val::Px(6.0)),
-                                ..default()
-                            },
-                            BackgroundColor(toggle_color(settings.fullscreen)),
-                            BorderColor::all(ThemeColors::CYAN_OUTLINE),
-                        ))
-                        .observe(on_toggle_fullscreen)
-                        .with_children(|btn| {
-                            btn.spawn((
-                                FullscreenToggleText,
-                                Text::new(if settings.fullscreen { "ON" } else { "OFF" }),
-                                TextFont {
-                                    font: FontSource::Handle(font.clone()),
-                                    font_size: FontSize::Px(16.0),
+                        // Row 3: Compression quality (50..=90 in steps of 5)
+                        spawn_setting_row(content, "Compression quality", font.clone(), |right| {
+                            right
+                                .spawn(Node {
+                                    flex_direction: FlexDirection::Row,
+                                    column_gap: Val::Px(10.0),
+                                    align_items: AlignItems::Center,
                                     ..default()
-                                },
-                                TextColor(ThemeColors::TEXT),
-                            ));
-                        });
-                });
-
-                // Section: Screen layout
-                content.spawn((
-                    Text::new("Screen layout"),
-                    TextFont {
-                        font: FontSource::Handle(font.clone()),
-                        font_size: FontSize::Px(24.0),
-                        ..default()
-                    },
-                    TextColor(ThemeColors::TEXT),
-                ));
-
-                content
-                    .spawn(Node {
-                        width: Val::Percent(100.0),
-                        flex_direction: FlexDirection::Row,
-                        flex_wrap: FlexWrap::Wrap,
-                        column_gap: Val::Px(10.0),
-                        row_gap: Val::Px(8.0),
-                        ..default()
-                    })
-                    .with_children(|choices| {
-                        for layout in registry.all() {
-                            let active = settings.layout == layout.id;
-                            choices
-                                .spawn((
-                                    LayoutOptionButton(layout.id.clone()),
-                                    Node {
-                                        padding: UiRect::axes(Val::Px(14.0), Val::Px(10.0)),
-                                        border: UiRect::all(Val::Px(1.5)),
-                                        border_radius: BorderRadius::all(Val::Px(6.0)),
-                                        ..default()
-                                    },
-                                    BackgroundColor(if active {
-                                        ThemeColors::BUTTON_PRESSED
-                                    } else {
-                                        ThemeColors::BUTTON
-                                    }),
-                                    BorderColor::all(ThemeColors::CYAN_OUTLINE),
-                                ))
-                                .observe(on_select_layout)
-                                .with_children(|btn| {
-                                    btn.spawn((
-                                        Text::new(layout.name.clone()),
+                                })
+                                .with_children(|group| {
+                                    spawn_step_button(group, "-", -5, font.clone());
+                                    group.spawn((
+                                        QualityValueText,
+                                        Text::new(format!("{}", settings.quality)),
                                         TextFont {
                                             font: FontSource::Handle(font.clone()),
                                             font_size: FontSize::Px(16.0),
@@ -409,57 +490,184 @@ fn spawn_settings_screen(
                                         },
                                         TextColor(ThemeColors::TEXT),
                                     ));
+                                    spawn_step_button(group, "+", 5, font.clone());
                                 });
-                        }
+                        });
+
+                        // Row 4: Vibration toggle
+                        spawn_setting_row(content, "Vibration", font.clone(), |right| {
+                            right
+                                .spawn((
+                                    VibrateToggleButton,
+                                    Node {
+                                        width: Val::Px(100.0),
+                                        height: Val::Px(38.0),
+                                        justify_content: JustifyContent::Center,
+                                        align_items: AlignItems::Center,
+                                        border: UiRect::all(Val::Px(1.5)),
+                                        border_radius: BorderRadius::all(Val::Px(6.0)),
+                                        ..default()
+                                    },
+                                    BackgroundColor(toggle_color(settings.vibrate)),
+                                    BorderColor::all(ThemeColors::CYAN_OUTLINE),
+                                ))
+                                .observe(on_toggle_vibrate)
+                                .with_children(|btn| {
+                                    btn.spawn((
+                                        VibrateToggleText,
+                                        Text::new(if settings.vibrate { "ON" } else { "OFF" }),
+                                        TextFont {
+                                            font: FontSource::Handle(font.clone()),
+                                            font_size: FontSize::Px(15.0),
+                                            ..default()
+                                        },
+                                        TextColor(ThemeColors::TEXT),
+                                    ));
+                                });
+                        });
+
+                        // Row 5: Fullscreen toggle
+                        spawn_setting_row(content, "Fullscreen", font.clone(), |right| {
+                            right
+                                .spawn((
+                                    FullscreenToggleButton,
+                                    Node {
+                                        width: Val::Px(100.0),
+                                        height: Val::Px(38.0),
+                                        justify_content: JustifyContent::Center,
+                                        align_items: AlignItems::Center,
+                                        border: UiRect::all(Val::Px(1.5)),
+                                        border_radius: BorderRadius::all(Val::Px(6.0)),
+                                        ..default()
+                                    },
+                                    BackgroundColor(toggle_color(settings.fullscreen)),
+                                    BorderColor::all(ThemeColors::CYAN_OUTLINE),
+                                ))
+                                .observe(on_toggle_fullscreen)
+                                .with_children(|btn| {
+                                    btn.spawn((
+                                        FullscreenToggleText,
+                                        Text::new(if settings.fullscreen { "ON" } else { "OFF" }),
+                                        TextFont {
+                                            font: FontSource::Handle(font.clone()),
+                                            font_size: FontSize::Px(15.0),
+                                            ..default()
+                                        },
+                                        TextColor(ThemeColors::TEXT),
+                                    ));
+                                });
+                        });
                     });
 
-                let current_desc = registry
-                    .find_or_default(&settings.layout)
-                    .description
-                    .clone();
-                content.spawn((
-                    LayoutDescriptionText,
-                    Text::new(current_desc),
-                    TextFont {
-                        font: FontSource::Handle(font.clone()),
-                        font_size: FontSize::Px(15.0),
-                        ..default()
-                    },
-                    TextColor(ThemeColors::MUTED_TEXT),
-                ));
-            });
-
-            // Footer with Close button
-            root.spawn(Node {
-                width: Val::Percent(100.0),
-                height: Val::Px(48.0),
-                justify_content: JustifyContent::FlexEnd,
-                align_items: AlignItems::Center,
-                ..default()
-            })
-            .with_children(|footer| {
-                footer
+                // Right / bottom column: screen layout selection
+                columns
                     .spawn((
+                        SettingsRightColumn,
                         Node {
-                            width: Val::Px(44.0),
-                            height: Val::Px(44.0),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
+                            width: Val::Percent(100.0),
+                            min_width: Val::Px(0.0),
+                            min_height: Val::Px(0.0),
+                            flex_direction: FlexDirection::Column,
+                            row_gap: Val::Px(10.0),
                             ..default()
                         },
-                        BackgroundColor(Color::NONE),
                     ))
-                    .observe(on_close_settings)
-                    .with_children(|btn| {
-                        btn.spawn((
-                            ImageNode::new(close_icon),
-                            Node {
-                                width: Val::Px(34.0),
-                                height: Val::Px(34.0),
+                    .with_children(|layout_col| {
+                        layout_col.spawn((
+                            SettingsSectionHeaderText,
+                            Text::new("Screen layout"),
+                            TextFont {
+                                font: FontSource::Handle(font.clone()),
+                                font_size: FontSize::Px(22.0),
                                 ..default()
                             },
+                            TextColor(ThemeColors::TEXT),
+                        ));
+
+                        layout_col
+                            .spawn(Node {
+                                width: Val::Percent(100.0),
+                                flex_direction: FlexDirection::Row,
+                                flex_wrap: FlexWrap::Wrap,
+                                column_gap: Val::Px(8.0),
+                                row_gap: Val::Px(6.0),
+                                ..default()
+                            })
+                            .with_children(|choices| {
+                                for layout in registry.all() {
+                                    let active = settings.layout == layout.id;
+                                    choices
+                                        .spawn((
+                                            LayoutOptionButton(layout.id.clone()),
+                                            Node {
+                                                padding: UiRect::axes(Val::Px(12.0), Val::Px(8.0)),
+                                                border: UiRect::all(Val::Px(1.5)),
+                                                border_radius: BorderRadius::all(Val::Px(6.0)),
+                                                ..default()
+                                            },
+                                            BackgroundColor(if active {
+                                                ThemeColors::BUTTON_PRESSED
+                                            } else {
+                                                ThemeColors::BUTTON
+                                            }),
+                                            BorderColor::all(ThemeColors::CYAN_OUTLINE),
+                                        ))
+                                        .observe(on_select_layout)
+                                        .with_children(|btn| {
+                                            btn.spawn((
+                                                Text::new(layout.name.clone()),
+                                                TextFont {
+                                                    font: FontSource::Handle(font.clone()),
+                                                    font_size: FontSize::Px(15.0),
+                                                    ..default()
+                                                },
+                                                TextColor(ThemeColors::TEXT),
+                                            ));
+                                        });
+                                }
+                            });
+
+                        let current_desc = registry
+                            .find_or_default(&settings.layout)
+                            .description
+                            .clone();
+                        layout_col.spawn((
+                            LayoutDescriptionText,
+                            Text::new(current_desc),
+                            TextFont {
+                                font: FontSource::Handle(font.clone()),
+                                font_size: FontSize::Px(14.0),
+                                ..default()
+                            },
+                            TextColor(ThemeColors::MUTED_TEXT),
                         ));
                     });
+            });
+
+            // Close button pinned to the lower-right corner, matching CockpitScreenRoot's settings button
+            root.spawn((
+                Node {
+                    position_type: PositionType::Absolute,
+                    right: Val::Px(10.0),
+                    bottom: Val::Px(12.0),
+                    width: Val::Px(44.0),
+                    height: Val::Px(44.0),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },
+                BackgroundColor(Color::NONE),
+            ))
+            .observe(on_close_settings)
+            .with_children(|btn| {
+                btn.spawn((
+                    ImageNode::new(close_icon),
+                    Node {
+                        width: Val::Px(34.0),
+                        height: Val::Px(34.0),
+                        ..default()
+                    },
+                ));
             });
 
             // Hidden-by-default IP Numpad modal overlay
@@ -474,20 +682,26 @@ fn spawn_setting_row(
     build_control: impl FnOnce(&mut ChildSpawnerCommands),
 ) {
     parent
-        .spawn(Node {
-            width: Val::Percent(100.0),
-            flex_direction: FlexDirection::Row,
-            justify_content: JustifyContent::SpaceBetween,
-            align_items: AlignItems::Center,
-            column_gap: Val::Px(12.0),
-            ..default()
-        })
+        .spawn((
+            SettingRow,
+            Node {
+                width: Val::Percent(100.0),
+                min_width: Val::Px(0.0),
+                flex_direction: FlexDirection::Row,
+                justify_content: JustifyContent::SpaceBetween,
+                align_items: AlignItems::Center,
+                column_gap: Val::Px(10.0),
+                row_gap: Val::Px(4.0),
+                ..default()
+            },
+        ))
         .with_children(|row| {
             row.spawn((
+                SettingLabelText,
                 Text::new(label),
                 TextFont {
                     font: FontSource::Handle(font),
-                    font_size: FontSize::Px(18.0),
+                    font_size: FontSize::Px(16.0),
                     ..default()
                 },
                 TextColor(ThemeColors::TEXT),
@@ -544,6 +758,7 @@ fn spawn_ip_numpad_modal(parent: &mut ChildSpawnerCommands, font: Handle<Font>) 
                 height: Val::Percent(100.0),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
+                overflow: Overflow::clip(),
                 ..default()
             },
             BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.78)),
@@ -552,8 +767,10 @@ fn spawn_ip_numpad_modal(parent: &mut ChildSpawnerCommands, font: Handle<Font>) 
         .with_children(|backdrop| {
             backdrop
                 .spawn((
+                    IpNumpadDialog,
                     Node {
                         width: Val::Px(340.0),
+                        max_height: Val::Percent(94.0),
                         padding: UiRect::all(Val::Px(18.0)),
                         flex_direction: FlexDirection::Column,
                         row_gap: Val::Px(12.0),
@@ -566,6 +783,7 @@ fn spawn_ip_numpad_modal(parent: &mut ChildSpawnerCommands, font: Handle<Font>) 
                 ))
                 .with_children(|dialog| {
                     dialog.spawn((
+                        IpNumpadTitleText,
                         Text::new("Server IP Address"),
                         TextFont {
                             font: FontSource::Handle(font.clone()),
@@ -578,6 +796,7 @@ fn spawn_ip_numpad_modal(parent: &mut ChildSpawnerCommands, font: Handle<Font>) 
                     // Preview box
                     dialog
                         .spawn((
+                            IpNumpadPreviewBox,
                             Node {
                                 width: Val::Percent(100.0),
                                 height: Val::Px(46.0),
@@ -800,6 +1019,214 @@ fn on_close_settings(
         next_state.set(AppState::Connecting);
     } else {
         next_state.set(AppState::Cockpit);
+    }
+}
+
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+fn apply_responsive_settings_layout(
+    windows: Query<&Window, With<PrimaryWindow>>,
+    mut screen_state: ResMut<SettingsScreenState>,
+    mut node_sets: ParamSet<(
+        ParamSet<(
+            Query<&mut Node, With<SettingsScreenRoot>>,
+            Query<&mut Node, With<SettingsColumnsContainer>>,
+            Query<&mut Node, With<SettingsLeftColumn>>,
+            Query<&mut Node, With<SettingsRightColumn>>,
+            Query<&mut Node, With<SettingRow>>,
+            Query<&mut Node, With<IpButton>>,
+            Query<&mut Node, With<RefreshRateOption>>,
+            Query<&mut Node, With<QualityStepButton>>,
+        )>,
+        ParamSet<(
+            Query<&mut Node, Or<(With<VibrateToggleButton>, With<FullscreenToggleButton>)>>,
+            Query<&mut Node, With<LayoutOptionButton>>,
+            Query<&mut Node, With<IpNumpadDialog>>,
+            Query<&mut Node, With<IpNumpadPreviewBox>>,
+            Query<&mut Node, With<NumpadKey>>,
+        )>,
+    )>,
+    mut fonts: ParamSet<(
+        Query<&mut TextFont, With<SettingsHeaderText>>,
+        Query<&mut TextFont, With<SettingsSectionHeaderText>>,
+        Query<&mut TextFont, With<SettingLabelText>>,
+        Query<&mut TextFont, With<LayoutDescriptionText>>,
+        Query<
+            &mut TextFont,
+            Or<(
+                With<IpDisplayText>,
+                With<QualityValueText>,
+                With<VibrateToggleText>,
+                With<FullscreenToggleText>,
+            )>,
+        >,
+        Query<&mut TextFont, Or<(With<IpNumpadTitleText>, With<IpNumpadPreviewText>)>>,
+        Query<&mut TextFont>,
+    )>,
+    children_query: Query<&Children>,
+    button_parents: Query<
+        Entity,
+        Or<(
+            With<RefreshRateOption>,
+            With<QualityStepButton>,
+            With<LayoutOptionButton>,
+            With<NumpadKey>,
+        )>,
+    >,
+    numpad_keys: Query<Entity, With<NumpadKey>>,
+) {
+    let Ok(window) = windows.single() else {
+        return;
+    };
+    let viewport = Vec2::new(window.width(), window.height());
+    if viewport.x <= 0.0 || viewport.y <= 0.0 || viewport == screen_state.last_viewport {
+        return;
+    }
+    screen_state.last_viewport = viewport;
+
+    let m = compute_settings_layout_metrics(viewport);
+
+    {
+        let mut layout_nodes = node_sets.p0();
+        for mut node in &mut layout_nodes.p0() {
+            node.padding = UiRect::all(Val::Px(m.root_padding));
+            node.row_gap = Val::Px(m.root_gap);
+        }
+
+        for mut node in &mut layout_nodes.p1() {
+            if m.two_column {
+                node.flex_direction = FlexDirection::Row;
+                node.max_width = Val::Percent(100.0);
+                node.align_items = AlignItems::FlexStart;
+            } else {
+                node.flex_direction = FlexDirection::Column;
+                node.max_width = Val::Px(760.0);
+                node.align_items = AlignItems::Stretch;
+            }
+            node.row_gap = Val::Px(m.section_gap);
+            node.column_gap = Val::Px(16.0);
+        }
+
+        for mut node in &mut layout_nodes.p2() {
+            if m.two_column {
+                node.width = Val::Auto;
+                node.flex_grow = 1.0;
+                node.flex_basis = Val::Px(0.0);
+            } else {
+                node.width = Val::Percent(100.0);
+                node.flex_grow = 0.0;
+                node.flex_basis = Val::Auto;
+            }
+            node.row_gap = Val::Px(m.section_gap);
+        }
+
+        for mut node in &mut layout_nodes.p3() {
+            if m.two_column {
+                node.width = Val::Auto;
+                node.flex_grow = 1.0;
+                node.flex_basis = Val::Px(0.0);
+            } else {
+                node.width = Val::Percent(100.0);
+                node.flex_grow = 0.0;
+                node.flex_basis = Val::Auto;
+            }
+            node.row_gap = Val::Px(m.section_gap);
+        }
+
+        for mut node in &mut layout_nodes.p4() {
+            if m.stack_rows {
+                node.flex_direction = FlexDirection::Column;
+                node.justify_content = JustifyContent::FlexStart;
+                node.align_items = AlignItems::FlexStart;
+            } else {
+                node.flex_direction = FlexDirection::Row;
+                node.justify_content = JustifyContent::SpaceBetween;
+                node.align_items = AlignItems::Center;
+            }
+            node.row_gap = Val::Px(m.row_gap);
+        }
+
+        for mut node in &mut layout_nodes.p5() {
+            node.min_width = Val::Px(m.ip_min_width);
+            node.height = Val::Px(m.control_height);
+        }
+
+        for mut node in &mut layout_nodes.p6() {
+            node.width = Val::Px(m.rate_btn_width);
+            node.height = Val::Px(m.control_height);
+        }
+
+        for mut node in &mut layout_nodes.p7() {
+            node.width = Val::Px(m.step_btn_width);
+            node.height = Val::Px(m.control_height);
+        }
+    }
+
+    {
+        let mut extra_nodes = node_sets.p1();
+        for mut node in &mut extra_nodes.p0() {
+            node.width = Val::Px(m.toggle_btn_width);
+            node.height = Val::Px(m.control_height);
+        }
+
+        for mut node in &mut extra_nodes.p1() {
+            node.padding = UiRect::axes(Val::Px(m.layout_pad_x), Val::Px(m.layout_pad_y));
+        }
+
+        for mut node in &mut extra_nodes.p2() {
+            node.width = Val::Px(m.numpad_dialog_width);
+            node.padding = UiRect::all(Val::Px(m.numpad_padding));
+            node.row_gap = Val::Px(m.numpad_gap);
+        }
+
+        for mut node in &mut extra_nodes.p3() {
+            node.height = Val::Px(m.numpad_preview_height);
+        }
+
+        for mut node in &mut extra_nodes.p4() {
+            node.height = Val::Px(m.numpad_key_height);
+        }
+    }
+
+    for mut tf in &mut fonts.p0() {
+        tf.font_size = FontSize::Px(m.header_font);
+    }
+    for mut tf in &mut fonts.p1() {
+        tf.font_size = FontSize::Px(m.section_font);
+    }
+    for mut tf in &mut fonts.p2() {
+        tf.font_size = FontSize::Px(m.label_font);
+    }
+    for mut tf in &mut fonts.p3() {
+        tf.font_size = FontSize::Px(m.desc_font);
+    }
+    for mut tf in &mut fonts.p4() {
+        tf.font_size = FontSize::Px(m.control_font);
+    }
+    for mut tf in &mut fonts.p5() {
+        tf.font_size = FontSize::Px(m.numpad_font + 2.0);
+    }
+
+    let button_font_updates: Vec<(Entity, f32)> = button_parents
+        .iter()
+        .flat_map(|entity| {
+            let size = if numpad_keys.contains(entity) {
+                m.numpad_font
+            } else {
+                m.control_font
+            };
+            children_query
+                .get(entity)
+                .into_iter()
+                .flat_map(|children| children.iter())
+                .map(move |child| (child, size))
+        })
+        .collect();
+
+    let mut all_fonts = fonts.p6();
+    for (child, size) in button_font_updates {
+        if let Ok(mut tf) = all_fonts.get_mut(child) {
+            tf.font_size = FontSize::Px(size);
+        }
     }
 }
 
@@ -1029,5 +1456,52 @@ mod tests {
 
         buf.backspace();
         assert!(buf.error.is_none());
+    }
+
+    #[test]
+    fn responsive_metrics_use_two_columns_on_landscape_phones_and_small_tablets() {
+        let phone_landscape = compute_settings_layout_metrics(Vec2::new(640.0, 360.0));
+        assert!(phone_landscape.two_column);
+        assert!(phone_landscape.stack_rows);
+        assert!(phone_landscape.numpad_key_height * 5.0 < 360.0);
+
+        let small_tablet_landscape = compute_settings_layout_metrics(Vec2::new(800.0, 480.0));
+        assert!(small_tablet_landscape.two_column);
+        assert!(small_tablet_landscape.stack_rows);
+    }
+
+    #[test]
+    fn responsive_metrics_use_single_column_on_portrait_and_desktop() {
+        let phone_portrait = compute_settings_layout_metrics(Vec2::new(360.0, 640.0));
+        assert!(!phone_portrait.two_column);
+        assert!(phone_portrait.stack_rows);
+        assert!(phone_portrait.ip_min_width <= 336.0);
+        assert!(phone_portrait.rate_btn_width * 3.0 + 12.0 <= 336.0);
+
+        let desktop = compute_settings_layout_metrics(Vec2::new(1920.0, 1080.0));
+        assert!(!desktop.two_column);
+        assert!(!desktop.stack_rows);
+    }
+
+    #[test]
+    fn settings_update_systems_run_without_query_conflicts() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins)
+            .add_plugins(bevy::state::app::StatesPlugin)
+            .init_state::<AppState>()
+            .init_resource::<Settings>()
+            .init_resource::<LayoutRegistry>()
+            .init_resource::<SettingsScreenState>()
+            .add_systems(
+                Update,
+                (apply_responsive_settings_layout, sync_settings_ui)
+                    .run_if(in_state(AppState::Settings)),
+            );
+
+        app.world_mut()
+            .resource_mut::<NextState<AppState>>()
+            .set(AppState::Settings);
+        app.update();
+        app.update();
     }
 }
